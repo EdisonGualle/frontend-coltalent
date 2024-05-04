@@ -1,15 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { useTable, useFilters, useGlobalFilter, useSortBy, usePagination } from 'react-table';
 import GlobalFilter from '../../../../../components/Table/GlobalFilter';
 import { Button, PageButton } from '../../../../../assets/Button';
 import { SortIcon, SortUpIcon, SortDownIcon } from '../../../../../assets/Icons';
 import { RiArrowLeftDoubleLine, RiArrowLeftSLine, RiArrowRightSLine, RiArrowRightDoubleLine } from "react-icons/ri";
-import { EmployeeColumns } from './EmployeColumns';
-import { getEmployees } from '../../../../../services/Employee/EmployeeService';
+import { UserColumns } from './UserColumns';
+import OptionsColumn from './OptionsColumn';
+import { UserDataContext } from '../../Context/UserDataContext';
 
-function EmployeeTable({ }) {
+function UserTable({ }) {
+  const { users, setUsers, updateUsers } = useContext(UserDataContext);
+    const [tableState, setTableState] = useState({ // Estado para controlar la página y el tamaño de la tabla
+    pageIndex: 0,
+    pageSize: 5,
+  });
 
-  const data = React.useMemo(() => getEmployees(), []);
+  const memoizedUsers = useMemo(() => users, [users]);
 
   const {
     getTableProps,
@@ -30,15 +36,19 @@ function EmployeeTable({ }) {
     setGlobalFilter,
   } = useTable(
     {
-      columns: EmployeeColumns,
-      data: data,
-      initialState: { pageIndex: 0, pageSize: 5 },
+      columns: UserColumns,
+      data: memoizedUsers,
+      initialState: tableState,
     },
     useFilters,
     useGlobalFilter,
     useSortBy,
-    usePagination,
+    usePagination
   );
+
+  useEffect(() => {
+    setTableState(state);
+  }, [state]);
 
   return (
     <>
@@ -48,15 +58,15 @@ function EmployeeTable({ }) {
           globalFilter={state.globalFilter}
           setGlobalFilter={setGlobalFilter}
         />
-      {headerGroups.map((headerGroup) =>
-  headerGroup.headers.map((column) =>
-    column.Filter ? (
-      <div className="mt-2 sm:mt-0" key={column.id}>
-        {column.render("Filter")}
-      </div>
-    ) : null
-  )
-)}
+        {headerGroups.map((headerGroup) =>
+          headerGroup.headers.map((column) =>
+            column.Filter ? (
+              <div className="mt-2 sm:mt-0" key={column.id}>
+                {column.render("Filter")}
+              </div>
+            ) : null
+          )
+        )}
       </div>
       {/* table */}
       <div className=" h-[54vh] mt-4 flex flex-col overflow-y-scroll">
@@ -87,6 +97,12 @@ function EmployeeTable({ }) {
                           </div>
                         </th>
                       ))}
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Opciones
+                      </th>
                     </tr>
                   ))}
                 </thead>
@@ -109,6 +125,9 @@ function EmployeeTable({ }) {
                             </td>
                           )
                         })}
+                        <td className='px-6 py-3 flex justify-center'>
+                          <OptionsColumn user={row.original} updateUsers={updateUsers} />                        
+                          </td>
                       </tr>
                     )
                   })}
@@ -172,4 +191,4 @@ function EmployeeTable({ }) {
   )
 }
 
-export default EmployeeTable;
+export default UserTable;

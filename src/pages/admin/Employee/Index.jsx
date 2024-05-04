@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { RiGalleryView2, RiUserAddLine, RiListView } from "react-icons/ri";
 import { CardHeader, Typography, Button } from "@material-tailwind/react";
 import EmployeeList from './components/Card/EmployeeList';
-import EmployeeTable from './components/Table/EmployeTable'; // Asegúrate de importar correctamente el componente EmployeeTable
+import EmployeeTable from './components/Table/EmployeTable';
 
 const EmployeeIndex = () => {
   const [showList, setShowList] = useState(true);

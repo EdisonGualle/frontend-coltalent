@@ -50,8 +50,8 @@ const Login = () => {
       await login(formData);
       navigate("/");
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.mensaje) {
-        setErrorMessage(error.response.data.mensaje);
+      if (error.response && error.response.data && error.response.data.msg) {
+        setErrorMessage(error.response.data.msg);
       } else {
         setErrorMessage('Ocurrió un error. Por favor, inténtalo de nuevo más tarde.');
       }

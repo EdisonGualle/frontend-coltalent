@@ -16,10 +16,6 @@ module.exports = {
         },
       },
       colors: {
-        success: 'hsl(var(--success))',
-        warning: 'hsl(var(--warning))',
-        info: 'hsl(var(--info))',
-        danger: 'hsl(var(--danger))',
         primary: "#ecd006",
         secondary: {
           '50': '#ebf7ff',
@@ -33,19 +29,7 @@ module.exports = {
           '800': '#0044d7',
           '900': '#0046ba',
           '950': '#062765',
-        },
-        border: 'hsl(var(--border))',
-        foreground: 'hsl(var(--foreground))',
-        background: {
-          DEFAULT: 'hsl(var(--background))',
-          secondary: 'hsl(var(--background-secondary))',
-          tertiary: 'hsl(var(--background-tertiary))',
-        },
-        muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
-        },
-        verde: '#ffff89',
+        }
       },
       transitionDuration: {
         DEFAULT: '150ms',
@@ -78,6 +62,5 @@ module.exports = {
       },
     },
   },
-  important: true,
   plugins: [require('@headlessui/tailwindcss')],
 };

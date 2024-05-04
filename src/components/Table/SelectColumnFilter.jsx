@@ -6,7 +6,10 @@ export const SelectColumnFilter = ({
   const options = useMemo(() => {
     const options = new Set();
     preFilteredRows.forEach((row) => {
-      options.add(row.values[id]);
+      const value = row.values[id];
+      if (value !== undefined) {
+        options.add(value);
+      }
     });
     return [...options.values()];
   }, [id, preFilteredRows]);

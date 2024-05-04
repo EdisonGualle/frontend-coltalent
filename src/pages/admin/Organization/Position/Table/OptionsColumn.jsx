@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { RiEdit2Line, RiDeleteBin6Line } from 'react-icons/ri';
-import Dialog2 from '../../../../../components/common/Dialog';
+import Dialog2 from '../../../../../components/ui/Dialog2';
 
 const OptionsColumn = ({ positionId }) => {
   const [isOpenEdit, setIsOpenEdit] = useState(false);

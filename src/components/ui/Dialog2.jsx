@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { RiDeleteBin2Fill } from 'react-icons/ri';
 
-const Dialog2= ({
+const Dialog2 = ({
   isOpen,
   setIsOpen,
   title,
@@ -49,25 +49,25 @@ const Dialog2= ({
                 <div className="text-center flex justify-center mb-5">
                   {icon}
                 </div>
-                <Dialog.Title as="h3" className="text-center text-xl font-medium leading-6">
+                <Dialog.Title as="h3" className="text-center text-lg font-medium leading-6">
                   {title}
                 </Dialog.Title>
                 <div className="mt-2">
-                  <p className="text-sm text-muted-foreground text-center">
+                  <p className="text-sm text-center">
                     {description}
                   </p>
                 </div>
                 <div className="mt-5 flex items-center gap-x-2">
                   <button
                     type="button"
-                    className={`p-2 px-1 ${confirmButtonColor} rounded-xl text-white w-full outline-none border border-transparent transform transition-all duration-300 hover:scale-105 hover:ring-offset-background-secondary hover:ring-2`}
+                    className={`p-2 px-1 ${confirmButtonColor} rounded-xl text-white w-full outline-none transform transition-all duration-300 hover:scale-105 `}
                     onClick={onConfirm}
                   >
                     {confirmButtonText}
                   </button>
                   <button
                     type="button"
-                    className={`p-2 rounded-xl bg-transparent border border-dashed ${cancelButtonColor} w-full outline-none transform transition-all duration-300 hover:scale-105 hover:ring-offset-background-secondary hover:ring-2`}
+                    className={`p-2 rounded-xl bg-transparent border border-dashed ${cancelButtonColor} w-full outline-none transform transition-all duration-300 hover:scale-105 `}
                     onClick={onCancel}
                   >
                     {cancelButtonText}

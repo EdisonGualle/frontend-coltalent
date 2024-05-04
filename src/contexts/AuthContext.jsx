@@ -21,7 +21,6 @@ export const AuthProvider = ({ children }) => {
           setLoading(true);
           const response = await AxiosInstance.get('user-auth');
           const userData = response.data.data;
-          console.log(userData);
           setUser(userData);
           setUserRole(userData.role);
           setIsAuthenticated(true);

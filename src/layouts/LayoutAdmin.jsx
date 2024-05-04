@@ -3,9 +3,7 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "../components/common/layout/Sidebar";
 import Header from "../components/common/layout/Header";
 import AppWrapper from "../components/common/layout/AppWrapper";
-import Breadcrumbs from "../components/common/Breadcrumbs";
-
-
+import Breadcrumbs from "../components/common/layout/Breadcrumbs";
 
 const LayoutAdmin = () => {
   return (

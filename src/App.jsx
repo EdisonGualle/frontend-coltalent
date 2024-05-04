@@ -16,6 +16,7 @@ import Unauthorized from "./pages/Unauthorized";
 
 import { AuthProvider } from "./contexts/AuthContext";
 
+
 // Proteccion de rutas
 import PrivateRoute from "./components/common/routing/PrivateRoute";
 import PublicRoute from "./components/common/routing/PublicRoute";
@@ -24,17 +25,24 @@ import PublicRoute from "./components/common/routing/PublicRoute";
 import EmployeeIndex from "./pages/admin/Employee/Index";
 import Setting from "./pages/Setting/Setting";
 
+// User
+import UserIndex from "./pages/admin/User/Index";
+
+
 // Organization
 import DepartmentIndex from "./pages/admin/Organization/Departament/Index";
 import UnitIndex from "./pages/admin/Organization/Units/Index";
 import PositionIndex from "./pages/admin/Organization/Position/Index";
 import Department from "./components/prueba";
+import { AlertProvider } from "./contexts/AlertContext";
+
 
 
 function App() {
   return (
 
-      <BrowserRouter>
+    <BrowserRouter>
+      <AlertProvider>
         <AuthProvider>
           <Routes>
             {/* Rutas públicas */}
@@ -51,6 +59,9 @@ function App() {
                 <Route path="empleados" element={<EmployeeIndex />} />
                 <Route path="/perfil/configuracion" element={<Setting />} />
 
+                {/* User */}
+                <Route path="/usuarios" element={<UserIndex />} />
+
                 {/* Employee */}
 
 
@@ -63,13 +74,14 @@ function App() {
               </Route>
             </Route>
 
-             {/* Ruta para manejar acceso no autorizado */}
-            <Route path="/unauthorized" element={<Unauthorized />} /> 
+            {/* Ruta para manejar acceso no autorizado */}
+            <Route path="/unauthorized" element={<Unauthorized />} />
             {/* Ruta para manejar cualquier otra URL */}
             <Route path="*" element={<Error404 />} />
           </Routes>
         </AuthProvider>
-      </BrowserRouter>
+      </AlertProvider>
+    </BrowserRouter>
   );
 }
 

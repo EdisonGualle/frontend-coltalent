@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation, Link } from "react-router-dom";
-import { FaHome, FaUserFriends, FaBuilding } from "react-icons/fa";
+import { FaHome } from "react-icons/fa";
 
 const Breadcrumbs = () => {
   const location = useLocation();
@@ -11,7 +11,8 @@ const Breadcrumbs = () => {
     { label: "Departamentos", path: "/departamentos" },
     { label: "Unidades", path: "/unidades" },
     { label: "Perfil", path: "/perfil" },
-    { label: "cargos", path: "/cargos" },
+    { label: "Cargos", path: "/cargos" },
+    { label: "Usuarios", path: "/usuarios" },
     { label: "Configuración", path: "/perfil/configuracion" },
   ];
 
