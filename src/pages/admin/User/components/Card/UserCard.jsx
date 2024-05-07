@@ -3,7 +3,9 @@ import { Card, CardBody, Avatar, Typography } from '@material-tailwind/react';
 import OptionsColumn from '../Table/OptionsColumn';
 
 const UserCard = ({ user, updateUsers }) => {
+  // Desestructuramos las propiedades del usuario
   const { id, name, email, photo = null } = user;
+  // Construimos la URL de la foto del usuario
   const photoUrl = photo ? `${import.meta.env.VITE_STORAGE_URL}/${photo}` : null;
 
   return (
@@ -11,8 +13,10 @@ const UserCard = ({ user, updateUsers }) => {
       <CardBody className="flex flex-col items-center gap-2 p-4 relative">
         <div className="relative">
           {photoUrl ? (
+            // Si el usuario tiene una foto, la mostramos
             <Avatar src={photoUrl} className="w-20 h-20 rounded-full border-2 border-blue-500 shadow-lg" />
           ) : (
+            // Si no tiene foto, mostramos las iniciales del nombre
             <div className="w-20 h-20 rounded-full border-2 border-blue-500 shadow-lg flex items-center justify-center bg-gray-200">
               <Typography variant="h2" className="text-gray-600">
                 {name.charAt(0).toUpperCase()}
@@ -29,7 +33,7 @@ const UserCard = ({ user, updateUsers }) => {
           </Typography>
         </div>
         <div className="absolute top-2 right-2">
-          <OptionsColumn user={user} updateUsers={updateUsers}/>
+          <OptionsColumn user={user} updateUsers={updateUsers} />
         </div>
       </CardBody>
     </Card>

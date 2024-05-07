@@ -12,7 +12,7 @@ export const UserColumns = [
   },
   {
     Header: "Empleado",
-    accessor: 'employee_full_name',
+    accessor: 'employee_name',
   },
   {
     Header: "Estado",

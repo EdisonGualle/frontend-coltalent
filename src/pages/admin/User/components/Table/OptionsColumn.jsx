@@ -1,31 +1,65 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useDispatch } from 'react-redux';
 import { Menu, MenuButton, MenuItem } from '@szhsin/react-menu';
 import { RiMore2Fill, RiEdit2Line, RiUserUnfollowLine, RiDeleteBin6Line } from 'react-icons/ri';
-import { VscActivateBreakpoints } from "react-icons/vsc";
-import { disableUser, enableUser, deleteUser, updateUser } from '../../../../../services/User/UserService';
+import { VscActivateBreakpoints } from 'react-icons/vsc';
 import Dialog2 from '../../../../../components/ui/Dialog2';
 import ModalForm from '../../../../../components/ui/ModalForm';
 import UserForm from '../UserForm';
+import { selectUsers, deleteUserAction, enableUserAction, disableUserAction } from '../../../../../redux/User/userSlice';
+import store from '../../../../../redux/store';
 import { AlertContext } from '../../../../../contexts/AlertContext';
+import { updateUser } from '../../../../../services/User/UserService';
 
+// Componente para la columna de opciones de la tabla de usuarios
+const selectUsersRef = selectUsers;
+
+// Componente para la columna de opciones de la tabla de usuarios
 const OptionsColumn = ({ user, updateUsers }) => {
-  const { showAlert} = useContext(AlertContext);
+ // Hook para despachar acciones
+  const dispatch = useDispatch();
+  // Inicializamos los estados locales
+  const [users, setUsers] = useState([]);
   const [isOpenDialog2, setIsOpenDialog2] = useState(false);
   const [isOpenEditModal, setIsOpenEditModal] = useState(false);
   const [action, setAction] = useState('');
   const [formErrors, setFormErrors] = useState({});
-  
+  // Inicializamos el contexto para mostrar alertas
+  const { showAlert } = useContext(AlertContext);
+
+  // Efecto para limpiar los errores del formulario al cerrar el modal
   useEffect(() => {
-    // Limpia los errores del formulario cuando se cierra el modal de edición
     if (!isOpenEditModal) {
       setFormErrors({});
     }
   }, [isOpenEditModal]);
 
+  // Efecto para mostrar los errores del formulario al abrir el modal
+  useEffect(() => {
+    if (isOpenEditModal && Object.values(formErrors).some(Boolean)) {
+      setIsOpenEditModal(true);
+    }
+  }, [formErrors, isOpenEditModal]);
+
+  useEffect(() => {
+    // Suscribirse al estado global para obtener la lista de usuarios
+    const unsubscribe = store.subscribe(() => {
+      // Obtener la lista de usuarios del estado global
+      const newUsers = selectUsersRef(store.getState());
+      // Actualizar la lista de usuarios
+      setUsers(newUsers);
+    });
+
+    // Retornar la función para cancelar la suscripción
+    return unsubscribe;
+  }, [selectUsersRef]);
+
+  // Funciones para realizar acciones en la tabla
   const actionFunctions = {
     desactivar: async () => {
       try {
-        await disableUser(user.id);
+        dispatch(disableUserAction(user.id));
+        updateUsers(); 
         showAlert('Usuario desactivado correctamente', 'success');
       } catch (error) {
         showAlert('Error al desactivar el usuario', 'error');
@@ -33,7 +67,8 @@ const OptionsColumn = ({ user, updateUsers }) => {
     },
     activar: async () => {
       try {
-        await enableUser(user.id);
+        dispatch(enableUserAction(user.id));
+        updateUsers(); 
         showAlert('Usuario activado correctamente', 'success');
       } catch (error) {
         showAlert('Error al activar el usuario', 'error');
@@ -41,7 +76,8 @@ const OptionsColumn = ({ user, updateUsers }) => {
     },
     eliminar: async () => {
       try {
-        await deleteUser(user.id);
+        dispatch(deleteUserAction(user.id));
+        updateUsers(); 
         showAlert('Usuario eliminado correctamente', 'success');
       } catch (error) {
         showAlert('Error al eliminar el usuario', 'error');
@@ -49,17 +85,19 @@ const OptionsColumn = ({ user, updateUsers }) => {
     },
     editar: async (formData) => {
       try {
+        // Obtener los datos del formulario
         const { name, email, role_id, user_state_id, employee_id } = formData;
-        const updatedUser = { name, email, role_id, user_state_id, employee_id};
+        // Actualizar el usuario
+        const updatedUser = { id: user.id, name, email, role_id, user_state_id, employee_id };
         await updateUser(updatedUser, user.id);
-        updateUsers();
-        setIsOpenEditModal(false);
         showAlert('Usuario actualizado correctamente', 'success');
+        updateUsers(); 
         setFormErrors({});
+        setIsOpenEditModal(false);
       } catch (error) {
-        const { errors } = error.response.data || {};
-
-        // Asigna los errores a formErrors
+        // Mostrar alerta si hay errores
+        const { errors } = error || {};
+        // Obtener los errores del formulario
         const formErrors = {
           name: errors?.name ? errors.name.join(', ') : '',
           email: errors?.email ? errors.email.join(', ') : '',
@@ -67,21 +105,18 @@ const OptionsColumn = ({ user, updateUsers }) => {
           user_state_id: errors?.user_state_id ? errors.user_state_id.join(', ') : '',
           employee_id: errors?.employee_id ? errors.employee_id.join(', ') : '',
         };
-
-        if (formErrors.name || formErrors.email || formErrors.role_id || formErrors.user_state_id || formErrors.employee_id) {
-          // Si hay errores específicos en los campos name o email
+        // Mostrar alerta si hay errores
+        if (Object.values(formErrors).some(error => error !== '')) {
           setFormErrors(formErrors);
-          setIsOpenEditModal(false);
-          handleEditClick(); // Abre el modal de edición con los errores
         } else {
-          // Si no hay errores específicos en los campos name o email
-          showAlert('Error al actualizar el usuario', 'error');
+          showAlert(error.message || 'Error al actualizar el usuario', 'error');
           setIsOpenEditModal(false);
         }
       }
     },
   };
 
+  // Funciones para manejar los eventos de los botones
   const handleEditClick = () => {
     setIsOpenEditModal(true);
   };
@@ -91,12 +126,12 @@ const OptionsColumn = ({ user, updateUsers }) => {
   };
 
   const handleCancelEdit = () => {
+    setFormErrors({});
     setIsOpenEditModal(false);
   };
 
   const handleConfirm = async () => {
     await actionFunctions[action]();
-    updateUsers();
     setIsOpenDialog2(false);
   };
 
@@ -108,6 +143,7 @@ const OptionsColumn = ({ user, updateUsers }) => {
     setIsOpenDialog2(true);
     setAction(actionType);
   };
+
 
   return (
     <>

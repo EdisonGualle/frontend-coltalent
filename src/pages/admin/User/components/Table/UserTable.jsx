@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useMemo, useContext } from 'react';
+// En UserTable.jsx
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { useTable, useFilters, useGlobalFilter, useSortBy, usePagination } from 'react-table';
 import GlobalFilter from '../../../../../components/Table/GlobalFilter';
 import { Button, PageButton } from '../../../../../assets/Button';
@@ -6,17 +8,30 @@ import { SortIcon, SortUpIcon, SortDownIcon } from '../../../../../assets/Icons'
 import { RiArrowLeftDoubleLine, RiArrowLeftSLine, RiArrowRightSLine, RiArrowRightDoubleLine } from "react-icons/ri";
 import { UserColumns } from './UserColumns';
 import OptionsColumn from './OptionsColumn';
-import { UserDataContext } from '../../Context/UserDataContext';
+import { fetchUsers, selectUsers } from '../../../../../redux/User/userSlice';
 
+// Componente para la tabla de usuarios
 function UserTable({ }) {
-  const { users, setUsers, updateUsers } = useContext(UserDataContext);
-    const [tableState, setTableState] = useState({ // Estado para controlar la página y el tamaño de la tabla
-    pageIndex: 0,
-    pageSize: 5,
+  // Usamos los hooks de Redux para despachar acciones y obtener el estado global
+  const dispatch = useDispatch();
+  // Obtener la lista de usuarios del estado global
+  const users = useSelector(selectUsers);
+
+ // Estado local para manejar el estado de la tabla
+  const [tableState, setTableState] = useState({
+    pageIndex: 0, // Página actual
+    pageSize: 5,  // Cantidad de elementos por página
   });
 
+  // Función para actualizar la lista de usuarios
   const memoizedUsers = useMemo(() => users, [users]);
 
+  // Función para obtener la lista de usuarios
+  const memoizedFetchUsers = useCallback(() => {
+    dispatch(fetchUsers()); // Despachar la acción para cargar los usuarios
+  }, [dispatch]);
+
+  // Configuración de la tabla
   const {
     getTableProps,
     getTableBodyProps,
@@ -36,9 +51,9 @@ function UserTable({ }) {
     setGlobalFilter,
   } = useTable(
     {
-      columns: UserColumns,
-      data: memoizedUsers,
-      initialState: tableState,
+      columns: UserColumns,    // Columnas de la tabla
+      data: memoizedUsers,     // Datos de la tabla
+      initialState: tableState,// Estado inicial de la tabla
     },
     useFilters,
     useGlobalFilter,
@@ -46,12 +61,25 @@ function UserTable({ }) {
     usePagination
   );
 
+  // Efecto para cargar la lista de usuarios
+  useEffect(() => {
+    memoizedFetchUsers();
+  }, [memoizedFetchUsers]);
+
+  // Efecto para actualizar el estado de la tabla
   useEffect(() => {
     setTableState(state);
   }, [state]);
 
+  // Función para actualizar la lista de usuarios
+  const updateUsers = useCallback(() => {
+    memoizedFetchUsers();
+  }, [memoizedFetchUsers]);
+  
+  // Renderizar la tabla
   return (
     <>
+      {/* Filtros */}
       <div className="sm:flex sm:gap-x-2">
         <GlobalFilter
           preGlobalFilteredRows={preGlobalFilteredRows}
@@ -73,6 +101,7 @@ function UserTable({ }) {
         <div className="-my-2 overflow-x-auto -mx-4 sm:-mx-6 lg:-mx-8">
           <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
             <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+              
               <table {...getTableProps()} className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-200">
                   {headerGroups.map(headerGroup => (
@@ -125,6 +154,7 @@ function UserTable({ }) {
                             </td>
                           )
                         })}
+                        {/* Columna de opciones */}
                         <td className='px-6 py-3 flex justify-center'>
                           <OptionsColumn user={row.original} updateUsers={updateUsers} />                        
                           </td>
@@ -157,6 +187,7 @@ function UserTable({ }) {
                   setPageSize(Number(e.target.value))
                 }}
               >
+                {/* Tamaño de paginacion */}
                 {[5, 6].map(pageSize => (
                   <option key={pageSize} value={pageSize} className='text-sm'>
                     Show {pageSize}

@@ -35,15 +35,19 @@ import UnitIndex from "./pages/admin/Organization/Units/Index";
 import PositionIndex from "./pages/admin/Organization/Position/Index";
 import Department from "./components/prueba";
 import { AlertProvider } from "./contexts/AlertContext";
+import { Provider } from "react-redux";
+import store from "./redux/store";
+
+
 
 
 
 function App() {
   return (
-
+    <Provider store={store}>
     <BrowserRouter>
-      <AlertProvider>
         <AuthProvider>
+          <AlertProvider>
           <Routes>
             {/* Rutas públicas */}
             <Route element={<PublicRoute />}>
@@ -79,9 +83,10 @@ function App() {
             {/* Ruta para manejar cualquier otra URL */}
             <Route path="*" element={<Error404 />} />
           </Routes>
+          </AlertProvider>
         </AuthProvider>
-      </AlertProvider>
     </BrowserRouter>
+    </Provider>
   );
 }
 

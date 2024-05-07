@@ -1,56 +1,73 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Input from '../../../../components/ui/Input';
 import { RiUserLine, RiMailLine } from 'react-icons/ri';
 import { validateUsername, validateEmail } from '../../../../Utils/validationsV2.js';
 import CustomSelect from '../../../../components/ui/Select.jsx';
-import { UserDataContext } from '../Context/UserDataContext.jsx';
+import { fetchRoles } from '../../../../redux/User/rolSlice.js';
+import { fetchUserStates } from '../../../../redux/User/userStateSlice.js';
+import { fetchEmployees } from '../../../../redux/Employee/employeSlice.js';
 
-
+// Componente para el formulario de creación y edición de usuarios
 const UserForm = ({
-  user,
-  isEditing,
-  onSubmit,
-  onCancel,
-  confirmButtonText = isEditing ? 'Guardar cambios' : 'Crear usuario', 
-  cancelButtonText = 'Cancelar',
-  confirmButtonColor = 'bg-blue-500',
-  cancelButtonColor = 'border-gray-400',
-  formErrors = {}
+  user,               // Usuario a editar
+  isEditing,          // Indica si se está editando un usuario
+  onSubmit,           // Función para enviar el formulario
+  onCancel,           // Función para cancelar la edición
+  confirmButtonText = isEditing ? 'Guardar cambios' : 'Crear usuario',  // Texto del botón de confirmación
+  cancelButtonText = 'Cancelar',         // Texto del botón de cancelación
+  confirmButtonColor = 'bg-blue-500',    // Color del botón de confirmación
+  cancelButtonColor = 'border-gray-400', // Color del botón de cancelación
+  formErrors = {}      // Errores del formulario
 }) => {
-  const {roles, userStates, employees } = useContext(UserDataContext);
-  const [errors, setErrors] = useState({ name: '', email: '', role: '', role_id: '', state:'',  state_id: '', employee:'', employee_id: ''});
+  // Hooks de Redux para despachar acciones 
+  const dispatch = useDispatch();
+  // Obtener los roles, estados de usuario y empleados del estado global
+  const rolesState = useSelector((state) => state.role);
+  const roles = rolesState ? rolesState.roles : [];
+  const userStatesState = useSelector((state) => state.userState);
+  const userStates = userStatesState ? userStatesState.userStates : [];
+  const employeesState = useSelector((state) => state.employee);
+  const employees = employeesState ? employeesState.employees : [];
+
+  // Estados locales para manejar los errores y los datos del formulario
+  const [errors, setErrors] = useState({ name: '', email: '', role: '', role_id: '', state: '', state_id: '', employee: '', employee_id: '' });
   const [formData, setFormData] = useState({ name: '', email: '' });
   const [selectedRole, setSelectedRole] = useState(null);
   const [selectedUserState, setSelectedUserState] = useState(null);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
+
+  // Efecto para actualizar los errores del formulario
   useEffect(() => {
+    setErrors(formErrors);
+  }, [formErrors]);
+
+  // Efecto para cargar los roles, estados de usuario y empleados
+  useEffect(() => {
+    // Despachar las acciones para cargar los roles, estados de usuario y empleados
+    dispatch(fetchRoles());
+    dispatch(fetchUserStates());
+    dispatch(fetchEmployees());
+  }, [dispatch]);
+
+  // Efecto para cargar los datos del usuario a editar
+  useEffect(() => {
+    // Buscar el rol, estado de usuario y empleado del usuario a editar
+    const userRole = roles.find(role => role.id === user?.role?.id);
+    const userState = userStates.find(state => state.id === user?.user_state?.id);
+    const userEmployee = employees.find(employee => employee.id === user?.employee_id);
+
+    // Actualizar los datos del formulario con los datos del usuario a editar
     if (isEditing && user && roles.length > 0 && userStates.length > 0 && employees.length > 0) {
       setFormData({ name: user.name, email: user.email });
-
-      // Buscar el rol del usuario en el arreglo roles
-      const userRole = roles.find(role => role.id === user.role.id);
-
-      // Asignar el rol del usuario a selectedRole con la estructura correcta
       setSelectedRole(userRole ? { value: userRole, label: userRole.name } : null);
-
-      // Buscar el estado del usuario en el arreglo userStates
-      const userState = userStates.find(state => state.id === user.user_state.id);
-
-      // Asignar el estado del usuario a selectedUserState con la estructura correcta
       setSelectedUserState(userState ? { value: userState, label: userState.name } : null);
-
-      // Buscar el empleado del usuario en el arreglo employees
-      const userEmployee = employees.find(employee => employee.id === user.employee_id);
-
-      // Asignar el empleado del usuario a selectedEmployee con la estructura correcta
       setSelectedEmployee(userEmployee ? { value: userEmployee, label: userEmployee.full_name } : null);
     }
   }, [isEditing, user, roles, userStates, employees]);
 
-
-
-
+  // Función para manejar el cambio de los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     let error = '';
@@ -79,45 +96,50 @@ const UserForm = ({
     setFormData({ ...formData, [name]: value });
   };
 
+  // Función para manejar el cambio del campo de rol
   const handleRoleChange = (option) => {
-
     setSelectedRole(option);
     setErrors((prevErrors) => ({
       ...prevErrors,
-      role: option ? '' : 'Por favor, selecciona un rol.', // Mensaje de error personalizado
+      role: option ? '' : 'Por favor, selecciona un rol.',
     }));
   };
 
+  // Función para manejar el cambio del campo de estado de usuario
   const handleUserStateChange = (option) => {
     setSelectedUserState(option);
     setErrors((prevErrors) => ({
       ...prevErrors,
-      state: option ? '' : 'Por favor, selecciona un estado.', // Mensaje de error personalizado
+      state: option ? '' : 'Por favor, selecciona un estado.',
     }));
   };
 
+  // Función para manejar el cambio del campo de empleado
   const handleEmployeeChange = (option) => {
     setSelectedEmployee(option);
     setErrors((prevErrors) => ({
       ...prevErrors,
-      employee_id: option ? '' : 'Por favor, selecciona un empleado.',  
-    })); 
+      employee_id: option ? '' : 'Por favor, selecciona un empleado.',
+    }));
   };
 
+  // Función para enviar el formulario
   const handleSubmit = (e) => {
+    // Evitar que el formulario recargue la página
     e.preventDefault();
+    // Validar si hay errores en los campos
     const hasErrors = Object.values(errors).some((error) => error !== '');
-  
+    // Validar si hay errores en los campos de rol, estado de usuario y empleado
     if (!hasErrors) {
       const roleId = selectedRole ? selectedRole.value.id : null;
       const userStateId = selectedUserState ? selectedUserState.value.id : null;
       const employeeId = selectedEmployee ? selectedEmployee.value.id : null;
       const updatedFormData = { ...formData, role_id: roleId, user_state_id: userStateId, employee_id: employeeId };
-  
+
       // Validar campos requeridos
       const { name, email, employee_id } = updatedFormData;
       const isCreating = !isEditing; // Determinar si se está creando un nuevo usuario
-  
+
       if (isCreating) {
         // Validaciones para crear un nuevo usuario
         if (!name) {
@@ -130,7 +152,7 @@ const UserForm = ({
           setErrors((prevErrors) => ({ ...prevErrors, employee_id: 'El empleado es requerido' }));
         }
       }
-  
+
       // Enviar el formulario si no hay errores en los campos requeridos
       if ((isCreating && name && email && employee_id) || (!isCreating)) {
         onSubmit(updatedFormData);
@@ -140,11 +162,8 @@ const UserForm = ({
 
   return (
     <form onSubmit={handleSubmit}>
-      {formErrors.name && <span className="text-red-500">{formErrors.name}<br /></span>}
-      {formErrors.email && <span className="text-red-500">{formErrors.email}<br /></span>}
       {formErrors.role_id && <span className="text-red-500">{formErrors.role_id}<br /></span>}
       {formErrors.user_state_id && <span className="text-red-500">{formErrors.user_state_id}<br /></span>}
-      {formErrors.employee_id && <span className="text-red-500">{formErrors.employee_id}<br /></span>}
       <div className='mt-2'>
         <Input
           label="Nombre de usuario"

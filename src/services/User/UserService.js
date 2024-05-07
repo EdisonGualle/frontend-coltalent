@@ -28,8 +28,7 @@ const updateUser = async (updatedUser, userId) => {
     const response = await AxiosInstance.put(`/users/${userId}`, updatedUser);
     return response.data;
   } catch (error) {
-    console.error('Error al actualizar el usuario:', error);
-    throw error;
+    throw error.response.data;
   }
 };
 
