@@ -53,19 +53,28 @@ const UserForm = ({
 
   // Efecto para cargar los datos del usuario a editar
   useEffect(() => {
-    // Buscar el rol, estado de usuario y empleado del usuario a editar
     const userRole = roles.find(role => role.id === user?.role?.id);
     const userState = userStates.find(state => state.id === user?.user_state?.id);
     const userEmployee = employees.find(employee => employee.id === user?.employee_id);
 
-    // Actualizar los datos del formulario con los datos del usuario a editar
     if (isEditing && user && roles.length > 0 && userStates.length > 0 && employees.length > 0) {
-      setFormData({ name: user.name, email: user.email });
-      setSelectedRole(userRole ? { value: userRole, label: userRole.name } : null);
-      setSelectedUserState(userState ? { value: userState, label: userState.name } : null);
-      setSelectedEmployee(userEmployee ? { value: userEmployee, label: userEmployee.full_name } : null);
+      // Si formData ya tiene valores, no lo actualices
+      if (!formData.name && !formData.email) {
+        setFormData({ name: user.name, email: user.email });
+      }
+
+      // Si los valores seleccionados no tienen valores, actualízalos
+      if (!selectedRole) {
+        setSelectedRole(userRole ? { value: userRole, label: userRole.name } : null);
+      }
+      if (!selectedUserState) {
+        setSelectedUserState(userState ? { value: userState, label: userState.name } : null);
+      }
+      if (!selectedEmployee) {
+        setSelectedEmployee(userEmployee ? { value: userEmployee, label: userEmployee.full_name } : null);
+      }
     }
-  }, [isEditing, user, roles, userStates, employees]);
+  }, [isEditing, user, roles, userStates, employees, formData]);
 
   // Función para manejar el cambio de los campos del formulario
   const handleChange = (e) => {
