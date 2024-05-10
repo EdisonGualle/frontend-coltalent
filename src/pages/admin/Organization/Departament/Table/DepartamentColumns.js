@@ -1,5 +1,4 @@
-import OptionsColumn from './OptionsColumn';
-
+import { AvatarCell } from '../../../../../components/Table/AvatarCell';
 
 export const DepartamentColumns = [
   {
@@ -11,7 +10,9 @@ export const DepartamentColumns = [
     accessor: 'function',
   },
   {
-    Header: "Opciones",
-    Cell: OptionsColumn,
+    Header: "Jefe de Dirección",
+    accessor: 'head_employee_name',
+    Cell: AvatarCell,
+    imgAccessor: "head_employee_photo",
   },
 ];

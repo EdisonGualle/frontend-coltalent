@@ -1,11 +1,38 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useTable, useFilters, useGlobalFilter, useSortBy, usePagination } from 'react-table';
 import GlobalFilter from '../../../../../components/Table/GlobalFilter';
 import { Button, PageButton } from '../../../../../assets/Button';
 import { SortIcon, SortUpIcon, SortDownIcon } from '../../../../../assets/Icons';
 import { RiArrowLeftDoubleLine, RiArrowLeftSLine, RiArrowRightSLine, RiArrowRightDoubleLine } from "react-icons/ri";
+import OptionsColumn from '../Table/OptionsColumn';
+import { DepartamentColumns } from './DepartamentColumns';
+import { fetchDepartments } from '../../../../../redux/Organization/DepartamentSlice';
+import Skeleton from '../../../../../components/Table/Skeleton';
 
-function DepartamentTable({ columns, data }) {
+
+function DepartamentTable() {
+  const dispatch = useDispatch();
+  const departments = useSelector(state => state.departament.departments);
+  const status = useSelector(state => state.departament.status);
+  const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        await dispatch(fetchDepartments());
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (departments.length === 0 && !isLoading) {
+      fetchData();
+    }
+  }, [dispatch, departments, isLoading]);
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -25,8 +52,8 @@ function DepartamentTable({ columns, data }) {
     setGlobalFilter,
   } = useTable(
     {
-      columns,
-      data,
+      columns: DepartamentColumns,
+      data: departments,
       initialState: { pageIndex: 0, pageSize: 5 },
     },
     useFilters,
@@ -34,6 +61,14 @@ function DepartamentTable({ columns, data }) {
     useSortBy,
     usePagination,
   );
+
+  const fetchDepartmentsAction = () => {
+    dispatch(fetchDepartments());
+  };
+
+  if (isLoading) {
+    return <Skeleton />;
+  }
 
   return (
     <>
@@ -82,6 +117,12 @@ function DepartamentTable({ columns, data }) {
                           </div>
                         </th>
                       ))}
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-center"
+                      >
+                        Opciones
+                      </th>
                     </tr>
                   ))}
                 </thead>
@@ -104,6 +145,10 @@ function DepartamentTable({ columns, data }) {
                             </td>
                           )
                         })}
+                        {/* Columna de opciones */}
+                        <td className='px-6 py-3 flex justify-center'>
+                          <OptionsColumn departament={row.original} fetchDepartments={fetchDepartmentsAction} />
+                        </td>
                       </tr>
                     )
                   })}

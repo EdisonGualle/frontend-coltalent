@@ -1,25 +1,62 @@
-import React, { useState, useEffect } from 'react';
-import { DepartamentColumns } from './Table/DepartamentColumns';
+import React, { useEffect, useState, useContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { RiAddLine } from "react-icons/ri";
+import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { CardHeader, Typography, Button } from "@material-tailwind/react";
 import DepartamentTable from './Table/DepartamentTable';
-import { getDepartments } from '../../../../services/Company/DepartamentService';
+import ModalForm from '../../../../components/ui/ModalForm';
+import { AlertContext } from '../../../../contexts/AlertContext';
+import DepartmentForm from './DepartmentForm';
+import { createNewDepartment, fetchDepartments } from '../../../../redux/Organization/DepartamentSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 const DepartamentIndex = () => {
-  const [departments, setDepartments] = useState([]);
+  const dispatch = useDispatch();
+  // Selector para obtener el estado de los departamentos
+  const {status} = useSelector(state => state.departament);
+  const [isOpen, setIsOpen] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+  const { showAlert } = useContext(AlertContext);
 
+  // Efecto para cargar los departamentos
   useEffect(() => {
-    const fetchDepartments = async () => {
-      try {
-        const data = await getDepartments();
-        setDepartments(data.data);
-      } catch (error) {
-        console.error('Error fetching department:', error);
-      }
-    };
+    // Si el estado es idle, se realiza la petición para obtener los departamentos
+    if (status === 'idle') {
+      dispatch(fetchDepartments());
+    }
+  }, [status, dispatch]);
 
-    fetchDepartments();
-  }, []);
+  // Funciones para manejar la apertura y cierre del modal
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
+
+  // Función para manejar el envío del formulario
+  const handleSubmit = async (departmentData) => {
+    try {
+      // Despachar la acción para crear un nuevo departamento
+      const actionResult = await dispatch(createNewDepartment(departmentData));
+      // Desempaquetar el resultado de la acción
+      unwrapResult(actionResult);
+      handleClose();
+      setFormErrors({});
+      showAlert('Dirección creada correctamente', 'success');
+    } catch (error) {
+      // Manejo de errores
+      const errorObject = JSON.parse(error.message);
+      const { errors = {} } = errorObject || {};
+      const formErrors = {
+        name: errors.name ? errors.name[0] : '',
+        function: errors.function ? errors.function[0] : '',
+        head_employee_id: errors.head_employee_id ? errors.head_employee_id[0] : '',
+      };
+      if (Object.values(formErrors).some(Boolean)) {
+        setFormErrors(formErrors);
+      } else {
+        showAlert('Error al actualizar el departamento', 'error');
+      }
+    }
+  };
+
 
   return (
     <>
@@ -27,21 +64,38 @@ const DepartamentIndex = () => {
         <div className="mb-2 flex items-center justify-between gap-8">
           <div>
             <Typography variant="h5" color="blue-gray" className="font-semibold">
-              Lista de departamentos
+              Lista de Direcciones
             </Typography>
             <Typography color="gray" className="mt-1">
-              Ver informacion sobre todos los departamentos
+              Ver informacion sobre todas las direcciones.
             </Typography>
           </div>
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-            <Button className="flex items-center gap-3 bg-secondary-500 text-white hover:bg-secondary-600 transition-colors rounded-full py-2 px-5" size="sm">
+            <Button className="flex items-center gap-3 bg-secondary-500 text-white hover:bg-secondary-600 transition-colors rounded-full py-2 px-5" size="sm" onClick={handleOpen}>
               <RiAddLine className="h-5 w-5" />
-              <span className="font-semibold">Nuevo Departamento</span>
+              <span className="font-semibold">Nueva Dirección</span>
             </Button>
           </div>
         </div>
       </CardHeader>
-      <DepartamentTable columns={DepartamentColumns} data={departments} />
+
+      {/* Tabla*/}
+      <DepartamentTable />
+      
+      {/* Formulario */}
+      <ModalForm
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        title="Crear nuevo departamento"
+        icon={<HiOutlineOfficeBuilding className="w-6 h-6 flex items-center justify-center rounded-full text-blue-500" />}
+      >
+        <DepartmentForm
+          isEditing={false}
+          onSubmit={handleSubmit}
+          onCancel={handleClose}
+          formErrors={formErrors}
+        />
+      </ModalForm>
     </>
   );
 };

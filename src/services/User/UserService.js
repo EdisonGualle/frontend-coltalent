@@ -37,7 +37,6 @@ const disableUser = async (user) => {
     const response = await AxiosInstance.put(`/users/${user}/disable`);
     return response.data.data;
   } catch (error) {
-    console.error('Error al deshabilitar el usuario:', error);
     throw error;
   } 
 }
@@ -47,7 +46,6 @@ const enableUser = async (user) => {
     const response = await AxiosInstance.put(`/users/${user}/enable`);
     return response.data.data;
   } catch (error) {
-    console.error('Error al habilitar el usuario:', error);
     throw error;
   }
 }
@@ -57,7 +55,6 @@ const deleteUser = async (user) => {
     const response = await AxiosInstance.delete(`/users/${user}`);
     return response.data.data;
   } catch (error) {
-    console.error('Error al eliminar el usuario:', error);
     throw error;
   }
 }
@@ -67,7 +64,6 @@ const getUserConfiguration = async (user) => {
     const response = await AxiosInstance.get(`/users/${user}/configuration`);
     return response.data.data;
   } catch (error) {
-    console.error('Error al obtener la configuración de usuario:', error);
     throw error;
   }
 };
@@ -85,7 +81,6 @@ const uploadUserPhoto = async (user, photoFile) => {
 
     return response.data.data;
   } catch (error) {
-    console.error('Error al subir la foto de usuario:', error);
     throw error;
   }
 };
