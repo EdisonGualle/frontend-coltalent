@@ -4,6 +4,7 @@ import userReducer from './User/userSlice';
 import rolReducer from './User/rolSlice';
 import userStateReducer from './User/userStateSlice';
 import departamentReducer from './Organization/DepartamentSlice';
+import unitReducer from './Organization/UnitSlince';
 export default configureStore({
   reducer: {
     employee: employeReducer,
@@ -11,5 +12,6 @@ export default configureStore({
     role: rolReducer,
     userState: userStateReducer,
     departament: departamentReducer,
+    unit: unitReducer,
   },
 });

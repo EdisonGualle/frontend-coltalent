@@ -1,6 +1,5 @@
 // Expresión regular para validar solo letras, números y un punto
 const usernameRegex = /^[a-zA-Z0-9]+([.]?[a-zA-Z0-9]+)*$/;
-
 export const validateUsername = (username) => {
   // Verificar si el nombre de usuario está vacío
   if (!username.trim()) {
@@ -21,10 +20,8 @@ export const validateUsername = (username) => {
   return null;
 };
 
-
 // Expresión regular para validar un correo electrónico
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export const validateEmail = (email) => {
   // Verificar si el correo electrónico está vacío
   if (!email.trim()) {
@@ -40,10 +37,8 @@ export const validateEmail = (email) => {
   return null;
 };
 
-
 // Expresión regular para validar solo letras y espacios
 const nameRegex = /^[a-zA-Z\s]+$/;
-
 export const validateName = (name) => {
   // Verificar si el nombre está vacío
   if (!name.trim()) {
@@ -53,6 +48,40 @@ export const validateName = (name) => {
   // Verificar si cumple con la expresión regular (solo letras y espacios)
   if (!nameRegex.test(name)) {
     return 'El nombre solo puede contener letras y espacios.';
+  }
+
+  // Si pasa todas las validaciones, retornar null (sin errores)
+  return null;
+};
+
+// Expresión regular para validar números de teléfono fijo en Ecuador
+const landlinePhoneRegex = /^(0[2-7])([0-9]{7})$/;
+export const validateLandlinePhone = (phone) => {
+  // Si el número de teléfono no se proporciona, considerarlo válido
+  if (!phone) {
+    return null;
+  }
+
+  // Verificar si cumple con la expresión regular
+  if (!landlinePhoneRegex.test(phone)) {
+    return 'El número de teléfono fijo no es válido.';
+  }
+
+  // Si pasa todas las validaciones, retornar null (sin errores)
+  return null;
+};
+
+// Expresión regular para validar números de teléfono móvil en Ecuador
+const mobilePhoneRegex = /^(?:\+593|0)9\d{8}$/;
+export const validateMobilePhone = (phone) => {
+  // Verificar si el número de teléfono está vacío
+  if (!phone.trim()) {
+    return 'Por favor, ingresa un número de teléfono.';
+  }
+
+  // Verificar si cumple con la expresión regular
+  if (!mobilePhoneRegex.test(phone)) {
+    return 'El número de teléfono móvil no es válido. Debe comenzar con 09 o +593 seguido de 8 dígitos.';
   }
 
   // Si pasa todas las validaciones, retornar null (sin errores)

@@ -1,4 +1,3 @@
-import OptionsColumn from './OptionsColumn';
 import { SelectColumnFilter } from '../../../../../components/Table/SelectColumnFilter';
 import { AvatarCell } from './AvatarCell';
 
@@ -17,18 +16,14 @@ export const UnitColumns = [
     accessor: 'phone',
   },
   {
-    Header: "Departamento",
+    Header: "Dirección",
     accessor: 'department.name',
     Filter: SelectColumnFilter,  
   },
   {
-    Header: "Jefe",
-    accessor: 'head_employee_full_name',
+    Header: "Jefe de Unidad",
+    accessor: 'head_employee_name',
     Cell: AvatarCell,
     imgAccessor: "head_employee_photo",
-  },
-  {
-    Header: "Opciones",
-    Cell: OptionsColumn,
   },
 ];

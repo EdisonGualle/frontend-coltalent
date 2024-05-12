@@ -64,14 +64,15 @@ const DepartamentIndex = () => {
         <div className="mb-2 flex items-center justify-between gap-8">
           <div>
             <Typography variant="h5" color="blue-gray" className="font-semibold">
-              Lista de Direcciones
+              Lista de direcciones
             </Typography>
             <Typography color="gray" className="mt-1">
               Ver informacion sobre todas las direcciones.
             </Typography>
           </div>
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-            <Button className="flex items-center gap-3 bg-secondary-500 text-white hover:bg-secondary-600 transition-colors rounded-full py-2 px-5" size="sm" onClick={handleOpen}>
+            <Button className="flex items-center gap-3 bg-secondary-500 text-white hover:bg-secondary-600 transition-colors rounded-full py-2 px-5" size="sm" 
+            onClick={handleOpen}>
               <RiAddLine className="h-5 w-5" />
               <span className="font-semibold">Nueva Dirección</span>
             </Button>

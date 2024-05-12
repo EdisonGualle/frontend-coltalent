@@ -8,6 +8,7 @@ const ModalForm = ({
     title,
     icon,
     children,
+    maxWidth = 'max-w-md'
 }) => {
     return (
         <Transition appear show={isOpen} as={Fragment}>
@@ -39,7 +40,7 @@ const ModalForm = ({
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-slate-100 p-4 text-left align-middle shadow-xl transition-all">
+                            <Dialog.Panel className={`w-full ${maxWidth} transform overflow-hidden rounded-2xl bg-slate-100 p-4 text-left align-middle shadow-xl transition-all`}>
                                 {/* Encabezado */}
                                 <div className="bg-gray-300 px-2 py-3 rounded-t-2xl flex items-center justify-between">
                                     <div className="flex items-center">

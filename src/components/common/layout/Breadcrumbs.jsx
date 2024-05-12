@@ -8,7 +8,7 @@ const Breadcrumbs = () => {
   const breadcrumbItems = [
     { icon: <FaHome />, label: "Home", path: "/" },
     { label: "Empleados", path: "/empleados" },
-    { label: "Departamentos", path: "/departamentos" },
+    { label: "Direcciones", path: "/direcciones" },
     { label: "Unidades", path: "/unidades" },
     { label: "Perfil", path: "/perfil" },
     { label: "Cargos", path: "/cargos" },

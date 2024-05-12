@@ -13,7 +13,7 @@ const createDepartment = async (newDepartment) => {
     const response = await AxiosInstance.post('/departaments', newDepartment);
     return response.data;
   } catch (error) {
-    console.log("error", error.response.data);
+   // Crear un objeto de error personalizado con un campo de mensaje que sea una cadena JSON del objeto de error
     const customError = new Error(JSON.stringify(error.response.data));
     throw customError;
   }
@@ -27,7 +27,7 @@ const getDepartment = async (id) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 const updateDepartment = async (updatedData) => {
   try {
@@ -35,7 +35,6 @@ const updateDepartment = async (updatedData) => {
     const response = await AxiosInstance.put(`/departaments/${id}`, data);
     return response.data;
   } catch (error) {
-    console.log("error", error.response.data);
     // Crear un objeto de error personalizado con un campo de mensaje que sea una cadena JSON del objeto de error
     const customError = new Error(JSON.stringify(error.response.data));
     throw customError;
@@ -49,7 +48,7 @@ const deleteDepartment = async (department) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 export { getDepartments, getDepartment, createDepartment, deleteDepartment, updateDepartment};
 

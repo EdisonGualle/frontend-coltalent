@@ -42,7 +42,7 @@ const OptionsColumn = ({ departament, fetchDepartments }) => {
         head_employee_id: headEmployeeId,
       };
 
-      // Crear el objeto con los datos actualizados
+      // Crear el objeto con los datos actualizados a enivar a la API
       const updatedData = {
         id: departament.id,
         data,
@@ -58,7 +58,6 @@ const OptionsColumn = ({ departament, fetchDepartments }) => {
       setIsOpenEditModal(false);
     } catch (error) {
       const errorObject = JSON.parse(error.message);
-      console.log('errorObject', errorObject);
       const { errors = {} } = errorObject || {};
       const formErrors = {
         name: errors.name ? errors.name[0] : '',
@@ -123,7 +122,7 @@ const OptionsColumn = ({ departament, fetchDepartments }) => {
         </button>
       </div>
       
-      {/* Modal de edicion*/}
+      {/* Modal de eliminacion*/}
       <Dialog2
         isOpen={isOpenDialog2}
         setIsOpen={setIsOpenDialog2}
