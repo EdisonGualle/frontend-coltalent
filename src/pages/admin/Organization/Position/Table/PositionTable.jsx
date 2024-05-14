@@ -1,11 +1,38 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useTable, useFilters, useGlobalFilter, useSortBy, usePagination } from 'react-table';
 import GlobalFilter from '../../../../../components/Table/GlobalFilter';
 import { Button, PageButton } from '../../../../../assets/Button';
 import { SortIcon, SortUpIcon, SortDownIcon } from '../../../../../assets/Icons';
 import { RiArrowLeftDoubleLine, RiArrowLeftSLine, RiArrowRightSLine, RiArrowRightDoubleLine } from "react-icons/ri";
+import OptionsColumn from './OptionsColumn';
+import { fetchPositions } from '../../../../../redux/Organization/PositionSlice';
+import Skeleton from '../../../../../components/Table/Skeleton';
+import { PositionColumns } from './PositionColumns';
 
-function PositionTable({ columns, data }) {
+function PositionTable({ }) {
+  const dispatch = useDispatch();
+  const positions = useSelector(state => state.position.positions);
+  const status = useSelector(state => state.position.status);
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        await dispatch(fetchPositions());
+      } catch (error) {
+        console.error('Error fetching positions:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (positions.length === 0 && !isLoading) {
+      fetchData();
+    }
+  }, [dispatch, positions, isLoading]);
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -25,8 +52,8 @@ function PositionTable({ columns, data }) {
     setGlobalFilter,
   } = useTable(
     {
-      columns,
-      data,
+      columns: PositionColumns,
+      data: positions,
       initialState: { pageIndex: 0, pageSize: 5 },
     },
     useFilters,
@@ -34,6 +61,14 @@ function PositionTable({ columns, data }) {
     useSortBy,
     usePagination,
   );
+
+  const fetchPositionsAction = async () => {
+    dispatch(fetchPositions());
+  }
+
+  if (isLoading) {
+    return <Skeleton />;
+  }
 
   return (
     <>
@@ -82,6 +117,13 @@ function PositionTable({ columns, data }) {
                           </div>
                         </th>
                       ))}
+                      {/* Columna opciones */}
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-center"
+                      >
+                        Opciones
+                      </th>
                     </tr>
                   ))}
                 </thead>
@@ -104,6 +146,10 @@ function PositionTable({ columns, data }) {
                             </td>
                           )
                         })}
+                        {/* Columna de opciones */}
+                        <td className='px-6 py-3 flex justify-center'>
+                          <OptionsColumn position={row.original} fetchPositions={fetchPositionsAction} />
+                        </td>
                       </tr>
                     )
                   })}

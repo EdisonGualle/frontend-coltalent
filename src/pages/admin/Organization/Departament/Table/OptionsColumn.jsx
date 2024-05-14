@@ -7,6 +7,7 @@ import { AlertContext } from '../../../../../contexts/AlertContext';
 import { unwrapResult } from '@reduxjs/toolkit';
 import DepartmentForm from '../DepartmentForm';
 import ModalForm from '../../../../../components/ui/ModalForm';
+import { fetchUnits } from '../../../../../redux/Organization/UnitSlince';
 
 const OptionsColumn = ({ departament, fetchDepartments }) => {
   const dispatch = useDispatch();
@@ -53,6 +54,7 @@ const OptionsColumn = ({ departament, fetchDepartments }) => {
       // Desempaquetar el resultado de la acción
       unwrapResult(actionResult);
       fetchDepartments();
+      dispatch(fetchUnits());
       showAlert('Dirección actualizada correctamente', 'success');
       setFormErrors({});
       setIsOpenEditModal(false);
@@ -82,6 +84,7 @@ const OptionsColumn = ({ departament, fetchDepartments }) => {
       // Desempaquetar el resultado de la acción
       unwrapResult(actionResult); 
       fetchDepartments();
+      dispatch(fetchUnits());
       showAlert('Dirección eliminada correctamente', 'success');
     } catch (error) {
       showAlert('Error al eliminar la dirección.', 'error');

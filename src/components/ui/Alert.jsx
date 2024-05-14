@@ -2,7 +2,7 @@ import { Fragment, useEffect } from 'react';
 import { Transition } from '@headlessui/react';
 import { RiCheckboxCircleFill, RiErrorWarningFill, RiInformationFill, RiAlertFill } from 'react-icons/ri';
 
-const Alert = ({ isOpen, setIsOpen, message, type = 'success', onConfirm, duration = 1100 }) => {
+const Alert = ({ isOpen, setIsOpen, message, type = 'success', onConfirm, duration = 1500 }) => {
   const getIcon = () => {
     switch (type) {
       case 'success':
@@ -38,14 +38,13 @@ const Alert = ({ isOpen, setIsOpen, message, type = 'success', onConfirm, durati
       setIsOpen(false);
       onConfirm();
     }, duration);
-
     return () => clearTimeout(timer);
   }, [setIsOpen, isOpen, onConfirm, duration]);
 
   return (
     <Transition appear show={isOpen} as={Fragment} enter="transition-opacity duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="transition-opacity duration-300" leaveFrom="opacity-100" leaveTo="opacity-0">
-      <div className="fixed bottom-4 right-4 z-50">
-        <div className={`bg-slate-200 py-4 px-6 max-w-md border-l-4 rounded-lg flex items-center gap-3 shadow-lg ${getBorderColor()}`}>
+      <div className="fixed top-20 right-4 z-50">
+        <div className={`bg-white bg-opacity-70 backdrop-filter backdrop-blur-sm py-4 px-6 max-w-md border-l-4 rounded-lg flex items-center gap-3 shadow-lg ${getBorderColor()}`}>
           <div>{getIcon()}</div>
           <div>
             <h3 className="font-semibold">{type === 'success' ? 'Éxito' : type === 'error' ? 'Error' : type === 'info' ? 'Información' : 'Peligro'}</h3>

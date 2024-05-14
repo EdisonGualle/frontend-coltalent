@@ -136,7 +136,7 @@ const DepartmentForm = ({
         <Input
           label="Nombre de la dirección"
           id="name"
-          placeholder="Ingresa un nombre"
+          placeholder="Ej. Dirección de Recursos Humanos"
           value={name}
           onChange={handleChange}
           error={errors.name}
@@ -146,7 +146,7 @@ const DepartmentForm = ({
         <Textarea
           label="Función de la dirección"
           id="functionDescription"
-          placeholder="Ingresa una función"
+          placeholder="Ej. Coordinar las actividades de la dirección de Recursos Humanos."
           value={functionDescription}
           onChange={handleChange}
           error={errors.function}

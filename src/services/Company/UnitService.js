@@ -35,7 +35,6 @@ const updateUnit = async (updatedData) => {
     const response = await AxiosInstance.put(`/units/${id}`, data);
     return response.data;
   } catch (error) {
-    console.log("error", error.response.data);
     // Crear un objeto de error personalizado con un campo de mensaje que sea una cadena JSON del objeto de error
     const customError = new Error(JSON.stringify(error.response.data));
     throw customError;

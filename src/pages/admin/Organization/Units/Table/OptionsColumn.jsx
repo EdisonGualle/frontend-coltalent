@@ -7,6 +7,7 @@ import { AlertContext } from '../../../../../contexts/AlertContext';
 import { unwrapResult } from '@reduxjs/toolkit';
 import ModalForm from '../../../../../components/ui/ModalForm';
 import UnitForm from '../UnitForm';
+import { fetchPositions } from '../../../../../redux/Organization/PositionSlice';
 
 
 const OptionsColumn = ({ unit, fetchUnits }) => {
@@ -32,6 +33,7 @@ const OptionsColumn = ({ unit, fetchUnits }) => {
 
   // Función para actualizar una unidad
   const handleUpdate = async (formData) => {
+
     try {
       // Obtener los datos del formulario
       const { name, function: functionDescription, phone: landlinePhone, head_employee_id: headEmployeeId, department_id: departmentId } = formData;
@@ -56,18 +58,19 @@ const OptionsColumn = ({ unit, fetchUnits }) => {
       // Desempaquetar el resultado de la acción
       unwrapResult(actionResult);
       fetchUnits();
+      dispatch(fetchPositions());
       showAlert('Unidad actualizada correctamente', 'success');
       setFormErrors({});
       setIsOpenEditModal(false);
     } catch (error) {
       const errorObject = JSON.parse(error.message);
-      console.log('errorObject', errorObject);
       const { errors = {} } = errorObject || {};
 
       const formErrors = {
         name: errors.name ? errors.name[0] : '',
         function: errors.function ? errors.function[0] : '',
         phone: errors.phone ? errors.phone[0] : '',
+        department_id: errors.department_id ? errors.department_id[0] : '',
         head_employee_id: errors.head_employee_id ? errors.head_employee_id[0] : '',
       };
       // Mostrar alerta si hay errores
@@ -88,13 +91,14 @@ const OptionsColumn = ({ unit, fetchUnits }) => {
       // Desempaquetar el resultado de la acción
       unwrapResult(actionResult);
       fetchUnits();
+      dispatch(fetchPositions());
       showAlert('Unidad eliminada correctamente', 'success');
     } catch (error) {
       showAlert('Error al eliminar la unidad', 'error');
     }
   }
 
-  // Fucniones para manejar la apertura y cierre del modal y actualizar la unidad
+  // Funciones para manejar la apertura y cierre del modal y actualizar la unidad
   const handleEditClick = () => setIsOpenEditModal(true);
   const handleConfirmEdit = async (formData) => await handleUpdate(formData);
   const handleCancelEdit = () => {

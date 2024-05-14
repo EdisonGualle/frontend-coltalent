@@ -38,7 +38,8 @@ export const validateEmail = (email) => {
 };
 
 // Expresión regular para validar solo letras y espacios
-const nameRegex = /^[a-zA-Z\s]+$/;
+const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]*$/;
+
 export const validateName = (name) => {
   // Verificar si el nombre está vacío
   if (!name.trim()) {

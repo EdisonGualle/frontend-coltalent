@@ -1,4 +1,4 @@
-import React, {useEffect,useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTable, useFilters, useGlobalFilter, useSortBy, usePagination } from 'react-table';
 import GlobalFilter from '../../../../../components/Table/GlobalFilter';
@@ -6,12 +6,12 @@ import { Button, PageButton } from '../../../../../assets/Button';
 import { SortIcon, SortUpIcon, SortDownIcon } from '../../../../../assets/Icons';
 import { RiArrowLeftDoubleLine, RiArrowLeftSLine, RiArrowRightSLine, RiArrowRightDoubleLine } from "react-icons/ri";
 import OptionsColumn from './OptionsColumn';
-import { UnitColumns} from './UnitColumns';
-import {fetchUnits} from '../../../../../redux/Organization/UnitSlince';
+import { UnitColumns } from './UnitColumns';
+import { fetchUnits } from '../../../../../redux/Organization/UnitSlince';
 import Skeleton from '../../../../../components/Table/Skeleton';
 
 
-function UnitTable({}) {
+function UnitTable({ }) {
   const dispatch = useDispatch();
   const units = useSelector(state => state.unit.units);
   const status = useSelector(state => state.unit.status);
@@ -20,19 +20,19 @@ function UnitTable({}) {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-    try {
-      await dispatch(fetchUnits());
-    } catch (error) {
-      console.error('Error fetching units:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      try {
+        await dispatch(fetchUnits());
+      } catch (error) {
+        console.error('Error fetching units:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  if (units.length === 0 && !isLoading) {
-    fetchData();
-  }
-}, [dispatch, units, isLoading]);
+    if (units.length === 0 && !isLoading) {
+      fetchData();
+    }
+  }, [dispatch, units, isLoading]);
 
   const {
     getTableProps,
@@ -119,7 +119,7 @@ function UnitTable({}) {
                         </th>
                       ))}
                       {/* Columna opciones */}
-                        <th
+                      <th
                         scope="col"
                         className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-center"
                       >

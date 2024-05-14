@@ -25,6 +25,7 @@ const UnitForm = ({
     cancelButtonColor = "border-gray-400",
     formErrors = {},
 }) => {
+    
     const dispatch = useDispatch();
     const employeesState = useSelector((state) => state.employee);
     const employees = employeesState ? employeesState.employees : [];
@@ -93,6 +94,7 @@ const UnitForm = ({
             });
         }
     }, [unit, employees, departments, isEditing]);
+
 
     // Efecto para limpiar los datos del formulario al cancelar la edición
     useEffect(() => {
@@ -190,7 +192,7 @@ const UnitForm = ({
                             <Input
                                 label="Nombre de la unidad"
                                 id="name"
-                                placeholder="Ingresa un nombre"
+                                placeholder="Ej. Gerencia de ventas"
                                 value={name}
                                 onChange={handleChange}
                                 error={errors.name}
@@ -200,7 +202,7 @@ const UnitForm = ({
                             <Input
                                 label="Teléfono fijo"
                                 id="landlinePhone"
-                                placeholder="Ingresa un teléfono fijo"
+                                placeholder="Ej. 022569542"
                                 value={landlinePhone}
                                 icon={RiPhoneLine}
                                 onChange={handleChange}
@@ -212,7 +214,7 @@ const UnitForm = ({
                         <Textarea
                             label="Función de la unidad"
                             id="functionDescription"
-                            placeholder="Ingresa una función"
+                            placeholder="Ej. Dirigir y coordinar las actividades de la unidad de ventas"
                             value={functionDescription}
                             onChange={handleChange}
                             error={errors.function}
@@ -250,8 +252,8 @@ const UnitForm = ({
                     <button
                         type="submit"
                         className={`p-2 px-1 rounded-xl text-white w-full outline-none border border-transparent transform transition-all duration-300 hover:scale-105 ${isSubmitDisabled
-                                ? `${confirmButtonColor} opacity-70 cursor-not-allowed` // Estilos cuando está deshabilitado
-                                : `${confirmButtonColor}` // Estilos cuando está habilitado
+                            ? `${confirmButtonColor} opacity-70 cursor-not-allowed` // Estilos cuando está deshabilitado
+                            : `${confirmButtonColor}` // Estilos cuando está habilitado
                             }`}
                         disabled={isSubmitDisabled}
                     >

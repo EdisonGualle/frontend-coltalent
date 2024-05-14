@@ -1,7 +1,6 @@
-import OptionsColumn from './OptionsColumn';
 import { SelectColumnFilter } from '../../../../../components/Table/SelectColumnFilter';
 
-export const positionColumns = [
+export const PositionColumns = [
   {
     Header: "Nombre",
     accessor: 'name',
@@ -14,9 +13,5 @@ export const positionColumns = [
     Header: "Unidad",
     accessor: 'unit.name',
     Filter: SelectColumnFilter,  
-  },
-  {
-    Header: "Opciones",
-    Cell: (props) => <OptionsColumn positionId={props.row.original.id} />,
   },
 ];
