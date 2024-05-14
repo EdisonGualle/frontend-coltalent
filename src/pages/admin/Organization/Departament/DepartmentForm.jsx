@@ -25,6 +25,7 @@ const DepartmentForm = ({
   const dispatch = useDispatch();
   const employeesState = useSelector((state) => state.employee);
   const employees = employeesState ? employeesState.employees : [];
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
   // Estados locales para manejar los errores y los datos del formulario
   const [formData, setFormData] = useState({ name: '', functionDescription: '', selectedEmployee: null });
@@ -99,6 +100,13 @@ const DepartmentForm = ({
     }));
   };
 
+  // Efecto para deshabilitar el botón de envío cuando haya errores
+  useEffect(() => {
+    const hasErrors = Object.values(errors).some((error) => error);
+    setIsSubmitDisabled(hasErrors);
+  }, [errors]);
+
+
   // Función para manejar el envío del formulario
   const handleSubmit = (e) => {
     // Evitar que el formulario recargue la página
@@ -160,7 +168,11 @@ const DepartmentForm = ({
       <div className="mt-6 flex items-center gap-x-2">
         <button
           type="submit"
-          className={`p-2 px-1 ${confirmButtonColor} rounded-xl text-white w-full outline-none border border-transparent transform transition-all duration-300 hover:scale-105`}
+          className={`p-2 px-1 rounded-xl text-white w-full outline-none border border-transparent transform transition-all duration-300 hover:scale-105 ${isSubmitDisabled
+            ? `${confirmButtonColor} opacity-70 cursor-not-allowed` // Estilos cuando está deshabilitado
+            : `${confirmButtonColor}` // Estilos cuando está habilitado
+            }`}
+          disabled={isSubmitDisabled}
         >
           {confirmButtonText}
         </button>
