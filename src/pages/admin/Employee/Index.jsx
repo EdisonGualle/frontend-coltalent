@@ -12,10 +12,6 @@ const EmployeeIndex = () => {
     console.log('Eliminar empleado con ID:', employeeId);
   };
 
-  const handleDisable = (employeeId) => {
-    // Lógica para deshabilitar un empleado
-    console.log('Deshabilitar empleado con ID:', employeeId);
-  };
 
   const handleViewChange = (view) => {
     setShowList(view === 'list' || view === 'gallery');
@@ -27,7 +23,7 @@ const EmployeeIndex = () => {
         <div className="mb-2 flex items-center justify-between gap-8">
           <div>
             <Typography variant="h5" color="blue-gray" className="font-semibold">
-              Lista de miembros
+              Lista de empleados
             </Typography>
             <Typography color="gray" className="mt-1">
               Ver información sobre todos los empleados
@@ -61,7 +57,7 @@ const EmployeeIndex = () => {
       {showList ? (
         <EmployeeList />
       ) : (
-        <EmployeeTable onDelete={handleDelete} onDisable={handleDisable} />
+        <EmployeeTable onDelete={handleDelete} />
       )}
     </>
   );

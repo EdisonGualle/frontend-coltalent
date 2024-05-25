@@ -1,4 +1,3 @@
-import { RiArrowDownCircleFill } from "react-icons/ri";
 import AxiosInstance from "../axiosInstance";
 
 const getPositions = async () => {

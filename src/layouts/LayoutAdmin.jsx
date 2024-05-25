@@ -14,7 +14,8 @@ const LayoutAdmin = () => {
         <Header />
         <div className="h-[90vh] px-4 overflow-auto">
           <Breadcrumbs />
-          <div className="mt-3 pt-2 border-t-2 bg-gray-100 border-gray-300 shadow-lg rounded-lg px-2">
+          {/* poner shadow-lg si es necesario luego */}
+          <div className="mt-3 pt-2 border-t-2  border-gray-300  rounded-lg px-2">
             <Outlet />
           </div>
         </div>

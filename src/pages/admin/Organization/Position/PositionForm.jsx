@@ -42,6 +42,7 @@ const PositionForm = ({
         unit_id: "",
     });
 
+    
     // Desestructurar los datos del formulario
     const { name, functionDescription, selectedUnit } = formData;
 
@@ -177,6 +178,16 @@ const PositionForm = ({
                     rows={2}
                 />
                 <CustomSelect
+                    label="Departamento"
+                    options={units}
+                    value={selectedUnit}
+                    onChange={handleUnitChange}
+                    placeholder="Selecciona una unidad"
+                    error={errors.unit_id}
+                    isSearchable={true}
+                    labelKey="name"
+                />
+                 <CustomSelect
                     label="Unidad"
                     options={units}
                     value={selectedUnit}

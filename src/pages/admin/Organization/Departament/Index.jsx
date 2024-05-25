@@ -71,7 +71,7 @@ const DepartamentIndex = () => {
             </Typography>
           </div>
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-            <Button className="flex items-center gap-3 bg-secondary-500 text-white hover:bg-secondary-600 transition-colors rounded-full py-2 px-5" size="sm" 
+            <Button className="flex items-center gap-3 bg-secondary-500 text-white hover:bg-secondary-600 transition-colors rounded-xl py-2 px-5" size="sm" 
             onClick={handleOpen}>
               <RiAddLine className="h-5 w-5" />
               <span className="font-semibold">Nueva Dirección</span>

@@ -23,6 +23,7 @@ function UserTable({ }) {
     pageSize: 5,  // Cantidad de elementos por página
   });
 
+
   // Función para actualizar la lista de usuarios
   const memoizedUsers = useMemo(() => users, [users]);
 
@@ -97,10 +98,10 @@ function UserTable({ }) {
         )}
       </div>
       {/* table */}
-      <div className=" h-[54vh] mt-4 flex flex-col overflow-y-scroll">
-        <div className="-my-2 overflow-x-auto -mx-4 sm:-mx-6 lg:-mx-8">
-          <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-            <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+      <div className=" h-[54vh] mt-4 flex flex-col ">
+        <div className="overflow-x-auto custom-scrollbar">
+          <div className="inline-block min-w-full align-middle">
+            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
               
               <table {...getTableProps()} className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-200">

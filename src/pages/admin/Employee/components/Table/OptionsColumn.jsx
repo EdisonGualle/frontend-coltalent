@@ -1,4 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { deleteOneEmployee } from '../../../../../redux/Employee/employeSlice';
+import Dialog2 from '../../../../../components/ui/Dialog2';
+import { AlertContext } from '../../../../../contexts/AlertContext';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { Menu, MenuButton, MenuItem } from '@szhsin/react-menu';
 import { Link } from 'react-router-dom';
 import {
@@ -8,24 +13,42 @@ import {
   RiDeleteBin6Line,
   RiKeyLine,
 } from 'react-icons/ri';
-import Dialog2 from '../../../../../components/ui/Dialog2';
 
-const OptionsColumn = ({ employeeId }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [action, setAction] = useState('');
+const OptionsColumn = ({ employee, updateEmployees }) => {
+  const dispatch = useDispatch();
+  const { showAlert } = useContext(AlertContext);
+  const [isOpenDialog2, setIsOpenDialog2] = useState(false);
+  const [isOpenEditModal, setIsOpenEditModal] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
 
-  const handleConfirm = () => {
-    console.log(`Confirmar eliminar para el empleado con ID: ${employeeId}`);
-    setIsOpen(false);
+  // Efecto para limpiar los errores del formulario al cerrar el modal
+  useEffect(() => {
+    if (!isOpenEditModal) {
+      setFormErrors({});
+    }
+  }, [isOpenEditModal]);
+
+  // Función para eliminar un empleado
+  const handleDelete = async () => {
+    try {
+      // Despachar la acción para eliminar el empleado
+      const actionResult = await dispatch(deleteOneEmployee(employee.id));
+      // Desempaquetar el resultado de la acción
+      unwrapResult(actionResult);
+      updateEmployees();
+      showAlert('Empleado eliminado correctamente', 'success');
+    } catch (error) {
+      console.error('Error deleting employee:', error);
+      showAlert('Error al eliminar el empleado', 'error');
+    }
   };
 
-  const handleCancel = () => {
-    setIsOpen(false);
-  };
-
-  const handleActionClick = (actionType) => {
-    setIsOpen(true);
-    setAction(actionType);
+  // Funciones para manejar la apertura y cierre del diálogo y empleado
+  const handleCancel = () => setIsOpenDialog2(false);
+  const handleClick = () => setIsOpenDialog2(true);
+  const handleConfirm = async () => {
+      await handleDelete();
+      setIsOpenDialog2(false);
   };
 
   return (
@@ -42,7 +65,7 @@ const OptionsColumn = ({ employeeId }) => {
         transition
         menuClassName="bg-gray-300 p-1 rounded-lg shadow-lg"
       >
-        <div className="overflow-y-auto h-[13vh]">
+        <div className="scroll-editado overflow-y-auto h-[13vh]">
           <MenuItem className="p-0 hover:bg-transparent">
             <Link
               to="/employee/profile"
@@ -58,10 +81,7 @@ const OptionsColumn = ({ employeeId }) => {
               <span className="truncate">Editar</span>
             </button>
           </MenuItem>
-          <MenuItem
-            className="p-0 hover:bg-transparent"
-            onClick={() => handleActionClick('eliminar')}
-          >
+          <MenuItem className="p-0 hover:bg-transparent" onClick={handleClick}>
             <button className="w-full rounded-lg transition-colors text-xs hover:bg-teal-50 flex items-center gap-x-2 p-2">
               <RiDeleteBin6Line className="text-red-500" />
               <span className="truncate">Eliminar</span>
@@ -76,11 +96,11 @@ const OptionsColumn = ({ employeeId }) => {
         </div>
       </Menu>
       <Dialog2
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        title="¿Eliminar cuenta?"
+        isOpen={isOpenDialog2}
+        setIsOpen={setIsOpenDialog2}
+        title="¿Eliminar Empleado?"
         description="Está seguro que desea eliminar la cuenta del empleado? Esta acción es permanente y no se podrá deshacer. Todos los datos del empleado se eliminarán."
-        confirmButtonText="Sí, eliminar cuenta"
+        confirmButtonText="Sí, eliminar empleado"
         cancelButtonText="Cancelar"
         onConfirm={handleConfirm}
         onCancel={handleCancel}

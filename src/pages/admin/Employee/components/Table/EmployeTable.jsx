@@ -1,16 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useTable, useFilters, useGlobalFilter, useSortBy, usePagination } from 'react-table';
 import GlobalFilter from '../../../../../components/Table/GlobalFilter';
 import { Button, PageButton } from '../../../../../assets/Button';
 import { SortIcon, SortUpIcon, SortDownIcon } from '../../../../../assets/Icons';
 import { RiArrowLeftDoubleLine, RiArrowLeftSLine, RiArrowRightSLine, RiArrowRightDoubleLine } from "react-icons/ri";
+import OptionColumn from './OptionsColumn';
+import { fetchEmployees, selectEmployees } from '../../../../../redux/Employee/employeSlice';
 import { EmployeeColumns } from './EmployeColumns';
-import { getEmployees } from '../../../../../services/Employee/EmployeeService';
 
 function EmployeeTable({ }) {
+  // Usamos los hooks de Redux para despachar acciones y obtener el estado global
+  const dispatch = useDispatch();
 
-  const data = React.useMemo(() => getEmployees(), []);
 
+  // Obtener la lista de empleados del estado global
+  const employees = useSelector(selectEmployees);
+
+  // Estado local para manejar el estado de la tabla
+  const [tableState, setTableState] = useState({
+    pageIndex: 0, // Página actual
+    pageSize: 5,  // Cantidad de elementos por página
+  });
+
+  // Función para actualizar la lista de empleados
+  const memoizedEmployees = useMemo(() => employees, [employees]);
+
+  // Función para obtener la lista de empleados
+  const fetchEmployeesAction = useCallback(() => {
+    dispatch(fetchEmployees()); // Despachar la acción para cargar los empleados
+ 
+  }, [dispatch]);
+
+  // Configuración de la tabla
   const {
     getTableProps,
     getTableBodyProps,
@@ -31,8 +53,8 @@ function EmployeeTable({ }) {
   } = useTable(
     {
       columns: EmployeeColumns,
-      data: data,
-      initialState: { pageIndex: 0, pageSize: 5 },
+      data: memoizedEmployees,
+      initialState: tableState,
     },
     useFilters,
     useGlobalFilter,
@@ -40,6 +62,22 @@ function EmployeeTable({ }) {
     usePagination,
   );
 
+  // efecto para cargar los empleados
+  useEffect(() => {
+    fetchEmployeesAction();
+  }, [fetchEmployeesAction]);
+
+  // efecto para actualizar el estado de la tabla
+  useEffect(() => {
+    setTableState(state);
+  }, [state]);
+
+  // Función para actualizar la lista de empleados
+  const updateEmployees = useCallback(() => {
+    fetchEmployeesAction();
+  }, [fetchEmployeesAction]);
+
+  // Render de la tabla
   return (
     <>
       <div className="sm:flex sm:gap-x-2">
@@ -48,22 +86,22 @@ function EmployeeTable({ }) {
           globalFilter={state.globalFilter}
           setGlobalFilter={setGlobalFilter}
         />
-      {headerGroups.map((headerGroup) =>
-  headerGroup.headers.map((column) =>
-    column.Filter ? (
-      <div className="mt-2 sm:mt-0" key={column.id}>
-        {column.render("Filter")}
-      </div>
-    ) : null
-  )
-)}
+        {headerGroups.map((headerGroup) =>
+          headerGroup.headers.map((column) =>
+            column.Filter ? (
+              <div className="mt-2 sm:mt-0" key={column.id}>
+                {column.render("Filter")}
+              </div>
+            ) : null
+          )
+        )}
       </div>
       {/* table */}
-      <div className=" h-[54vh] mt-4 flex flex-col overflow-y-scroll">
-        <div className="-my-2 overflow-x-auto -mx-4 sm:-mx-6 lg:-mx-8">
-          <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-            <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-              <table {...getTableProps()} className="min-w-full divide-y divide-gray-200">
+      <div className=" h-[54vh] mt-4 flex flex-col">
+        <div className="overflow-x-auto custom-scrollbar">
+          <div className="inline-block min-w-full align-middle ">
+            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+              <table {...getTableProps()} className="min-w-full divide-y divide-gray-200  ">
                 <thead className="bg-gray-200">
                   {headerGroups.map(headerGroup => (
                     <tr {...headerGroup.getHeaderGroupProps()}>
@@ -87,6 +125,13 @@ function EmployeeTable({ }) {
                           </div>
                         </th>
                       ))}
+                      {/* Columna opciones */}
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-center"
+                      >
+                        Opciones
+                      </th>
                     </tr>
                   ))}
                 </thead>
@@ -109,6 +154,9 @@ function EmployeeTable({ }) {
                             </td>
                           )
                         })}
+                        <td className="px-6 py-3 flex justify-center">
+                          <OptionColumn employee={row.original} updateEmployees={updateEmployees} />
+                        </td>
                       </tr>
                     )
                   })}
@@ -138,7 +186,7 @@ function EmployeeTable({ }) {
                   setPageSize(Number(e.target.value))
                 }}
               >
-                {[5, 6].map(pageSize => (
+                {[5, 10, 15].map(pageSize => (
                   <option key={pageSize} value={pageSize} className='text-sm'>
                     Show {pageSize}
                   </option>

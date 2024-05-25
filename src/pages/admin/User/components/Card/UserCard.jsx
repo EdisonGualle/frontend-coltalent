@@ -9,15 +9,15 @@ const UserCard = ({ user, updateUsers }) => {
   const photoUrl = photo ? `${import.meta.env.VITE_STORAGE_URL}/${photo}` : null;
 
   return (
-    <Card className="bg-blue-50 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105 transform">
+    <Card className="bg-gray-100 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105 transform">
       <CardBody className="flex flex-col items-center gap-2 p-4 relative">
         <div className="relative">
           {photoUrl ? (
             // Si el usuario tiene una foto, la mostramos
-            <Avatar src={photoUrl} className="w-20 h-20 rounded-full border-2 border-blue-500 shadow-lg" />
+            <Avatar src={photoUrl} className="w-16 h-16 rounded-full border-2 border-blue-500 shadow-lg" />
           ) : (
             // Si no tiene foto, mostramos las iniciales del nombre
-            <div className="w-20 h-20 rounded-full border-2 border-blue-500 shadow-lg flex items-center justify-center bg-gray-200">
+            <div className="w-16 h-16 rounded-full border-2 border-blue-500 shadow-lg flex items-center justify-center bg-gray-200">
               <Typography variant="h2" className="text-gray-600">
                 {name.charAt(0).toUpperCase()}
               </Typography>
@@ -28,7 +28,7 @@ const UserCard = ({ user, updateUsers }) => {
           <Typography variant="h6" className="text-gray-800 mb-1 truncate">
             {name}
           </Typography>
-          <Typography color="blue-gray" className="text-base truncate">
+          <Typography color="blue-gray" className="text-sm truncate">
             {email}
           </Typography>
         </div>

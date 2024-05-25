@@ -1,38 +1,31 @@
 import { SelectColumnFilter } from '../../../../../components/Table/SelectColumnFilter';
-import { StatusPill } from '../../../../../components/Table/StatusPill';
 import { AvatarCell } from './AvatarCell';
-import OptionsColumn from './OptionsColumn';
 export const EmployeeColumns = [
   {
-    Header: "Name",
-    accessor: 'name',
+    Header: "Nombres y Apellidos",
+    accessor: 'full_name',
     Cell: AvatarCell,
-    imgAccessor: "imgUrl",
-    emailAccessor: "email",
+    imgAccessor: "photo",
+    identification: "identification",
   },
   {
-    Header: "Title",
-    accessor: 'title',
+    Header: "Genero",
+    accessor: 'gender',
   },
   {
-    Header: "Status",
-    accessor: 'status',
-    Cell: StatusPill,
-    Filter: SelectColumnFilter,  
-    filter: 'includes',
+    Header: "Estado Civil",
+    accessor: 'marital_status',
   },
   {
-    Header: "Age",
-    accessor: 'age',
+    Header: "Celular",
+    accessor: 'contact.personal_phone',
   },
   {
-    Header: "Role",
-    accessor: 'role',
-    Filter: SelectColumnFilter,  
-    filter: 'includes',
+    Header: "Correo",
+    accessor: 'contact.personal_email',
   },
   {
-    Header: "Options",
-    Cell: (props) => <OptionsColumn employeeId={props.row.original.id} />,
+    Header: "Cargo",
+    accessor: 'position.name',
   },
 ];

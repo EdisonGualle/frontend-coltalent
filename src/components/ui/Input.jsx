@@ -30,7 +30,7 @@ const Input = ({ label, id, type = 'text', placeholder, value, onChange, icon: I
       </label>
       <div className="relative rounded-lg shadow-lg transition-all duration-300">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <div className="w-8 h-8 bg-gray-100 flex items-center justify-center">
+          <div className="w-8 h-8  flex items-center justify-center">
             {IconComponent ? (
               <IconComponent className={`h-5 w-5 ${iconColor}`} aria-hidden="true" />
             ) : (

@@ -5,3 +5,42 @@
 ::-webkit-scrollbar {
   width: 0px;
 }
+
+.scroll-editado {
+  scrollbar-width: thin;
+  scrollbar-color:#d1d5db #d1d5db;
+}
+
+/* Estilo para el scrollbar en WebKit (Chrome, Safari, Opera) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px; /* Ancho del scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent; /* Color del thumb (la barra que se mueve) */
+  border-radius: 4px; /* Borde redondeado del thumb */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: transparent; /* Color del track (el área de desplazamiento) */
+}
+
+/* Estilo para el scrollbar en Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin; /* Grosor del scrollbar */
+  scrollbar-color: transparent transparent; /* Color del thumb y del track */
+}
+
+/* Estilos adicionales */
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: #939393; /* Color del thumb al pasar el mouse por encima */
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-track {
+  background-color: #f5f5f5; /* Color del track al pasar el mouse por encima */
+}
+
+.custom-scrollbar:hover {
+  scrollbar-color: #dddddd #f5f5f5; /* Color del thumb y del track al pasar el mouse por encima */
+  
+}

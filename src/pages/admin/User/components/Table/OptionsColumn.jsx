@@ -159,7 +159,7 @@ const OptionsColumn = ({ user, updateUsers }) => {
         transition
         menuClassName="bg-gray-300 p-1 rounded-lg shadow-lg"
       >
-        <div className="overflow-y-auto h-[13vh]">
+        <div className=" scroll-editado overflow-y-auto h-[13vh]">
           <MenuItem className="p-0 hover:bg-transparent" onClick={handleEditClick}>
             <button className="w-full rounded-lg transition-colors text-xs hover:bg-teal-50 flex items-center gap-x-2 p-2">
               <RiEdit2Line className="text-blue-500" />
