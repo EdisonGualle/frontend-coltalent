@@ -4,13 +4,8 @@ import { RiUser3Line } from 'react-icons/ri';
 const Input = ({ label, id, type = 'text', placeholder, value, onChange, icon: IconComponent, error, ...rest }) => {
   const [isFocused, setIsFocused] = useState(false);
 
-  const handleFocus = () => {
-    setIsFocused(true);
-  };
-
-  const handleBlur = () => {
-    setIsFocused(false);
-  };
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
 
   const inputClasses = `pl-16 block w-full rounded-lg border-2 py-2 px-3 text-gray-800 transition-colors duration-300 ${
     error
@@ -30,7 +25,7 @@ const Input = ({ label, id, type = 'text', placeholder, value, onChange, icon: I
       </label>
       <div className="relative rounded-lg shadow-lg transition-all duration-300">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <div className="w-8 h-8  flex items-center justify-center">
+          <div className="w-8 h-8 flex items-center justify-center">
             {IconComponent ? (
               <IconComponent className={`h-5 w-5 ${iconColor}`} aria-hidden="true" />
             ) : (
@@ -52,7 +47,7 @@ const Input = ({ label, id, type = 'text', placeholder, value, onChange, icon: I
           {...rest}
         />
       </div>
-      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 };

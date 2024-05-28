@@ -105,6 +105,8 @@ useEffect(() => {
           className="text-sm px-2 py-1 border border-gray-300 mt-1 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-500 sm:mt-0"
         />
       </div>
+
+      <div className='h-[60vh] overflow-auto custom-scrollbar'>
       {employees && employees.length > 0 ? (
         filteredEmployees.length > 0 ? (
           <div className="grid grid-cols-5 gap-6">
@@ -133,6 +135,9 @@ useEffect(() => {
           </button>
         ))}
       </div>
+
+      </div>
+
     </div>
   );
 };

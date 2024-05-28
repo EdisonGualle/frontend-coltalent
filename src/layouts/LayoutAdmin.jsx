@@ -12,8 +12,10 @@ const LayoutAdmin = () => {
       <Sidebar />
       <div className="xl:col-span-5">
         <Header />
-        <div className="h-[90vh] px-4 overflow-auto">
-          <Breadcrumbs />
+        <div className="px-4">
+        <Breadcrumbs />
+        </div>
+        <div className="h-[83vh] px-4 overflow-auto">
           {/* poner shadow-lg si es necesario luego */}
           <div className="mt-3 pt-2 border-t-2  border-gray-300  rounded-lg px-2">
             <Outlet />

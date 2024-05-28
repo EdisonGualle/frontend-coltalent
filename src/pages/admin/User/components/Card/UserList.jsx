@@ -97,6 +97,8 @@ const UserList = () => {
           className="text-sm px-2 py-1 border border-gray-300 mt-1 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-500 sm:mt-0"
         />
       </div>
+
+      <div className='h-[60vh] overflow-auto custom-scrollbar'>
       {filteredUsers.length > 0 ? (
         <div className="grid grid-cols-5 gap-6">
           {filteredUsers.map((user) => (
@@ -108,6 +110,7 @@ const UserList = () => {
           <p className="text-base text-red-500">No hay usuarios que coincidan con su búsqueda.</p>
         </div>
       )}
+      </div>
     </div>
   );
 };

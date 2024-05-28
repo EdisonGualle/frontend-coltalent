@@ -11,6 +11,7 @@ import {
   RiDashboardLine,
   RiUserStarLine,
   RiSettings3Line,
+  RiClipboardLine
 } from "react-icons/ri";
 
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
@@ -50,7 +51,7 @@ const Sidebar = () => {
                 to=""
                 className="flex text-secondary-100  items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100   hover:text-black transition-colors"
               >
-                <RiDashboardLine className="text-primary text-xl group-hover:text-yellow-500" /> Dashboard
+                <RiDashboardLine className="text-primary text-xl group-hover:text-yellow-500" /> Tablero
               </Link>
             </li>
 
@@ -58,7 +59,7 @@ const Sidebar = () => {
             {(userRole === 'administrador' || userRole === 'superadministrador'|| userRole === 'empleado') && (
             <li className="group">
               <Link
-                to=""
+                to="/perfil"
                 className="flex  text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100   hover:text-black transition-colors"
               >
                 <RiUser3Line className="text-primary text-xl group-hover:text-yellow-500" /> Mi Perfil
@@ -86,6 +87,53 @@ const Sidebar = () => {
               >
                 <RiUser3Line className="text-primary text-xl group-hover:text-yellow-500" /> Usuarios
               </Link>
+            </li>
+            )}
+             {/*Asistencia */}
+             {(userRole === 'administrador' || userRole === 'superadministrador') && (
+            <li className="group">
+              <button
+                onClick={() => toggleSubMenu(2)}
+                className="w-full flex text-secondary-100 items-center justify-between py-2 px-4 rounded-lg hover:bg-secondary-100    hover:text-black transition-colors"
+              >
+                <span className="flex items-center gap-4">
+                  <RiClipboardLine className="text-primary text-xl group-hover:text-yellow-500" />{" "}
+                  Asistencia y tiempo
+                </span>
+                <RiArrowRightSLine
+                  className={`mt-1 ${activeSubmenus.includes(2) && "rotate-90"
+                    } transition-all`}
+                />
+              </button>
+              <ul
+                className={` ${activeSubmenus.includes(2) ? "h-[110px]" : "h-0"
+                  } overflow-y-hidden transition-all`}
+              >
+                <li >
+                  <Link
+                    to="/asistencia"
+                    className="py-2 text-secondary-100 px-4 border-l border-gray-500 ml-6 block relative before:w-3 before:h-3 before:absolute before:bg-lime-500 before:rounded-full before:-left-[6.5px] before:top-1/2 before:-translate-y-1/2 before:border-4 before:border-secondary-100 hover:text-primary transition-colors"
+                  >
+                    Asistencia
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/unidades"
+                    className="py-2   text-secondary-100 px-4 border-l border-gray-500 ml-6 block relative before:w-3 before:h-3 before:absolute before:bg-violet-500 before:rounded-full before:-left-[6.5px] before:top-1/2 before:-translate-y-1/2 before:border-4 before:border-secondary-100 hover:text-primary transition-colors"
+                  >
+                    Mi horario
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/cargos"
+                    className="py-2    text-secondary-100 px-4 border-l border-gray-500 ml-6 block relative before:w-3 before:h-3 before:absolute before:bg-purple-500 before:rounded-full before:-left-[6.5px] before:top-1/2 before:-translate-y-1/2 before:border-4 before:border-secondary-100 hover:text-primary transition-colors"
+                  >
+                    Configuracion
+                  </Link>
+                </li>
+              </ul>
             </li>
             )}
             {/* Información de la Empresa */}

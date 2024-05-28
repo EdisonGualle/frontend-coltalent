@@ -132,7 +132,7 @@ const CustomSelect = ({
         menuPortalTarget={document.body}
         isSearchable={isSearchable}
       />
-      {selectError && <p className="text-red-500 text-sm mt-1">{selectError}</p>}
+      {selectError && <p className="text-red-500 text-xs mt-1">{selectError}</p>}
     </div>
   );
 };

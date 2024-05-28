@@ -34,9 +34,12 @@ import { AlertProvider } from "./contexts/AlertContext";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 
-// Pruebas
-import CreateDepartmentForm from "./pages/admin/Organization/Departament/pruebba";
-import Department from "./components/prueba";
+// Perfil
+import Perfil from "./pages/admin/perfil/Index";
+
+// Asistencia 
+import Attendance from "./pages/admin/Attendance/Index";
+
 
 
 function App() {
@@ -54,12 +57,20 @@ function App() {
             {/* Rutas protegidas que requieren autenticación */}
             <Route element={<PrivateRoute />}>
               <Route path="/" element={<LayoutAdmin />}>
-                <Route index element={<Home />} />
-                <Route path="empleados" element={<EmployeeIndex />} />
+                <Route  index element={<Home />} />
+
                 <Route path="/perfil/configuracion" element={<Setting />} />
                 {/* User */}
                 <Route path="/usuarios" element={<UserIndex />} />
+
                 {/* Employee */}
+                <Route path="empleados" element={<EmployeeIndex />} />
+
+                {/* Perfil */}
+                <Route path="/perfil/*" element={<Perfil />} />
+
+                {/* Asistencia */}
+                <Route path="/asistencia" element={<Attendance />} />
 
 
                 {/* Organization */}

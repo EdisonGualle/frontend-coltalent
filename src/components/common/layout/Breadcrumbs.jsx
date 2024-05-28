@@ -8,12 +8,25 @@ const Breadcrumbs = () => {
   const breadcrumbItems = [
     { icon: <FaHome />, label: "Home", path: "/" },
     { label: "Empleados", path: "/empleados" },
+
+    { label: "Asistencia", path: "/asistencia" },
     { label: "Direcciones", path: "/direcciones" },
     { label: "Unidades", path: "/unidades" },
     { label: "Perfil", path: "/perfil" },
+    { label: "Datos Personales", path: "/perfil/datos-personales" },
+    { label: "Datos Laborales", path: "/perfil/datos-laborales" },
+    { label: "Educación", path: "/perfil/educacion" },
+    { label: "Idiomas", path: "/perfil/idiomas" },
+    { label: "Publicaciones", path: "/perfil/publicaciones" },
+    { label: "Capacitaciones", path: "/perfil/capacitaciones" },
+    { label: "Experiencia Laboral", path: "/perfil/experiencia-laboral" },
+    { label: "Referencia Laboral", path: "/perfil/referencia-laboral" },
+    { label: "Asistencia", path: "/perfil/asistencias" },
+    { label: "Permisos", path: "/perfil/permisos" },
+    { label: "Salidas a Campo", path: "/perfil/salidas-a-campo" },
+    { label: "Configuración", path: "/perfil/configuracion" },
     { label: "Cargos", path: "/cargos" },
     { label: "Usuarios", path: "/usuarios" },
-    { label: "Configuración", path: "/perfil/configuracion" },
   ];
 
   const activeBreadcrumbItems = breadcrumbItems.filter((item) =>
