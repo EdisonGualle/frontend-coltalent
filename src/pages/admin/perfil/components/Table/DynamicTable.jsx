@@ -70,7 +70,7 @@ const DynamicTable = ({ title, columns, data, onAddNew, onGenerateReport, onEdit
   const someSelected = selectedCount > 0 && !allSelected;
 
   return (
-    <div className="shadow-md rounded-lg bg-gray-50 relative px-3 pb-3">
+    <div className=" flex-1   shadow-md rounded-lg bg-gray-50 relative px-3 pb-3">
       <div className="flex justify-between items-center py-4">
         <h2 className="text-sm font-semibold text-gray-800">{title}</h2>
         <div className="flex items-center space-x-4">
@@ -91,7 +91,7 @@ const DynamicTable = ({ title, columns, data, onAddNew, onGenerateReport, onEdit
           </div>
         </div>
       </div>
-      <div className="h-[57.9vh] overflow-auto custom-scrollbar ">
+      <div className="  overflow-auto custom-scrollbar ">
         <table className="min-w-full leading-normal">
           <thead>
             <tr className="bg-gray-100 text-gray-600 uppercase text-xs leading-normal">

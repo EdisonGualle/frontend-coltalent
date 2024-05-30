@@ -12,7 +12,6 @@ import Publication from "./Ability/Publication";
 import Training from "./Ability/Training";
 import WorkExperience from "./Ability/WorkExperience";
 import WorkReference from "./Ability/WorkReference";
-import AttendanceTable from "../Attendance/components/Table/AttendanceTable";
 
 
 
@@ -28,7 +27,7 @@ const Perfil = () => {
         <Header />
         <div className="flex-1  shadow-lg overflow-auto custom-scrollbar ">
           <Routes>
-          <Route index element={<Dashboard />} />
+            <Route index element={<Dashboard />} />
             <Route path="datos-personales" element={<PersonalData />} />
             <Route path="educacion" element={<Education />} />
             <Route path="idiomas" element={<Language />} />
@@ -36,8 +35,10 @@ const Perfil = () => {
             <Route path="capacitaciones" element={<Training />} />
             <Route path="experiencia-laboral" element={<WorkExperience />} />
             <Route path="referencia-laboral" element={<WorkReference />} />
-            <Route path="asistencias" element={<AttendanceTable />} />
-            
+
+            {/* Redirección específica */}
+            <Route path="asistencias" element={<Navigate to="/asistencia" replace />} />
+
             {/* Maneja rutas no definidas dentro de Perfil */}
             <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>

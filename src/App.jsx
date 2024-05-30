@@ -70,7 +70,7 @@ function App() {
                 <Route path="/perfil/*" element={<Perfil />} />
 
                 {/* Asistencia */}
-                <Route path="/asistencia" element={<Attendance />} />
+                <Route path="/asistencia/*" element={<Attendance />} />
 
 
                 {/* Organization */}

@@ -106,7 +106,7 @@ const Sidebar = () => {
                 />
               </button>
               <ul
-                className={` ${activeSubmenus.includes(2) ? "h-[110px]" : "h-0"
+                className={` ${activeSubmenus.includes(2) ? "h-[75px]" : "h-0"
                   } overflow-y-hidden transition-all`}
               >
                 <li >
@@ -115,14 +115,6 @@ const Sidebar = () => {
                     className="py-2 text-secondary-100 px-4 border-l border-gray-500 ml-6 block relative before:w-3 before:h-3 before:absolute before:bg-lime-500 before:rounded-full before:-left-[6.5px] before:top-1/2 before:-translate-y-1/2 before:border-4 before:border-secondary-100 hover:text-primary transition-colors"
                   >
                     Asistencia
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/unidades"
-                    className="py-2   text-secondary-100 px-4 border-l border-gray-500 ml-6 block relative before:w-3 before:h-3 before:absolute before:bg-violet-500 before:rounded-full before:-left-[6.5px] before:top-1/2 before:-translate-y-1/2 before:border-4 before:border-secondary-100 hover:text-primary transition-colors"
-                  >
-                    Mi horario
                   </Link>
                 </li>
                 <li>
@@ -153,7 +145,7 @@ const Sidebar = () => {
                 />
               </button>
               <ul
-                className={` ${activeSubmenus.includes(1) ? "h-[110px]" : "h-0"
+                className={` ${activeSubmenus.includes(1) ? "h-[115px]" : "h-0"
                   } overflow-y-hidden transition-all`}
               >
                 <li >

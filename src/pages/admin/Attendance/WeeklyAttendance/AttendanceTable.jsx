@@ -4,6 +4,16 @@ import { FaSignInAlt, FaSignOutAlt } from 'react-icons/fa';
 import { MdOutlineFreeBreakfast, MdRestaurantMenu } from 'react-icons/md';
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from 'react-icons/ai';
 import { format, startOfWeek, addDays } from 'date-fns';
+import { es } from 'date-fns/locale';
+
+const capitalizeFirstLetter = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+const formatMonth = (date) => {
+  const month = format(date, 'MMM', { locale: es });
+  return capitalizeFirstLetter(month);
+};
 
 const AttendanceTable = () => {
   const [expanded, setExpanded] = useState(null);
@@ -29,6 +39,7 @@ const AttendanceTable = () => {
         lunchIn: '2024-05-27 12:00',
         lunchOut: '2024-05-27 12:30',
         fullTime: true,
+        completedHours: true,
       },
       {
         hours: '5h 00m',
@@ -36,6 +47,7 @@ const AttendanceTable = () => {
         punchIn: '2024-05-28 09:00',
         punchOut: '2024-05-28 14:00',
         fullTime: false,
+        completedHours: false,
       },
       {
         hours: '6h 30m',
@@ -58,8 +70,8 @@ const AttendanceTable = () => {
     const daysWithDates = currentWeek.map((day, index) => {
       const date = addDays(start, index);
       return {
-        day: day.day || format(date, 'E'), // Día de la semana (abreviado)
-        date: day.date || format(date, 'dd MMM'), // Fecha en formato 'dd MMM'
+        day: capitalizeFirstLetter(format(date, 'eee', { locale: es })), // Día de la semana (abreviado) en español con la primera letra en mayúscula
+        date: `${format(date, 'dd')} ${formatMonth(date)}`, // Fecha en formato 'dd MMM' en español con la primera letra del mes en mayúscula
         ...day,
       };
     });
@@ -72,18 +84,18 @@ const AttendanceTable = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 m-4 bg-gray-50 rounded-xl shadow-md">
+    <div className=" mx-auto p-2 m-4 bg-gray-50 rounded-xl shadow-md">
       <div className="space-y-2">
         {days.map((day, index) => (
-          <div key={index} className={`rounded-xl ${expanded === index ? 'border-2 border-black' : ''} ${index === 0 && expanded === index ? 'rounded-t-xl' : ''} ${index === days.length - 1 && expanded === index ? 'rounded-b-xl' : ''}`}>
+          <div key={index} className={`rounded-xl ${expanded === index ? 'border-2 border-gray-400' : ''} ${index === 0 && expanded === index ? 'rounded-t-xl' : ''} ${index === days.length - 1 && expanded === index ? 'rounded-b-xl' : ''}`}>
             <div
-              className={`flex items-center justify-between p-2 cursor-pointer rounded-xl ${index === 0 || index === days.length - 1 ? 'bg-gray-200' : 'bg-white'} flex-wrap`}
+              className={`flex items-center justify-between p-2 cursor-pointer rounded-xl ${index === 0 || index === days.length - 1 ? 'bg-gray-200' : day.completedHours === false ? 'bg-rose-100' : 'bg-white'} flex-wrap`}
               onClick={() => handleRowClick(index)}
             >
               <div className="flex items-center w-full md:w-auto">
-                <div className={`flex flex-col items-center justify-center w-14 h-14 rounded-2xl ${expanded === index ? 'bg-gray-500' : 'bg-gray-100'}`}>
-                  <span className={`text-sm ${expanded === index ? 'text-white' : 'text-gray-700'} font-bold`}>{day.day}</span>
-                  <span className={`text-xs ${expanded === index ? 'text-white' : 'text-gray-500'}`}>{day.date}</span>
+                <div className={`flex flex-col items-center justify-center w-14 h-14 rounded-2xl ${day.completedHours === false ? 'bg-rose-400' : expanded === index ? 'bg-gray-500' : 'bg-gray-100'}`}>
+                  <span className={`text-sm ${day.completedHours === false ? 'text-white' : expanded === index ? 'text-white' : 'text-gray-700'} font-bold`}>{day.day}</span>
+                  <span className={`text-xs ${day.completedHours === false ? 'text-white' : expanded === index ? 'text-white' : 'text-gray-500'}`}>{day.date}</span>
                 </div>
                 <div className="ml-4">
                   <div className="text-md font-medium text-gray-800">{day.hours}</div>
@@ -100,7 +112,7 @@ const AttendanceTable = () => {
                   ) : (
                     <div className="flex items-center text-red-500">
                       <AiOutlineCloseCircle className="mr-1" />
-                      <span className="text-xs text-gray-600">Tiempo no completo</span>
+                      <span className="text-xs text-gray-600">Tiempo incompleto</span>
                     </div>
                   )}
                 </div>

@@ -3,7 +3,6 @@ import { Link, useLocation } from "react-router-dom";
 import {
   FaUserCircle,
   FaBriefcase,
-  FaGraduationCap,
   FaSchool,
   FaBook,
   FaChalkboardTeacher,
@@ -24,7 +23,7 @@ const InternalSidebar = () => {
 
   return (
     <div className="bg-slate-200 shadow-lg rounded-lg p-4 w-64">
-      <h5 className="text-gray-900 text-lg font-bold mb-4">PERFIL EMPLEADO</h5>
+      <h5 className="text-gray-900 text-lg text-center font-bold mb-4">PERFIL EMPLEADO</h5>
       <Link className="flex flex-col items-center mb-6 text-gray-700 hover:text-blue-500" to="">
         <div className="flex flex-col items-center">
           <img
