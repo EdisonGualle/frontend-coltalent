@@ -1,6 +1,5 @@
+import { AvatarCell } from '../../../../../components/Table/AvatarCell';
 import { SelectColumnFilter } from '../../../../../components/Table/SelectColumnFilter';
-import { AvatarCell } from './AvatarCell';
-
 
 export const UnitColumns = [
   {
@@ -17,13 +16,13 @@ export const UnitColumns = [
   },
   {
     Header: "Dirección",
-    accessor: 'department.name',
+    accessor: 'direction.name',
     Filter: SelectColumnFilter,  
   },
   {
     Header: "Jefe de Unidad",
-    accessor: 'head_employee_name',
+    accessor: 'manager.name',
     Cell: AvatarCell,
-    imgAccessor: "head_employee_photo",
+    imgAccessor: "manager.photo",
   },
 ];

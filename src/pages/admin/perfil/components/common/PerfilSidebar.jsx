@@ -15,7 +15,7 @@ import {
 } from 'react-icons/fa';
 import { useAuth } from "../../../../../hooks/useAuth";
 
-const InternalSidebar = () => {
+const PerfilSidebar = () => {
   const { user } = useAuth();
   const location = useLocation();
 
@@ -163,4 +163,4 @@ const InternalSidebar = () => {
   );
 };
 
-export default InternalSidebar;
+export default PerfilSidebar;

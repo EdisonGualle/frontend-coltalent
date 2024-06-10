@@ -8,8 +8,8 @@ const Breadcrumbs = () => {
   const breadcrumbItems = [
     { icon: <FaHome />, label: "Home", path: "/" },
     { label: "Empleados", path: "/empleados" },
-
     { label: "Asistencia", path: "/asistencia" },
+    { label: "Permisos", path: "/solicitudes" },
     { label: "Direcciones", path: "/direcciones" },
     { label: "Unidades", path: "/unidades" },
     { label: "Perfil", path: "/perfil" },
@@ -21,9 +21,8 @@ const Breadcrumbs = () => {
     { label: "Capacitaciones", path: "/perfil/capacitaciones" },
     { label: "Experiencia Laboral", path: "/perfil/experiencia-laboral" },
     { label: "Referencia Laboral", path: "/perfil/referencia-laboral" },
-    { label: "Asistencia", path: "/perfil/asistencias" },
-    { label: "Permisos", path: "/perfil/permisos" },
-    { label: "Salidas a Campo", path: "/perfil/salidas-a-campo" },
+    { label: "Historial de asistencias", path: "/asistencia/historial" },
+    { label: "Horario Laboral", path: "/asistencia/horario" },
     { label: "Configuración", path: "/perfil/configuracion" },
     { label: "Cargos", path: "/cargos" },
     { label: "Usuarios", path: "/usuarios" },

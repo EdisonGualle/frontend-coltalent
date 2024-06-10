@@ -5,13 +5,14 @@ import Textarea from "../../../../components/ui/Textarea";
 import CustomSelect from "../../../../components/ui/Select";
 import { fetchUnits } from "../../../../redux/Organization/UnitSlince";
 import { validateName } from "../../../../Utils/validationsV2";
-
-
+import { fetchDepartments } from "../../../../redux/Organization/DepartamentSlice";
 
 const NAME_REQUIRED = "Se requiere el nombre del cargo.";
 const FUNCTION_REQUIRED = "Indica la función que desempeña el cargo.";
 const FUNCTION_DESCRIPTION_REQUIRED = "Proporciona una descripción de la función que desempeña el cargo.";
-const UNIT_REQUIRED = "Selecciona un departamento.";
+const UNIT_REQUIRED = "Selecciona una unidad.";
+const DIRECTION_REQUIRED = "Selecciona una dirección.";
+const UNIT_OR_DIRECTION_REQUIRED = "Debe seleccionar una unidad o una dirección.";
 
 const PositionForm = ({
     position,
@@ -27,75 +28,88 @@ const PositionForm = ({
     const dispatch = useDispatch();
     const unitsState = useSelector((state) => state.unit);
     const units = unitsState ? unitsState.units : [];
+    const departmentsState = useSelector((state) => state.departament);
+    const departments = departmentsState ? departmentsState.departments : [];
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+    const [selectedOption, setSelectedOption] = useState(null);
 
-
-    // Estados locales para manejar los errores y los datos del formularios
     const [formData, setFormData] = useState({
         name: "",
         functionDescription: "",
         selectedUnit: null,
+        selectedDirection: null,
+        isManager: false,
     });
+
     const [errors, setErrors] = useState({
         name: "",
         function: "",
         unit_id: "",
+        direction_id: "",
+        belongsTo: "",
+        is_manager: "",
     });
 
-    
-    // Desestructurar los datos del formulario
-    const { name, functionDescription, selectedUnit } = formData;
+    const { name, functionDescription, selectedUnit, selectedDirection, isManager } = formData;
 
-    // Efecto para actualizar los errores del formulario
     useEffect(() => {
         setErrors(formErrors);
     }, [formErrors]);
 
-    // Efecto para cargar las unidades
     useEffect(() => {
         dispatch(fetchUnits());
+        dispatch(fetchDepartments());
     }, [dispatch]);
 
-    // Efecto para cargar los datos del cargo a editar
     useEffect(() => {
-        // Encontrar la unidad seleccionada
         const positionUnit = units.find((unit) => unit.id === position?.unit?.id);
+        const positionDirection = departments.find((department) => department.id === position?.direction?.id);
 
-        //Validar los datos del cargo
-        if (isEditing && position && units.length > 0) {
+        if (isEditing && position && (units.length > 0 || departments.length > 0)) {
             const nameError = validateName(position.name) || "";
             const functionError = !position.function ? FUNCTION_REQUIRED : "";
-            // Actualizar los datos del formulario y los errores
+            const belongsToValue = position.unit ? 'unit' : (position.direction ? 'direction' : null);
+
             setFormData({
                 name: position.name,
                 functionDescription: position.function,
                 selectedUnit: positionUnit ? { value: positionUnit, label: positionUnit.name } : null,
+                selectedDirection: positionDirection ? { value: positionDirection, label: positionDirection.name } : null,
+                isManager: position.is_manager === 1,
             });
+            setSelectedOption(belongsToValue);
             setErrors({
                 name: nameError,
                 function: functionError,
                 unit_id: "",
+                direction_id: "",
+                belongsTo: "",
+                is_manager: "",
             });
         }
-    }, [position, units, isEditing]);
+    }, [position, units, departments, isEditing]);
 
-    // Efecto para limpiar los datos del formulario al cancelar la edición
     useEffect(() => {
         if (!isEditing) {
             setFormData({
                 name: "",
                 functionDescription: "",
                 selectedUnit: null,
+                selectedDirection: null,
+                isManager: false,
             });
+            setSelectedOption(null);
             setErrors({
                 name: "",
                 function: "",
                 unit_id: "",
+                direction_id: "",
+                belongsTo: "",
+                is_manager: "",
             });
         }
     }, [isEditing]);
 
-    // Función para manejar los cambios en los campos del formulario
     const handleChange = (e) => {
         const { name, value } = e.target;
 
@@ -110,52 +124,89 @@ const PositionForm = ({
         setFormData({ ...formData, [name]: value });
     };
 
-    // Función para manejar los cambios en el campo de la unidad
     const handleUnitChange = (option) => {
-        setFormData({ ...formData, selectedUnit: option });
+        setFormData({ ...formData, selectedUnit: option, selectedDirection: null });
         setErrors((prevState) => ({
             ...prevState,
-            unit_id: option ? "" : UNIT_REQUIRED
+            unit_id: option ? "" : UNIT_REQUIRED,
+            direction_id: "",
+            belongsTo: "",
+            is_manager: "",
         }));
     };
 
-    // Efecto para deshabilitar el botón de enviar si hay errores
+    const handleDirectionChange = (option) => {
+        setFormData({ ...formData, selectedDirection: option, selectedUnit: null });
+        setErrors((prevState) => ({
+            ...prevState,
+            direction_id: option ? "" : DIRECTION_REQUIRED,
+            unit_id: "",
+            belongsTo: "",
+            is_manager: "",
+        }));
+    };
+
+    const handleOptionChange = (e) => {
+        const { value } = e.target;
+        setSelectedOption(value);
+        setFormData({
+            ...formData,
+            selectedUnit: null,
+            selectedDirection: null,
+            isManager: false,
+        });
+        setErrors((prevState) => ({
+            ...prevState,
+            unit_id: "",
+            direction_id: "",
+            belongsTo: "",
+            is_manager: "",
+        }));
+    };
+
+    const handleIsManagerChange = (e) => {
+        setFormData({ ...formData, isManager: e.target.checked });
+        setErrors((prevState) => ({
+            ...prevState,
+            is_manager: "",
+        }));
+    };
+
     useEffect(() => {
         const isDisabled = Object.values(errors).some((error) => error);
         setIsSubmitDisabled(isDisabled);
     }, [errors]);
 
-    // Función para manejar el envío del formulario
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validar los campos del formulario
         const newErrors = {
             name: !name ? NAME_REQUIRED : "",
             function: !functionDescription ? FUNCTION_REQUIRED : "",
-            unit_id: !selectedUnit ? UNIT_REQUIRED : "",
+            unit_id: selectedOption === "unit" && !selectedUnit ? UNIT_REQUIRED : "",
+            direction_id: selectedOption === "direction" && !selectedDirection ? DIRECTION_REQUIRED : "",
+            belongsTo: !selectedOption ? UNIT_OR_DIRECTION_REQUIRED : "",
         };
 
-        // Actualizar los errores
         setErrors(newErrors);
 
-        // Verificar si hay errores
         const hasErrors = Object.values(newErrors).some((error) => error);
 
         if (!hasErrors) {
             const unitId = selectedUnit ? selectedUnit.value.id : null;
+            const directionId = selectedDirection ? selectedDirection.value.id : null;
 
-            // Crear el objeto con los datos del formulario
             const updatePositionData = {
                 name,
                 function: functionDescription,
                 unit_id: unitId,
+                direction_id: directionId,
+                is_manager: isManager,
             };
 
-            // Enviar los datos del formulario al componente padre
             onSubmit(updatePositionData);
         }
-    }
+    };
 
     return (
         <form onSubmit={handleSubmit}>
@@ -177,33 +228,93 @@ const PositionForm = ({
                     error={errors.function}
                     rows={2}
                 />
-                <CustomSelect
-                    label="Departamento"
-                    options={units}
-                    value={selectedUnit}
-                    onChange={handleUnitChange}
-                    placeholder="Selecciona una unidad"
-                    error={errors.unit_id}
-                    isSearchable={true}
-                    labelKey="name"
-                />
-                 <CustomSelect
-                    label="Unidad"
-                    options={units}
-                    value={selectedUnit}
-                    onChange={handleUnitChange}
-                    placeholder="Selecciona una unidad"
-                    error={errors.unit_id}
-                    isSearchable={true}
-                    labelKey="name"
-                />
+                <div className="flex gap-4">
+                    <label>
+                        <input
+                            type="radio"
+                            name="belongsTo"
+                            value="unit"
+                            checked={selectedOption === "unit"}
+                            onChange={handleOptionChange}
+                        />
+                        Unidad
+                    </label>
+                    <label>
+                        <input
+                            type="radio"
+                            name="belongsTo"
+                            value="direction"
+                            checked={selectedOption === "direction"}
+                            onChange={handleOptionChange}
+                        />
+                        Dirección
+                    </label>
+                </div>
+                {selectedOption === "unit" && (
+                    <>
+                        <CustomSelect
+                            label="Unidad"
+                            options={units}
+                            value={selectedUnit}
+                            onChange={handleUnitChange}
+                            placeholder="Selecciona una unidad"
+                            error={errors.unit_id}
+                            isSearchable={true}
+                            labelKey="name"
+                        />
+                        <label className="flex items-center mt-2">
+                            <input
+                                type="checkbox"
+                                name="isManager"
+                                checked={isManager}
+                                onChange={handleIsManagerChange}
+                                className="mr-2"
+                            />
+                            ¿Es jefe de la unidad?
+                        </label>
+                    </>
+                )}
+                {selectedOption === "direction" && (
+                    <>
+                        <CustomSelect
+                            label="Dirección"
+                            options={departments}
+                            value={selectedDirection}
+                            onChange={handleDirectionChange}
+                            placeholder="Selecciona una dirección"
+                            error={errors.direction_id}
+                            isSearchable={true}
+                            labelKey="name"
+                        />
+                        <label className="flex items-center mt-2">
+                            <input
+                                type="checkbox"
+                                name="isManager"
+                                checked={isManager}
+                                onChange={handleIsManagerChange}
+                                className="mr-2"
+                            />
+                            ¿Es jefe de la dirección?
+                        </label>
+                    </>
+                )}
+                {errors.belongsTo && (
+                    <div className="text-red-500 text-sm mt-2">
+                        {errors.belongsTo}
+                    </div>
+                )}
+                {errors.is_manager && (
+                    <div className="text-red-500 text-sm mt-2">
+                        {errors.is_manager}
+                    </div>
+                )}
             </div>
             <div className="flex justify-end gap-4 mt-6">
                 <button
                     type="submit"
                     className={`p-2 px-1 rounded-xl text-white w-full outline-none border border-transparent transform transition-all duration-300 hover:scale-105 ${isSubmitDisabled
-                        ? `${confirmButtonColor} opacity-70 cursor-not-allowed` // Estilos cuando está deshabilitado
-                        : `${confirmButtonColor}` // Estilos cuando está habilitado
+                        ? `${confirmButtonColor} opacity-70 cursor-not-allowed`
+                        : `${confirmButtonColor}`
                         }`}
                     disabled={isSubmitDisabled}
                 >
@@ -222,4 +333,3 @@ const PositionForm = ({
 }
 
 export default PositionForm;
-

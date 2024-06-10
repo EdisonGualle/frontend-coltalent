@@ -1,4 +1,3 @@
-// src/components/AttendanceTable.js
 import React, { useState, useEffect } from 'react';
 import { FaSignInAlt, FaSignOutAlt } from 'react-icons/fa';
 import { MdOutlineFreeBreakfast, MdRestaurantMenu } from 'react-icons/md';
@@ -15,7 +14,7 @@ const formatMonth = (date) => {
   return capitalizeFirstLetter(month);
 };
 
-const AttendanceTable = () => {
+const AttendanceList = () => {
   const [expanded, setExpanded] = useState(null);
   const [days, setDays] = useState([]);
 
@@ -178,4 +177,4 @@ const AttendanceTable = () => {
   );
 };
 
-export default AttendanceTable;
+export default AttendanceList;

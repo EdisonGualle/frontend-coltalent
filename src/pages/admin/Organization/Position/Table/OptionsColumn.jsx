@@ -15,7 +15,6 @@ const OptionsColumn = ({ position, fetchPositions }) => {
   const [isOpenEditModal, setIsOpenEditModal] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
-
   // Efecto para limpiar los errores del formulario al cerrar el modal
   useEffect(() => {
     if (!isOpenEditModal) {
@@ -30,19 +29,19 @@ const OptionsColumn = ({ position, fetchPositions }) => {
     }
   }, [formErrors, isOpenEditModal]);
 
-
   // Función para actualizar una posición
   const handleUpdate = async (formData) => {
-   
     try {
       // Obtener los datos del formulario
-      const { name, function: functionDescription, unit_id: unitId } = formData;
+      const { name, function: functionDescription, unit_id: unitId, direction_id: directionId, is_manager: isManager } = formData;
 
       // Crear el objeto con los datos actualizados
       const data = {
         name,
         function: functionDescription,
         unit_id: unitId,
+        direction_id: directionId,
+        is_manager: isManager,
       };
 
       // Crear el objeto con los datos actualizados a enviar a la API
@@ -50,7 +49,7 @@ const OptionsColumn = ({ position, fetchPositions }) => {
         id: position.id,
         data,
       };
-      
+
       // Despachar la acción para actualizar la posición
       const actionResult = await dispatch(updateOnePosition(updatedData));
       // Desempaquetar el resultado de la acción
@@ -67,6 +66,8 @@ const OptionsColumn = ({ position, fetchPositions }) => {
         name: errors.name ? errors.name[0] : '',
         function: errors.function ? errors.function[0] : '',
         unit_id: errors.unit_id ? errors.unit_id[0] : '',
+        direction_id: errors.direction_id ? errors.direction_id[0] : '',
+        is_manager: errors.is_manager ? errors.is_manager[0] : '',
       };
 
       // Mostrar alerta si hay errores
@@ -76,7 +77,6 @@ const OptionsColumn = ({ position, fetchPositions }) => {
         showAlert('Error al actualizar el cargo', 'error');
         setIsOpenEditModal(false);
       }
-
     }
   };
 
@@ -103,7 +103,6 @@ const OptionsColumn = ({ position, fetchPositions }) => {
     setIsOpenEditModal(false);
   };
 
-
   // Funciones para manejar la apertura y cierre del dialogo y eliminar la unidad
   const handleCancel = () => setIsOpenDialog2(false);
   const handleClick = async () => setIsOpenDialog2(true);
@@ -111,7 +110,6 @@ const OptionsColumn = ({ position, fetchPositions }) => {
     await handleDelete();
     setIsOpenDialog2(false);
   };
-
 
   return (
     <>
@@ -163,7 +161,6 @@ const OptionsColumn = ({ position, fetchPositions }) => {
           formErrors={formErrors}
         />
       </ModalForm>
-
     </>
   );
 };

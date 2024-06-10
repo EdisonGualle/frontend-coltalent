@@ -9,7 +9,6 @@ import ModalForm from '../../../../../components/ui/ModalForm';
 import UnitForm from '../UnitForm';
 import { fetchPositions } from '../../../../../redux/Organization/PositionSlice';
 
-
 const OptionsColumn = ({ unit, fetchUnits }) => {
   const dispatch = useDispatch();
   const { showAlert } = useContext(AlertContext);
@@ -33,18 +32,16 @@ const OptionsColumn = ({ unit, fetchUnits }) => {
 
   // Función para actualizar una unidad
   const handleUpdate = async (formData) => {
-
     try {
       // Obtener los datos del formulario
-      const { name, function: functionDescription, phone: landlinePhone, head_employee_id: headEmployeeId, department_id: departmentId } = formData;
+      const { name, function: functionDescription, phone: landlinePhone, direction_id: directionId } = formData;
 
       // Crear el objeto con los datos actualizados
       const data = {
         name,
         function: functionDescription,
         phone: landlinePhone,
-        head_employee_id: headEmployeeId,
-        department_id: departmentId,
+        direction_id: directionId,
       };
 
       // Crear el objeto con los datos actualizados a enviar a la API
@@ -70,8 +67,7 @@ const OptionsColumn = ({ unit, fetchUnits }) => {
         name: errors.name ? errors.name[0] : '',
         function: errors.function ? errors.function[0] : '',
         phone: errors.phone ? errors.phone[0] : '',
-        department_id: errors.department_id ? errors.department_id[0] : '',
-        head_employee_id: errors.head_employee_id ? errors.head_employee_id[0] : '',
+        direction_id: errors.direction_id ? errors.direction_id[0] : '',
       };
       // Mostrar alerta si hay errores
       if (Object.values(formErrors).some(Boolean)) {
@@ -96,7 +92,7 @@ const OptionsColumn = ({ unit, fetchUnits }) => {
     } catch (error) {
       showAlert('Error al eliminar la unidad', 'error');
     }
-  }
+  };
 
   // Funciones para manejar la apertura y cierre del modal y actualizar la unidad
   const handleEditClick = () => setIsOpenEditModal(true);
@@ -106,7 +102,6 @@ const OptionsColumn = ({ unit, fetchUnits }) => {
     setIsOpenEditModal(false);
   };
 
-
   // Funciones para manejar la apertura y cierre del dialogo y eliminar la unidad
   const handleCancel = () => setIsOpenDialog2(false);
   const handleClick = async () => setIsOpenDialog2(true);
@@ -114,7 +109,6 @@ const OptionsColumn = ({ unit, fetchUnits }) => {
     await handleDelete();
     setIsOpenDialog2(false);
   };
-
 
   return (
     <>
@@ -165,7 +159,6 @@ const OptionsColumn = ({ unit, fetchUnits }) => {
         />
       </ModalForm>
     </>
-
   );
 };
 

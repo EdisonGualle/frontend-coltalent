@@ -10,6 +10,7 @@ const getUnits = async () => {
 
 const createUnit = async (newUnit) => {
   try {
+    console.log(newUnit)
     const response = await AxiosInstance.post('/units', newUnit);
     return response.data;
   } catch (error) {

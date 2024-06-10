@@ -11,8 +11,8 @@ export const DepartamentColumns = [
   },
   {
     Header: "Jefe de Dirección",
-    accessor: 'head_employee_name',
+    accessor: 'manager.name',
     Cell: AvatarCell,
-    imgAccessor: "head_employee_photo",
+    imgAccessor: 'manager.photo',
   },
 ];

@@ -1,8 +1,8 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
-import Sidebar from "./components/common/Sidebar";
-import Header from "./components/common/Header";
+import PerfilSidebar from "./components/common/PerfilSidebar";
+import PerfilHeader from "./components/common/PerfilHeader";
 import Dashboard from "./Dashboard";
 
 import PersonalData from "./Information/PersonalData";
@@ -13,18 +13,15 @@ import Training from "./Ability/Training";
 import WorkExperience from "./Ability/WorkExperience";
 import WorkReference from "./Ability/WorkReference";
 
-
-
-
 const Perfil = () => {
   return (
     <div className="flex h-[76vh]">
       <div className=" bg-slate-200 overflow-auto custom-scrollbar shadow-lg rounded-lg mt-1">
-        <Sidebar />
+        <PerfilSidebar />
       </div>
 
       <div className="flex flex-col w-3/4  mt-1 ms-2 ">
-        <Header />
+        <PerfilHeader />
         <div className="flex-1  shadow-lg overflow-auto custom-scrollbar ">
           <Routes>
             <Route index element={<Dashboard />} />

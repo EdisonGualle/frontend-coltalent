@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { FaRegClock, FaHistory, FaCalendarAlt, FaClipboardList } from "react-icons/fa";
 import { useAuth } from "../../../../../hooks/useAuth";
 
 const AttendanceSidebar = () => {
   const { user } = useAuth();
   const [currentTime, setCurrentTime] = useState("");
+  const location = useLocation();
 
   // Function to get the current time in Ecuador timezone (GMT -5.0)
   const getCurrentTimeInEcuador = () => {
@@ -32,10 +33,12 @@ const AttendanceSidebar = () => {
     alert('Hora marcada!');
   };
 
+  const isActive = (path) => location.pathname === path;
+
   return (
     <div className="bg-slate-200 rounded-lg pt-6 px-6 w-64">
       <h5 className="text-gray-900 text-lg text-center font-bold mb-4 uppercase">Asistencia Laboral</h5>
-      <Link className="flex flex-col items-center mb-6 text-gray-700 hover:text-blue-500" to="/perfil">
+      <Link className="flex flex-col items-center mb-6 text-gray-700 hover:text-blue-500" to="/asistencia">
         <div className="flex flex-col items-center">
           <img
             src={`${import.meta.env.VITE_STORAGE_URL}/${user.photo}`}
@@ -69,20 +72,20 @@ const AttendanceSidebar = () => {
         <span className="block text-gray-600 text-sm font-semibold mb-1">Opciones</span>
         <div className="flex flex-col space-y-2">
           <Link
-            to="/historial-asistencia"
-            className="flex items-center text-gray-700 text-sm px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-300"
+            to="/asistencia/historial"
+            className={`flex items-center text-gray-700 text-sm px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-300 ${isActive('/asistencia/historial') ? 'bg-slate-300' : ''}`}
           >
             <FaHistory className="mr-2" /> Historial de Asistencia
           </Link>
           <Link
-            to="/horario-laboral"
-            className="flex items-center text-gray-700 text-sm px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-300"
+            to="/asistencia/horario"
+            className={`flex items-center text-gray-700 text-sm px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-300 ${isActive('/asistencia/horario') ? 'bg-slate-300' : ''}`}
           >
             <FaCalendarAlt className="mr-2" /> Horario Laboral
           </Link>
           <Link
-            to="/reporte-mensual"
-            className="flex items-center text-gray-700 text-sm px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-300"
+            to=""
+            className={`flex items-cent\er text-gray-700 text-sm px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-300 `}
           >
             <FaClipboardList className="mr-2" /> Reporte Mensual
           </Link>

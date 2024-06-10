@@ -40,6 +40,10 @@ import Perfil from "./pages/admin/perfil/Index";
 // Asistencia 
 import Attendance from "./pages/admin/Attendance/Index";
 
+// Permisos
+import LeaveIndex from "./pages/admin/Leave/LeaveIndex";
+
+
 
 
 function App() {
@@ -71,6 +75,9 @@ function App() {
 
                 {/* Asistencia */}
                 <Route path="/asistencia/*" element={<Attendance />} />
+
+                {/* Permisos */}
+                <Route path="/solicitudes/*" element={<LeaveIndex />} />
 
 
                 {/* Organization */}

@@ -1,8 +1,12 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import AttendanceSidebar from "./components/common/Sidebar";
-import AttendanceHeader from "./components/common/Header";
-import AttendanceTable from "./WeeklyAttendance/AttendanceTable";
+import AttendanceSidebar from "./components/common/AttendanceSidebar;";
+import AttendanceHeader from "./components/common/AttendanceHeader";
+import AttendanceList from "./WeeklyAttendance/AttendanceList";
+import ParentComponent from "./MonthlyAttendance/ParentComponent";
+import Schedule from "./Schedule/Schedule";
+
+
 
 const Attendance = () => {
   return (
@@ -14,8 +18,10 @@ const Attendance = () => {
         <AttendanceHeader />
         <div className="flex-1 shadow-lg overflow-auto custom-scrollbar">
           <Routes>
-            <Route index element={<AttendanceTable />} />
-            {/* <Route path="datos-personales" element={<PersonalData />} /> */}
+            <Route index element={<AttendanceList/>} />
+            <Route path="historial" element={<ParentComponent />} />
+            <Route path="horario" element={<Schedule />} />
+
             {/* Maneja rutas no definidas dentro de Perfil */}
             <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>

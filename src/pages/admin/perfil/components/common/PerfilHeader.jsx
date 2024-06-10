@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 
-const Header = () => {
+const PerfilHeader = () => {
   const location = useLocation();
   let headerTitle = "";
 
@@ -59,4 +59,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default PerfilHeader;

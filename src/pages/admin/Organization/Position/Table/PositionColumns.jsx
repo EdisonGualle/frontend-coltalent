@@ -14,4 +14,9 @@ export const PositionColumns = [
     accessor: 'unit.name',
     Filter: SelectColumnFilter,  
   },
+  {
+    Header: "Dirección",
+    accessor: 'direction.name',
+    Filter: SelectColumnFilter,  
+  },
 ];

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../../hooks/useAuth";
-// Icons
 import {
   RiLogoutCircleRLine,
   RiArrowRightSLine,
@@ -11,24 +10,23 @@ import {
   RiDashboardLine,
   RiUserStarLine,
   RiSettings3Line,
-  RiClipboardLine
+  RiClipboardLine,
+  RiArrowDropRightLine,
+  RiShieldUserLine // Nuevo ícono para Permisos
 } from "react-icons/ri";
-
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
-
 
 const Sidebar = () => {
   const [showMenu, setShowMenu] = useState(false);
-  const [activeSubmenus, setActiveSubmenus] = useState([]);
-  const { logout, userRole } = useAuth();;
+  const [activeSubmenu, setActiveSubmenu] = useState(null);
+  const { logout, userRole } = useAuth();
+
   const toggleSubMenu = (index) => {
-    setActiveSubmenus((prevSubmenus) => {
-      if (prevSubmenus.includes(index)) {
-        return prevSubmenus.filter((item) => item !== index);
-      } else {
-        return [...prevSubmenus, index];
-      }
-    });
+    if (activeSubmenu === index) {
+      setActiveSubmenu(null); // Cerrar el submenú si ya está abierto
+    } else {
+      setActiveSubmenu(index); // Abrir un nuevo submenú y cerrar el anterior
+    }
   };
 
   const handleLogout = () => {
@@ -49,148 +47,221 @@ const Sidebar = () => {
             <li className="group">
               <Link
                 to=""
-                className="flex text-secondary-100  items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100   hover:text-black transition-colors"
+                className="flex text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
               >
                 <RiDashboardLine className="text-primary text-xl group-hover:text-yellow-500" /> Tablero
               </Link>
             </li>
 
-            {/* Mi Perfil */}
-            {(userRole === 'administrador' || userRole === 'superadministrador'|| userRole === 'empleado') && (
-            <li className="group">
-              <Link
-                to="/perfil"
-                className="flex  text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100   hover:text-black transition-colors"
-              >
-                <RiUser3Line className="text-primary text-xl group-hover:text-yellow-500" /> Mi Perfil
-              </Link>
-            </li>
+            {(userRole === 'administrador' || userRole === 'superadministrador' || userRole === 'empleado') && (
+              <li className="group">
+                <Link
+                  to="/perfil"
+                  className="flex text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
+                >
+                  <RiUser3Line className="text-primary text-xl group-hover:text-yellow-500" /> Mi Perfil
+                </Link>
+              </li>
             )}
 
-            {/* Empleados */}
             {(userRole === 'administrador' || userRole === 'superadministrador') && (
               <li className="group">
                 <Link
                   to="/empleados"
-                  className="flex  text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100   hover:text-black transition-colors"
+                  className="flex text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
                 >
                   <RiUserStarLine className="text-primary text-xl group-hover:text-yellow-500" /> Empleados
                 </Link>
               </li>
             )}
-            {/* Usuarios */}
             {(userRole === 'administrador' || userRole === 'superadministrador') && (
-            <li className="group">
-              <Link
-                to="/usuarios"
-                className="flex  text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100  hover:text-black transition-colors"
-              >
-                <RiUser3Line className="text-primary text-xl group-hover:text-yellow-500" /> Usuarios
-              </Link>
-            </li>
+              <li className="group">
+                <Link
+                  to="/usuarios"
+                  className="flex text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
+                >
+                  <RiUser3Line className="text-primary text-xl group-hover:text-yellow-500" /> Usuarios
+                </Link>
+              </li>
             )}
-             {/*Asistencia */}
-             {(userRole === 'administrador' || userRole === 'superadministrador') && (
-            <li className="group">
-              <button
-                onClick={() => toggleSubMenu(2)}
-                className="w-full flex text-secondary-100 items-center justify-between py-2 px-4 rounded-lg hover:bg-secondary-100    hover:text-black transition-colors"
-              >
-                <span className="flex items-center gap-4">
-                  <RiClipboardLine className="text-primary text-xl group-hover:text-yellow-500" />{" "}
-                  Asistencia y tiempo
-                </span>
-                <RiArrowRightSLine
-                  className={`mt-1 ${activeSubmenus.includes(2) && "rotate-90"
-                    } transition-all`}
-                />
-              </button>
-              <ul
-                className={` ${activeSubmenus.includes(2) ? "h-[75px]" : "h-0"
-                  } overflow-y-hidden transition-all`}
-              >
-                <li >
-                  <Link
-                    to="/asistencia"
-                    className="py-2 text-secondary-100 px-4 border-l border-gray-500 ml-6 block relative before:w-3 before:h-3 before:absolute before:bg-lime-500 before:rounded-full before:-left-[6.5px] before:top-1/2 before:-translate-y-1/2 before:border-4 before:border-secondary-100 hover:text-primary transition-colors"
-                  >
+
+            {(userRole === 'administrador' || userRole === 'superadministrador') && (
+              <li className="group">
+                <button
+                  onClick={() => toggleSubMenu(2)}
+                  className="w-full flex text-secondary-100 items-center justify-between py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
+                >
+                  <span className="flex items-center gap-4">
+                    <RiClipboardLine className="text-primary text-xl group-hover:text-yellow-500" />{" "}
                     Asistencia
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/cargos"
-                    className="py-2    text-secondary-100 px-4 border-l border-gray-500 ml-6 block relative before:w-3 before:h-3 before:absolute before:bg-purple-500 before:rounded-full before:-left-[6.5px] before:top-1/2 before:-translate-y-1/2 before:border-4 before:border-secondary-100 hover:text-primary transition-colors"
-                  >
-                    Configuracion
-                  </Link>
-                </li>
-              </ul>
-            </li>
+                  </span>
+                  <RiArrowRightSLine
+                    className={`mt-1 ${activeSubmenu === 2 && "rotate-90"} transition-all`}
+                  />
+                </button>
+                <ul
+                  className={` ${activeSubmenu === 2 ? "h-auto" : "h-0"} overflow-y-hidden transition-all`}
+                >
+                  <li>
+                    <Link
+                      to="/asistencia"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                    >
+                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
+                      Registro de Asistencia
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/cargos"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                    >
+                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
+                      Horarios de Trabajo
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/tipos-de-horarios"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                    >
+                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
+                      Tipos de Horarios
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/configuracion-asistencia"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                    >
+                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
+                      Configuración
+                    </Link>
+                  </li>
+                </ul>
+              </li>
             )}
-            {/* Información de la Empresa */}
+
             {(userRole === 'administrador' || userRole === 'superadministrador') && (
-            <li className="group">
-              <button
-                onClick={() => toggleSubMenu(1)}
-                className="w-full flex text-secondary-100 items-center justify-between py-2 px-4 rounded-lg hover:bg-secondary-100    hover:text-black transition-colors"
-              >
-                <span className="flex items-center gap-4">
-                  <HiOutlineOfficeBuilding className="text-primary text-xl group-hover:text-yellow-500" />{" "}
-                  Empresa
-                </span>
-                <RiArrowRightSLine
-                  className={`mt-1 ${activeSubmenus.includes(1) && "rotate-90"
-                    } transition-all`}
-                />
-              </button>
-              <ul
-                className={` ${activeSubmenus.includes(1) ? "h-[115px]" : "h-0"
-                  } overflow-y-hidden transition-all`}
-              >
-                <li >
-                  <Link
-                    to="/direcciones"
-                    className="py-2 text-secondary-100 px-4 border-l border-gray-500 ml-6 block relative before:w-3 before:h-3 before:absolute before:bg-lime-500 before:rounded-full before:-left-[6.5px] before:top-1/2 before:-translate-y-1/2 before:border-4 before:border-secondary-100 hover:text-primary transition-colors"
-                  >
-                    Direcciones
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/unidades"
-                    className="py-2   text-secondary-100 px-4 border-l border-gray-500 ml-6 block relative before:w-3 before:h-3 before:absolute before:bg-violet-500 before:rounded-full before:-left-[6.5px] before:top-1/2 before:-translate-y-1/2 before:border-4 before:border-secondary-100 hover:text-primary transition-colors"
-                  >
-                    Unidades
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/cargos"
-                    className="py-2   text-secondary-100 px-4 border-l border-gray-500 ml-6 block relative before:w-3 before:h-3 before:absolute before:bg-purple-500 before:rounded-full before:-left-[6.5px] before:top-1/2 before:-translate-y-1/2 before:border-4 before:border-secondary-100 hover:text-primary transition-colors"
-                  >
-                    Cargos
-                  </Link>
-                </li>
-              </ul>
-            </li>
+              <li className="group">
+                <button
+                  onClick={() => toggleSubMenu(3)}
+                  className="w-full flex text-secondary-100 items-center justify-between py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
+                >
+                  <span className="flex items-center gap-4">
+                    <RiShieldUserLine className="text-primary text-xl group-hover:text-yellow-500" />{" "}
+                    Permisos
+                  </span>
+                  <RiArrowRightSLine
+                    className={`mt-1 ${activeSubmenu === 3 && "rotate-90"} transition-all`}
+                  />
+                </button>
+                <ul
+                  className={` ${activeSubmenu === 3 ? "h-auto" : "h-0"} overflow-y-hidden transition-all`}
+                >
+                  <li>
+                    <Link
+                      to="/solicitudes"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                    >
+                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
+                      Solicitudes
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/autorizaciones"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                    >
+                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
+                      Autorizaciones
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/motivos-de-rechazo"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                    >
+                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
+                      Motivos de Rechazo
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/configuracion-permisos"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                    >
+                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
+                      Configuración
+                    </Link>
+                  </li>
+                </ul>
+              </li>
             )}
-            {/* Configuraciones */}
+
             {(userRole === 'administrador' || userRole === 'superadministrador') && (
-            <li className="group">
-              <Link
-                to=""
-                className="flex  text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100   hover:text-black transition-colors"
-              >
-                <RiSettings3Line className="text-primary text-xl group-hover:text-yellow-500" />
-                Configuraciones
-              </Link>
-            </li>
+              <li className="group">
+                <button
+                  onClick={() => toggleSubMenu(1)}
+                  className="w-full flex text-secondary-100 items-center justify-between py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
+                >
+                  <span className="flex items-center gap-4">
+                    <HiOutlineOfficeBuilding className="text-primary text-xl group-hover:text-yellow-500" />{" "}
+                    Empresa
+                  </span>
+                  <RiArrowRightSLine
+                    className={`mt-1 ${activeSubmenu === 1 && "rotate-90"} transition-all`}
+                  />
+                </button>
+                <ul
+                  className={` ${activeSubmenu === 1 ? "h-auto" : "h-0"} overflow-y-hidden transition-all`}
+                >
+                  <li>
+                    <Link
+                      to="/direcciones"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                    >
+                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
+                      Direcciones
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/unidades"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                    >
+                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
+                      Unidades
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/cargos"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                    >
+                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
+                      Cargos
+                    </Link>
+                  </li>
+                </ul>
+              </li>
+            )}
+
+            {(userRole === 'administrador' || userRole === 'superadministrador') && (
+              <li className="group">
+                <Link
+                  to=""
+                  className="flex text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
+                >
+                  <RiSettings3Line className="text-primary text-xl group-hover:text-yellow-500" />
+                  Configuraciones
+                </Link>
+              </li>
             )}
           </ul>
         </div>
         <nav className="group">
-          <button onClick={handleLogout} className="flex  w-full text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100   hover:text-black transition-colors">
+          <button onClick={handleLogout} className="flex w-full text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors">
             <RiLogoutCircleRLine className="text-primary text-xl group-hover:text-yellow-500" /> Cerrar
             sesión
           </button>

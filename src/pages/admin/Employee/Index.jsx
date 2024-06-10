@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { RiGalleryView2, RiUserAddLine, RiListView } from "react-icons/ri";
 import { CardHeader, Typography, Button } from "@material-tailwind/react";
 import EmployeeList from './components/Card/EmployeeList';
 import EmployeeTable from './components/Table/EmployeTable';
+import { fetchUsers } from '../../../redux/User/userSlice';
 
 const EmployeeIndex = () => {
+  const dispatch = useDispatch();
+
   const [showList, setShowList] = useState(true);
+
+    // Hook useEffect para ejecutar fetchUsers cuando se carga el componente
+    useEffect(() => {
+      dispatch(fetchUsers());
+    }, [dispatch]);
+  
 
   const handleDelete = (employeeId) => {
     // Lógica para eliminar un empleado
