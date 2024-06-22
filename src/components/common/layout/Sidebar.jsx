@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, {useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
 import { useAuth } from "../../../hooks/useAuth";
 import {
   RiLogoutCircleRLine,
@@ -15,17 +16,22 @@ import {
   RiShieldUserLine // Nuevo ícono para Permisos
 } from "react-icons/ri";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
+import ConfigCard from "../../ui/ConfigCard";
 
 const Sidebar = () => {
   const [showMenu, setShowMenu] = useState(false);
+
   const [activeSubmenu, setActiveSubmenu] = useState(null);
-  const { logout, userRole } = useAuth();
+
+  const { logout, userRole, user} = useAuth();
+
+  const navigate = useNavigate();
 
   const toggleSubMenu = (index) => {
     if (activeSubmenu === index) {
-      setActiveSubmenu(null); // Cerrar el submenú si ya está abierto
+      setActiveSubmenu(null); 
     } else {
-      setActiveSubmenu(index); // Abrir un nuevo submenú y cerrar el anterior
+      setActiveSubmenu(index); 
     }
   };
 
@@ -33,10 +39,15 @@ const Sidebar = () => {
     logout();
   };
 
+  const handleProfileClick = () => {
+    navigate(`/perfil/${user.employee_id}`);
+  };
+
+
   return (
     <>
       <div
-        className={`xl:h-[100vh] absolute overflow-y-scroll fixed xl:static w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto h-full top-0 bg-secondary-900 p-4 flex flex-col justify-between z-50  ${showMenu ? "left-0" : "-left-full"
+        className={`xl:h-[100vh] absolute overflow-y-scroll xl:static w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto h-full top-0 bg-secondary-900 p-4 flex flex-col justify-between z-50  ${showMenu ? "left-0" : "-left-full"
           } transition-all`}
       >
         <div>
@@ -55,12 +66,12 @@ const Sidebar = () => {
 
             {(userRole === 'administrador' || userRole === 'superadministrador' || userRole === 'empleado') && (
               <li className="group">
-                <Link
-                  to="/perfil"
-                  className="flex text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
+                <button
+                  onClick={handleProfileClick}
+                  className=" w-full flex text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
                 >
                   <RiUser3Line className="text-primary text-xl group-hover:text-yellow-500" /> Mi Perfil
-                </Link>
+                </button>
               </li>
             )}
 
@@ -105,7 +116,7 @@ const Sidebar = () => {
                   <li>
                     <Link
                       to="/asistencia"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
                     >
                       <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
                       Registro de Asistencia
@@ -114,7 +125,7 @@ const Sidebar = () => {
                   <li>
                     <Link
                       to="/cargos"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
                     >
                       <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
                       Horarios de Trabajo
@@ -123,7 +134,7 @@ const Sidebar = () => {
                   <li>
                     <Link
                       to="/tipos-de-horarios"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
                     >
                       <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
                       Tipos de Horarios
@@ -132,7 +143,7 @@ const Sidebar = () => {
                   <li>
                     <Link
                       to="/configuracion-asistencia"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
                     >
                       <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
                       Configuración
@@ -162,7 +173,7 @@ const Sidebar = () => {
                   <li>
                     <Link
                       to="/solicitudes"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
                     >
                       <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
                       Solicitudes
@@ -171,7 +182,7 @@ const Sidebar = () => {
                   <li>
                     <Link
                       to="/autorizaciones"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
                     >
                       <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
                       Autorizaciones
@@ -180,7 +191,7 @@ const Sidebar = () => {
                   <li>
                     <Link
                       to="/motivos-de-rechazo"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
                     >
                       <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
                       Motivos de Rechazo
@@ -189,7 +200,7 @@ const Sidebar = () => {
                   <li>
                     <Link
                       to="/configuracion-permisos"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
                     >
                       <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
                       Configuración
@@ -219,7 +230,7 @@ const Sidebar = () => {
                   <li>
                     <Link
                       to="/direcciones"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
                     >
                       <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
                       Direcciones
@@ -228,7 +239,7 @@ const Sidebar = () => {
                   <li>
                     <Link
                       to="/unidades"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
                     >
                       <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
                       Unidades
@@ -237,7 +248,7 @@ const Sidebar = () => {
                   <li>
                     <Link
                       to="/cargos"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6 block relative hover:text-primary transition-colors"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
                     >
                       <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
                       Cargos
@@ -250,7 +261,7 @@ const Sidebar = () => {
             {(userRole === 'administrador' || userRole === 'superadministrador') && (
               <li className="group">
                 <Link
-                  to=""
+                  to="/configuraciones"
                   className="flex text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
                 >
                   <RiSettings3Line className="text-primary text-xl group-hover:text-yellow-500" />

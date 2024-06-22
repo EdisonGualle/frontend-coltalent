@@ -43,7 +43,8 @@ import Attendance from "./pages/admin/Attendance/Index";
 // Permisos
 import LeaveIndex from "./pages/admin/Leave/LeaveIndex";
 
-
+//Configuracion
+import Configurations from "./pages/Configurations";
 
 
 function App() {
@@ -63,7 +64,6 @@ function App() {
               <Route path="/" element={<LayoutAdmin />}>
                 <Route  index element={<Home />} />
 
-                <Route path="/perfil/configuracion" element={<Setting />} />
                 {/* User */}
                 <Route path="/usuarios" element={<UserIndex />} />
 
@@ -71,7 +71,7 @@ function App() {
                 <Route path="empleados" element={<EmployeeIndex />} />
 
                 {/* Perfil */}
-                <Route path="/perfil/*" element={<Perfil />} />
+                <Route path="/perfil/:id/*" element={<Perfil />} />
 
                 {/* Asistencia */}
                 <Route path="/asistencia/*" element={<Attendance />} />
@@ -79,11 +79,18 @@ function App() {
                 {/* Permisos */}
                 <Route path="/solicitudes/*" element={<LeaveIndex />} />
 
+                <Route path="/perfil/configuracion" element={<Setting />} />
+
 
                 {/* Organization */}
                 <Route path="/direcciones" element={<DepartmentIndex />} />
                 <Route path="/unidades" element={<UnitIndex />} />
                 <Route path="/cargos" element={<PositionIndex />} />
+              
+
+                {/* Configuraciones */}
+                <Route path="/configuraciones" element={<Configurations />} />              
+              
               </Route>
             </Route>
             {/* Ruta para manejar acceso no autorizado */}

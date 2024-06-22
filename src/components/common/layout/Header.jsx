@@ -29,9 +29,9 @@ const Header = () => {
                 src={`${import.meta.env.VITE_STORAGE_URL}/${user.photo}`}
                 className="w-6 h-6 object-cover rounded-full"
               />
-              {user && user.name ? (
+              {user && user.employee_name ? (
                 <span className="text-secondary-100 group-hover:text-black">
-                  {user.name}
+                  {user.employee_name}
                 </span>
               ) : (
                 <span className="text-secondary-100 group-hover:text-black">
@@ -57,8 +57,8 @@ const Header = () => {
                 className="w-8 h-8 object-cover rounded-full"
               />
               <div className="flex flex-col text-sm">
-                {user && user.name ? (
-                  <span className="text-sm">{user.name}</span>
+                {user && user.employee_name ? (
+                  <span className="text-sm">{user.employee_name}</span>
                 ) : (
                   <span className="text-sm">Usuario</span>
                 )}

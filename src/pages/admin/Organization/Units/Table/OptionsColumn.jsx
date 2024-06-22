@@ -104,7 +104,9 @@ const OptionsColumn = ({ unit, fetchUnits }) => {
 
   // Funciones para manejar la apertura y cierre del dialogo y eliminar la unidad
   const handleCancel = () => setIsOpenDialog2(false);
+
   const handleClick = async () => setIsOpenDialog2(true);
+  
   const handleConfirm = async () => {
     await handleDelete();
     setIsOpenDialog2(false);

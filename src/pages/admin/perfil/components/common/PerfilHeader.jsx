@@ -5,47 +5,51 @@ const PerfilHeader = () => {
   const location = useLocation();
   let headerTitle = "";
 
-  switch (location.pathname) {
-    case "/perfil/datos-personales":
+  // Obtén el segmento final de la URL después del ID del empleado
+  const pathSegments = location.pathname.split('/');
+  const section = pathSegments[pathSegments.length - 1];
+
+  switch (section) {
+    case "datos-personales":
       headerTitle = "Datos Personales";
       break;
-    case "/perfil/datos-laborales":
+    case "datos-laborales":
       headerTitle = "Datos Laborales";
       break;
-    case "/perfil/educacion":
+    case "educacion":
       headerTitle = "Educación";
       break;
-      case "/perfil/idiomas":
-        headerTitle = "Idiomas";
-        break;
-    case "/perfil/publicaciones":
+    case "idiomas":
+      headerTitle = "Idiomas";
+      break;
+    case "publicaciones":
       headerTitle = "Publicaciones";
       break;
-    case "/perfil/capacitaciones":
+    case "capacitaciones":
       headerTitle = "Capacitaciones";
       break;
-    case "/perfil/experiencia-laboral":
+    case "experiencia-laboral":
       headerTitle = "Experiencia Laboral";
       break;
-    case "/perfil/referencia-laboral":
+    case "referencia-laboral":
       headerTitle = "Referencia Laboral";
       break;
-    case "/perfil/asistencias":
+    case "asistencias":
       headerTitle = "Asistencias";
       break;
-    case "/perfil/permisos":
+    case "permisos":
       headerTitle = "Permisos";
       break;
-    case "/perfil/salidas-a-campo":
+    case "salidas-a-campo":
       headerTitle = "Salidas a Campo";
       break;
-    case "/perfil/configuracion":
+    case "configuracion":
       headerTitle = "Configuración";
       break;
-    case "/perfil/cambiar-contrasena":
+    case "cambiar-contrasena":
       headerTitle = "Cambiar Contraseña";
       break;
-    case "/perfil/notificaciones":
+    case "notificaciones":
       headerTitle = "Notificaciones";
       break;
     default:

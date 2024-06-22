@@ -88,3 +88,25 @@ export const validateMobilePhone = (phone) => {
   // Si pasa todas las validaciones, retornar null (sin errores)
   return null;
 };
+
+
+
+export const validateLanguage = (language) => {
+    
+    // Lista de idiomas permitidos
+const allowedLanguages = [
+  "Quechua", "Ingles", "Español", "Portugues", "Ruso", "Frances", "Arabe", "Chino",
+  "quechua", "ingles", "español", "portugues", "ruso", "frances", "arabe", "chino",
+  "Español", "Portugués", "Francés", "Árabe",
+  "español", "portugués", "francés", "árabe"
+];
+
+
+    // Verificar si el idioma está en la lista de idiomas permitidos
+    if (!allowedLanguages.includes(language)) {
+        return 'El idioma ingresado no está permitido.';
+    }
+
+    // Si pasa todas las validaciones, retornar null (sin errores)
+    return null;
+};

@@ -1,67 +1,117 @@
-import React from "react";
-import { useLocation, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useLocation, Link, useParams } from "react-router-dom";
 import { FaHome } from "react-icons/fa";
+import { getEmployee } from "../../../services/Employee/EmployeService1";
 
 const Breadcrumbs = () => {
   const location = useLocation();
+  const { id } = useParams(); // Obtener el ID de los parámetros de la URL
+  const [employeeName, setEmployeeName] = useState("");
+
+  useEffect(() => {
+    const fetchEmployeeName = async () => {
+      try {
+        const response = await getEmployee(id);
+        if (response && response.data && response.data.employee_name) {
+          setEmployeeName(response.data.employee_name); 
+        }
+      } catch (error) {
+        // Puedes manejar el error aquí si es necesario, por ejemplo, mostrando un mensaje al usuario
+      }
+    };
+
+    if (id) {
+      fetchEmployeeName();
+    }
+  }, [id]);
+
   const currentPath = location.pathname;
+  const pathSegments = currentPath.split('/').filter(segment => segment);
+
   const breadcrumbItems = [
     { icon: <FaHome />, label: "Home", path: "/" },
-    { label: "Empleados", path: "/empleados" },
-    { label: "Asistencia", path: "/asistencia" },
-    { label: "Permisos", path: "/solicitudes" },
-    { label: "Direcciones", path: "/direcciones" },
-    { label: "Unidades", path: "/unidades" },
-    { label: "Perfil", path: "/perfil" },
-    { label: "Datos Personales", path: "/perfil/datos-personales" },
-    { label: "Datos Laborales", path: "/perfil/datos-laborales" },
-    { label: "Educación", path: "/perfil/educacion" },
-    { label: "Idiomas", path: "/perfil/idiomas" },
-    { label: "Publicaciones", path: "/perfil/publicaciones" },
-    { label: "Capacitaciones", path: "/perfil/capacitaciones" },
-    { label: "Experiencia Laboral", path: "/perfil/experiencia-laboral" },
-    { label: "Referencia Laboral", path: "/perfil/referencia-laboral" },
-    { label: "Historial de asistencias", path: "/asistencia/historial" },
-    { label: "Horario Laboral", path: "/asistencia/horario" },
-    { label: "Configuración", path: "/perfil/configuracion" },
-    { label: "Cargos", path: "/cargos" },
-    { label: "Usuarios", path: "/usuarios" },
   ];
 
-  const activeBreadcrumbItems = breadcrumbItems.filter((item) =>
-    currentPath.startsWith(item.path)
-  );
+  pathSegments.forEach((segment, index) => {
+    let label = segment.charAt(0).toUpperCase() + segment.slice(1);
+    const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
+
+    // Añade casos específicos para rutas conocidas y ajusta la etiqueta según sea necesario
+    switch(segment) {
+      case 'empleados':
+        label = 'Empleados';
+        break;
+      case 'usuarios':
+        label = 'Usuarios';
+        break;
+      case 'asistencia':
+        label = 'Asistencia';
+        break;
+      case 'perfil':
+        label = 'Perfil';
+        break;
+      case id:
+        label = employeeName || id; // Usa el nombre del empleado si está disponible
+        break;
+      case 'datos-personales':
+        label = 'Datos Personales';
+        break;
+      case 'datos-laborales':
+        label = 'Datos Laborales';
+        break;
+      case 'educacion':
+        label = 'Educación';
+        break;
+      case 'idiomas':
+        label = 'Idiomas';
+        break;
+      case 'publicaciones':
+        label = 'Publicaciones';
+        break;
+      case 'capacitaciones':
+        label = 'Capacitaciones';
+        break;
+      case 'experiencia-laboral':
+        label = 'Experiencia Laboral';
+        break;
+      case 'referencia-laboral':
+        label = 'Referencia Laboral';
+        break;
+      case 'configuracion':
+        label = 'Configuración';
+        break;
+      case 'cargos':
+        label = 'Cargos';
+        break;
+      default:
+        break;
+    }
+
+    breadcrumbItems.push({ label, path, isClickable: segment !== 'perfil' });
+  });
 
   return (
-    <nav
-      aria-label="Breadcrumb"
-      className="mt-2 border-b-2 bg-gray-300 border-gray-600 shadow-lg rounded-lg px-2 py-1"
-    >
+    <nav aria-label="Breadcrumb" className="mt-2 border-b-2 bg-gray-300 border-gray-600 shadow-lg rounded-lg px-2 py-1">
       <ol className="flex items-center gap-1 text-sm text-gray-600">
-        {activeBreadcrumbItems.map((item, index) => (
+        {breadcrumbItems.map((item, index) => (
           <React.Fragment key={index}>
             <li>
-              <Link
-                to={item.path}
-                className="block transition hover:text-gray-700 flex items-center"
-              >
-                {item.icon && <span className="mr-1">{item.icon}</span>}
-                <span>{item.label}</span>
-              </Link>
+              {item.isClickable ? (
+                <Link to={item.path} className="block transition hover:text-gray-700 flex items-center">
+                  {item.icon && <span className="mr-1">{item.icon}</span>}
+                  <span>{item.label}</span>
+                </Link>
+              ) : (
+                <span className="block transition text-gray-700 flex items-center cursor-default">
+                  {item.icon && <span className="mr-1">{item.icon}</span>}
+                  <span>{item.label}</span>
+                </span>
+              )}
             </li>
-            {index !== activeBreadcrumbItems.length - 1 && (
+            {index !== breadcrumbItems.length - 1 && (
               <li className="rtl:rotate-180">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                    clipRule="evenodd"
-                  />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                 </svg>
               </li>
             )}

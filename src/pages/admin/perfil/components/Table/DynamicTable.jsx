@@ -1,4 +1,3 @@
-// src/components/DynamicTable.js
 import React, { useState, useRef, useEffect } from 'react';
 import { FaPencilAlt, FaEllipsisV } from 'react-icons/fa';
 import { HiOutlinePlus, HiOutlineDocumentReport } from 'react-icons/hi';
@@ -26,6 +25,7 @@ const DynamicTable = ({ title, columns, data, onAddNew, onGenerateReport, onEdit
   const handleDeleteSelected = () => {
     const ids = Object.keys(selectedRows);
     onDelete(ids);
+    setSelectedRows({});
     setShowMenu(false);
   };
 
@@ -64,17 +64,21 @@ const DynamicTable = ({ title, columns, data, onAddNew, onGenerateReport, onEdit
     }
   }, [showMenu]);
 
+  const getNestedValue = (obj, path) => {
+    return path.split('.').reduce((o, p) => (o ? o[p] : null), obj);
+  };
+
   const selectedCount = Object.keys(selectedRows).length;
   const allSelected = selectedCount === data.length;
   const noneSelected = selectedCount === 0;
   const someSelected = selectedCount > 0 && !allSelected;
 
   return (
-    <div className=" flex-1   shadow-md rounded-lg bg-gray-50 relative px-3 pb-3">
+    <div className=" flex-1 shadow-md rounded-lg bg-gray-50 relative px-3 pb-3">
       <div className="flex justify-between items-center py-4">
         <h2 className="text-sm font-semibold text-gray-800">{title}</h2>
         <div className="flex items-center space-x-4">
-          <span className="text-gray-600 text-sm">{data.length} record(s)</span>
+          <span className="text-gray-600 text-sm">{data.length} registro(s)</span>
           <div className="flex items-center space-x-2">
             <button
               className="flex items-center justify-center w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg transition-colors hover:bg-indigo-200"
@@ -91,7 +95,7 @@ const DynamicTable = ({ title, columns, data, onAddNew, onGenerateReport, onEdit
           </div>
         </div>
       </div>
-      <div className="  overflow-auto custom-scrollbar ">
+      <div className="overflow-auto custom-scrollbar">
         <table className="min-w-full leading-normal">
           <thead>
             <tr className="bg-gray-100 text-gray-600 uppercase text-xs leading-normal">
@@ -114,13 +118,13 @@ const DynamicTable = ({ title, columns, data, onAddNew, onGenerateReport, onEdit
                           className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left"
                           onClick={handleDeselectAll}
                         >
-                          Deselect All
+                          Desmarcar todos
                         </button>
                         <button
                           className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left"
                           onClick={handleDeleteSelected}
                         >
-                          Delete Selected
+                          Eliminar seleccionados
                         </button>
                       </>
                     ) : someSelected ? (
@@ -129,19 +133,19 @@ const DynamicTable = ({ title, columns, data, onAddNew, onGenerateReport, onEdit
                           className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left"
                           onClick={handleSelectAll}
                         >
-                          Select All
+                          Seleccionar todos
                         </button>
                         <button
                           className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left"
                           onClick={handleDeselectAll}
                         >
-                          Deselect All
+                          Desmarcar todos
                         </button>
                         <button
                           className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left"
                           onClick={handleDeleteSelected}
                         >
-                          Delete Selected
+                          Eliminar seleccionados
                         </button>
                       </>
                     ) : (
@@ -149,7 +153,7 @@ const DynamicTable = ({ title, columns, data, onAddNew, onGenerateReport, onEdit
                         className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left"
                         onClick={handleSelectAll}
                       >
-                        Select All
+                        Seleccionar todos
                       </button>
                     )}
                   </div>
@@ -166,7 +170,7 @@ const DynamicTable = ({ title, columns, data, onAddNew, onGenerateReport, onEdit
             </tr>
           </thead>
           <tbody className="text-gray-700 text-xs bg-white">
-            {data.map((row, index) => (
+            {data.map((row) => (
               <tr
                 key={row.id}
                 className="border-b border-gray-200 hover:bg-gray-100 group"
@@ -181,7 +185,7 @@ const DynamicTable = ({ title, columns, data, onAddNew, onGenerateReport, onEdit
                 </td>
                 {columns.map((column) => (
                   <td key={column.id} className="py-4 px-6 text-left text-xs group-hover:bg-gray-100" style={{ minHeight: '50px' }}>
-                    {row[column.id]}
+                    {getNestedValue(row, column.id)}
                   </td>
                 ))}
                 <td className="py-4 px-4 text-center text-xs sticky right-0 bg-white z-10 group-hover:bg-gray-100" style={{ minHeight: '50px', width: '80px' }}>

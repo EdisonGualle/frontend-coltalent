@@ -1,7 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Unauthorized = () => {
+  const navigate = useNavigate();
+
+  const handleGoBack = () => {
+    navigate('/'); // Navega a la página anterior
+  };
+
   return (
     <div className="flex items-center justify-center w-screen h-screen">
       <div className="px-40 py-20 bg-white rounded-md">
@@ -13,9 +19,12 @@ const Unauthorized = () => {
           <p className="mb-8 text-center text-gray-500 md:text-lg">
             No tienes permiso para acceder a esta página.
           </p>
-          <Link to="/" className="px-6 py-2 text-sm font-semibold text-blue-800 bg-blue-100">
-            Ir al inicio
-          </Link>
+          <button
+            onClick={handleGoBack}
+            className="px-6 py-2 text-sm font-semibold text-blue-800 bg-blue-100"
+          >
+            Inicio
+          </button>
         </div>
       </div>
     </div>

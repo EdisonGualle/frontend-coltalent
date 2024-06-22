@@ -18,7 +18,7 @@ export function AvatarCell({ value, column, row }) {
       </div>
       <div className="ml-4">
         <div className="text-sm font-medium text-gray-900">
-          <Link to={`/profile/${row.original.id}`}>{value}</Link>
+        <Link to={`/perfil/${row.original.employee_id}`}>{value}</Link>
         </div>
         <div className="text-sm text-gray-500">
           {row.original[column.emailAccessor]}

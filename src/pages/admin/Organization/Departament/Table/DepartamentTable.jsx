@@ -180,7 +180,7 @@ function DepartamentTable() {
               >
                 {[5, 6].map(pageSize => (
                   <option key={pageSize} value={pageSize} className='text-sm'>
-                    Show {pageSize}
+                    Ver {pageSize}
                   </option>
                 ))}
               </select>

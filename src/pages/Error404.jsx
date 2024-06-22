@@ -1,7 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Error404 = () => {
+  const navigate = useNavigate();
+
+  const handleGoBack = () => {
+    navigate('/'); // Navega a la página anterior
+  };
+
   return (
     <div className="flex items-center justify-center w-screen h-screen">
       <div className="px-40 py-20 bg-white rounded-md">
@@ -13,12 +19,12 @@ const Error404 = () => {
           <p className="mb-8 text-center text-gray-500 md:text-lg">
             La página que estás buscando no existe.
           </p>
-          <Link
-            to="/"
+          <button
+            onClick={handleGoBack}
             className="px-6 py-2 text-sm font-semibold text-blue-800 bg-blue-100"
           >
-            Ir al inicio
-          </Link>
+            Inicio
+          </button>
         </div>
       </div>
     </div>

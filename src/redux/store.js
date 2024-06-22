@@ -6,6 +6,17 @@ import userStateReducer from './User/userStateSlice';
 import departamentReducer from './Organization/DepartamentSlice';
 import unitReducer from './Organization/UnitSlince';
 import positionReducer from './Organization/PositionSlice';
+import formalEducationReducer from './Employee/Education/formalEducationSince';
+import educationLevelReducer from './Employee/Education/educationLevelSince';
+import educationStateReducer from './Employee/Education/educationStateSince';
+import languageReducer from './Employee/Backgrounds/languageSlince';
+import publicationReducer from './Employee/Backgrounds/publicationSlince';
+import publicationTypeReducer from './Employee/Backgrounds/publicationTypeSlince';
+import trainingReducer from './Employee/Education/trainingSlince';
+import trainingTypeReducer from './Employee/Education/trainingTypeSlince';
+import workExperienceReducer from './Employee/Backgrounds/workExperienceSlince';
+import workReferenceReducer from './Employee/Backgrounds/workReferenceSlince';
+
 export default configureStore({
   reducer: {
     employee: employeReducer,
@@ -15,5 +26,15 @@ export default configureStore({
     departament: departamentReducer,
     unit: unitReducer,
     position: positionReducer,
+    formalEducation: formalEducationReducer,
+    educationLevel: educationLevelReducer,
+    educationState: educationStateReducer,
+    language: languageReducer,
+    publication: publicationReducer,
+    publicationType: publicationTypeReducer,
+    training: trainingReducer,
+    trainingType: trainingTypeReducer,
+    workExperience: workExperienceReducer,
+    workReference: workReferenceReducer,
   },
 });

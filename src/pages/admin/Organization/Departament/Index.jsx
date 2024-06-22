@@ -52,7 +52,7 @@ const DepartamentIndex = () => {
       if (Object.values(formErrors).some(Boolean)) {
         setFormErrors(formErrors);
       } else {
-        showAlert('Error al actualizar el departamento', 'error');
+        showAlert('Error al actualizar la dirección', 'error');
       }
     }
   };
@@ -87,7 +87,7 @@ const DepartamentIndex = () => {
       <ModalForm
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        title="Crear nuevo departamento"
+        title="Crear nueva dirección"
         icon={<HiOutlineOfficeBuilding className="w-6 h-6 flex items-center justify-center rounded-full text-blue-500" />}
       >
         <DepartmentForm
