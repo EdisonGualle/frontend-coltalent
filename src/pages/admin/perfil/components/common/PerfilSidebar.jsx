@@ -146,16 +146,8 @@ const PerfilSidebar = () => {
       </ul>
 
       <hr className="my-4 border-gray-300" />
-      <h6 className="text-gray-700 text-xs uppercase font-bold mb-2">Asistencia y Actividades</h6>
+      <h6 className="text-gray-700 text-xs uppercase font-bold mb-2">Actividades</h6>
       <ul className="space-y-2">
-        <li>
-          <Link
-            className={`flex items-center text-sm ${isActive('/asistencias') ? 'text-blue-500 font-bold' : 'text-gray-700'} hover:text-blue-500`}
-            to={`/perfil/${id}/asistencias`}
-          >
-            <FaTable className="mr-2" /> Asistencias
-          </Link>
-        </li>
         <li>
           <Link
             className={`flex items-center text-sm ${isActive('/permisos') ? 'text-blue-500 font-bold' : 'text-gray-700'} hover:text-blue-500`}

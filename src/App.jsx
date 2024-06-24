@@ -42,6 +42,8 @@ import Attendance from "./pages/admin/Attendance/Index";
 
 // Permisos
 import LeaveIndex from "./pages/admin/Leave/LeaveIndex";
+import RejectionReason from "./pages/admin/Leave/RejectionReason/RejectionReason";
+
 
 //Configuracion
 import Configurations from "./pages/Configurations";
@@ -73,12 +75,11 @@ function App() {
                 {/* Perfil */}
                 <Route path="/perfil/:id/*" element={<Perfil />} />
 
-                {/* Asistencia */}
-                <Route path="/asistencia/*" element={<Attendance />} />
-
                 {/* Permisos */}
-                <Route path="/solicitudes/*" element={<LeaveIndex />} />
-
+                <Route path="/permisos/*" element={<LeaveIndex />} />
+                <Route path="/permisos/motivos-rechazo" element={<RejectionReason />} />
+                
+                {/* Configuraciones perfil */}
                 <Route path="/perfil/configuracion" element={<Setting />} />
 
 

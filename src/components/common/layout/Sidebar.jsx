@@ -99,63 +99,6 @@ const Sidebar = () => {
             {(userRole === 'administrador' || userRole === 'superadministrador') && (
               <li className="group">
                 <button
-                  onClick={() => toggleSubMenu(2)}
-                  className="w-full flex text-secondary-100 items-center justify-between py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
-                >
-                  <span className="flex items-center gap-4">
-                    <RiClipboardLine className="text-primary text-xl group-hover:text-yellow-500" />{" "}
-                    Asistencia
-                  </span>
-                  <RiArrowRightSLine
-                    className={`mt-1 ${activeSubmenu === 2 && "rotate-90"} transition-all`}
-                  />
-                </button>
-                <ul
-                  className={` ${activeSubmenu === 2 ? "h-auto" : "h-0"} overflow-y-hidden transition-all`}
-                >
-                  <li>
-                    <Link
-                      to="/asistencia"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
-                    >
-                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
-                      Registro de Asistencia
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/cargos"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
-                    >
-                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
-                      Horarios de Trabajo
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/tipos-de-horarios"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
-                    >
-                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
-                      Tipos de Horarios
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/configuracion-asistencia"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
-                    >
-                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
-                      Configuración
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-            )}
-
-            {(userRole === 'administrador' || userRole === 'superadministrador') && (
-              <li className="group">
-                <button
                   onClick={() => toggleSubMenu(3)}
                   className="w-full flex text-secondary-100 items-center justify-between py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
                 >
@@ -172,7 +115,7 @@ const Sidebar = () => {
                 >
                   <li>
                     <Link
-                      to="/solicitudes"
+                      to="/permisos"
                       className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
                     >
                       <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
@@ -190,22 +133,14 @@ const Sidebar = () => {
                   </li>
                   <li>
                     <Link
-                      to="/motivos-de-rechazo"
+                      to="/permisos/motivos-rechazo"
                       className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
                     >
                       <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
                       Motivos de Rechazo
                     </Link>
                   </li>
-                  <li>
-                    <Link
-                      to="/configuracion-permisos"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
-                    >
-                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
-                      Configuración
-                    </Link>
-                  </li>
+                 
                 </ul>
               </li>
             )}

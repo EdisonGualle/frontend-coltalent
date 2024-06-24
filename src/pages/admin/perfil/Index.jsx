@@ -54,13 +54,13 @@ const Perfil = () => {
   }
 
   return (
-    <div className="flex h-[76vh]">
-      <div className="bg-slate-200 overflow-auto custom-scrollbar shadow-lg rounded-lg mt-1">
+    <div className="flex h-[80vh] w-full">
+      <div className="bg-slate-200 overflow-auto custom-scrollbar rounded-lg mt-1">
         <PerfilSidebar />
       </div>
       <div className="flex flex-col w-3/4 mt-1 ms-2">
         <PerfilHeader />
-        <div className="flex-1 shadow-lg overflow-auto custom-scrollbar">
+        <div className=" flex-1  overflow-auto custom-scrollbar">
           <Routes>
             <Route index element={<Dashboard />} />
             <Route path="datos-personales" element={<PersonalData />} />
@@ -70,7 +70,6 @@ const Perfil = () => {
             <Route path="capacitaciones" element={<Training />} />
             <Route path="experiencia-laboral" element={<WorkExperience />} />
             <Route path="referencia-laboral" element={<WorkReference />} />
-            <Route path="asistencias" element={<Navigate to="/asistencia" replace />} />
             <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>
         </div>

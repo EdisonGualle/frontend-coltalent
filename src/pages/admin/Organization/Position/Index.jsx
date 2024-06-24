@@ -54,7 +54,7 @@ const PositionIndex = () => {
 
   return (
     <>
-      <CardHeader floated={false} shadow={false} className="rounded-none mt-0">
+      <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0">
         <div className="mb-2 flex items-center justify-between gap-8">
           <div>
             <Typography variant="h5" color="blue-gray" className="font-semibold">

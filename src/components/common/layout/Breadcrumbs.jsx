@@ -83,6 +83,9 @@ const Breadcrumbs = () => {
       case 'cargos':
         label = 'Cargos';
         break;
+      case 'motivos-rechazo':
+        label = 'Motivos de Rechazo';
+        break;
       default:
         break;
     }
@@ -97,12 +100,12 @@ const Breadcrumbs = () => {
           <React.Fragment key={index}>
             <li>
               {item.isClickable ? (
-                <Link to={item.path} className="block transition hover:text-gray-700 flex items-center">
+                <Link to={item.path} className=" transition hover:text-gray-700 flex items-center">
                   {item.icon && <span className="mr-1">{item.icon}</span>}
                   <span>{item.label}</span>
                 </Link>
               ) : (
-                <span className="block transition text-gray-700 flex items-center cursor-default">
+                <span className=" transition text-gray-700 flex items-center cursor-default">
                   {item.icon && <span className="mr-1">{item.icon}</span>}
                   <span>{item.label}</span>
                 </span>

@@ -16,6 +16,7 @@ import trainingReducer from './Employee/Education/trainingSlince';
 import trainingTypeReducer from './Employee/Education/trainingTypeSlince';
 import workExperienceReducer from './Employee/Backgrounds/workExperienceSlince';
 import workReferenceReducer from './Employee/Backgrounds/workReferenceSlince';
+import rejectionReasonReducer from './Leave/rejectionReasonSlince';
 
 export default configureStore({
   reducer: {
@@ -36,5 +37,6 @@ export default configureStore({
     trainingType: trainingTypeReducer,
     workExperience: workExperienceReducer,
     workReference: workReferenceReducer,
+    rejectionReason: rejectionReasonReducer,
   },
 });

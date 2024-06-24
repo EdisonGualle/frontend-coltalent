@@ -79,6 +79,7 @@ const ParentComponent = () => {
                 showAddNew={true}
                 showColumnOptions={true}
                 showActions={true}
+                
             />
         </div>
     );
