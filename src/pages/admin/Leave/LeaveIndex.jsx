@@ -19,6 +19,7 @@ const LeaveIndex = () => {
             <Route index element={<LeaveRequest />} />
             <Route path="nuevo" element={<NewLeaveForm />} />
             <Route path="motivos-de-rechazo" element={<RejectionReason />} />
+            
           </Routes>
         </div>
       </div>

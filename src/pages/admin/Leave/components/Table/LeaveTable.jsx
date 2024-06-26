@@ -51,7 +51,7 @@ const LeaveTable = ({
 
   const displayedData = Array.isArray(filteredData) ? filteredData.filter(row => {
     const matchesSearchTerm = visibleColumns.some(column =>
-      row[column.id].toString().toLowerCase().includes(searchTerm.toLowerCase())
+      (row[column.id] !== undefined && row[column.id] !== null) && row[column.id].toString().toLowerCase().includes(searchTerm.toLowerCase())
     );
     const matchesFromDate = fromDate ? new Date(row.date) >= new Date(fromDate) : true;
     const matchesToDate = toDate ? new Date(row.date) <= new Date(toDate) : true;
@@ -238,7 +238,7 @@ const LeaveTable = ({
         <table className="min-w-full leading-normal">
           <thead className="sticky top-0 bg-gray-100  z-0">
             <tr className="bg-gray-100 text-gray-600 uppercase text-xs leading-normal">
-              {showActions && (
+              {showActions && onDelete && (
                 <th className="py-4 px-6 text-left relative" style={{ minHeight: '50px' }}>
                   <button
                     ref={buttonRef}
@@ -321,26 +321,28 @@ const LeaveTable = ({
                   className="border-b border-gray-200 hover:bg-gray-100 group"
                   style={{ minHeight: '50px' }}
                 >
-                  <td className="py-4 px-6 text-left whitespace-nowrap group-hover:bg-gray-100" style={{ minHeight: '50px' }}>
-                    <input
-                      type="checkbox"
-                      checked={!!selectedRows[row.id]}
-                      onChange={() => toggleRowSelection(row.id)}
-                    />
-                  </td>
+                  {onDelete && (
+                    <td className="py-4 px-6 text-left whitespace-nowrap group-hover:bg-gray-100" style={{ minHeight: '50px' }}>
+                      <input
+                        type="checkbox"
+                        checked={!!selectedRows[row.id]}
+                        onChange={() => toggleRowSelection(row.id)}
+                      />
+                    </td>
+                  )}
                   {visibleColumns.map((column) => (
                     <td
                       key={column.id}
                       className="py-4 px-6 text-left text-xs group-hover:bg-gray-100"
                       style={{ minHeight: '50px' }}
                     >
-                      <span className={`rounded-full px-2 py-1 inline-block ${getCellStyle(column.id, row[column.id])}`}>
-                        {row[column.id]}
+                      <span className={`rounded-full px-2 py-1 inline-block ${getCellStyle(column.id, row[column.id] || '')}`}>
+                        {(row[column.id] !== undefined && row[column.id] !== null) ? row[column.id].toString() : ''}
                       </span>
                     </td>
                   ))}
                   {showActions && (
-                    <td className="py-4 px-4 text-center text-xs  bg-white z-10 group-hover:bg-gray-100" style={{ minWidth: '50px' }}>
+                    <td className="py-4 px-4 text-center text-xs bg-white z-10 group-hover:bg-gray-100" style={{ minWidth: '50px' }}>
                       {actions.map(action => (
                         <button
                           key={action.label}
@@ -358,7 +360,7 @@ const LeaveTable = ({
               ))
             ) : (
               <tr>
-                <td colSpan={visibleColumns.length + (showActions ? 2 : 1)} className="py-4 px-6 text-center text-xs text-gray-500">
+                <td colSpan={visibleColumns.length + (showActions && onDelete ? 2 : 1)} className="py-4 px-6 text-center text-xs text-gray-500">
                   No hay coincidencias que mostrar
                 </td>
               </tr>

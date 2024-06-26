@@ -110,3 +110,23 @@ const allowedLanguages = [
     // Si pasa todas las validaciones, retornar null (sin errores)
     return null;
 };
+
+export const validateNames = (name) => {
+  // Verificar si cumple con la expresión regular (solo letras y espacios)
+  if (!nameRegex.test(name)) {
+    return 'El nombre solo puede contener letras y espacios.';
+  }
+
+  // Si pasa todas las validaciones, retornar null (sin errores)
+  return null;
+};
+
+export const validateDescripcion = (name) => {
+  // Verificar si cumple con la expresión regular (solo letras y espacios)
+  if (!nameRegex.test(name)) {
+    return 'La descripción solo puede contener letras y espacios.';
+  }
+
+  // Si pasa todas las validaciones, retornar null (sin errores)
+  return null;
+};

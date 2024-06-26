@@ -21,6 +21,7 @@ const OptionsColumn = ({ employee, updateEmployees }) => {
   const [isOpenEditModal, setIsOpenEditModal] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
+
   // Efecto para limpiar los errores del formulario al cerrar el modal
   useEffect(() => {
     if (!isOpenEditModal) {

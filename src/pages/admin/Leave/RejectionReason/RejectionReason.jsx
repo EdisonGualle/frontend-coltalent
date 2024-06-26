@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { CardHeader, Typography } from "@material-tailwind/react";
-import { RiEdit2Line, RiEyeLine } from 'react-icons/ri';
+import { RiEdit2Line} from 'react-icons/ri';
 import LeaveTable from '../components/Table/LeaveTable';
 import rejectionReasonColumns from './Table/rejectionReasonColumns';
 import Dialog2 from '../../../../components/ui/Dialog2';
@@ -146,16 +146,10 @@ const RejectionReason = () => {
   const actions = [
     {
       label: 'Editar',
-      icon: <RiEdit2Line className="text-green-600" />,
+      icon: <RiEdit2Line className="text-green-600 h-4 w-4" />,
       onClick: handleEdit,
-      className: 'bg-green-100 hover:bg-green-200',
-    },
-    {
-      label: 'Ver',
-      icon: <RiEyeLine className="text-gray-600" />,
-      onClick: handleView,
-      className: 'bg-gray-100 hover:bg-gray-200',
-    },
+      className: 'bg-green-100 hover:bg-green-200 cursor-pointer',
+    }
   ];
 
   return (

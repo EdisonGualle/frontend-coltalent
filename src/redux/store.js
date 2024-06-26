@@ -17,6 +17,9 @@ import trainingTypeReducer from './Employee/Education/trainingTypeSlince';
 import workExperienceReducer from './Employee/Backgrounds/workExperienceSlince';
 import workReferenceReducer from './Employee/Backgrounds/workReferenceSlince';
 import rejectionReasonReducer from './Leave/rejectionReasonSlince';
+import leaveTypeReducer from './Leave/leaveTypeSlince';
+import leaveReducer from './Leave/leaveSince';
+import assignedLeavesReducer from './Leave/assignedLeavesSlice';
 
 export default configureStore({
   reducer: {
@@ -38,5 +41,8 @@ export default configureStore({
     workExperience: workExperienceReducer,
     workReference: workReferenceReducer,
     rejectionReason: rejectionReasonReducer,
+    leaveType: leaveTypeReducer,
+    leave: leaveReducer,
+    assignedLeaves: assignedLeavesReducer,
   },
 });

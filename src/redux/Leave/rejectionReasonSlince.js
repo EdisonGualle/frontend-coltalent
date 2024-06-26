@@ -39,7 +39,6 @@ export const createNewRejectionReason = createAsyncThunk(
 export const updateOneRejectionReason = createAsyncThunk(
   "rejectionReasons/updateOneRejectionReason",
   async ({ rejectionReasonId, updateRejectionReason }) => {
-    console.log(rejectionReasonId, updateRejectionReason)
     const response = await updateRejectionReasonService(
       rejectionReasonId,
       updateRejectionReason

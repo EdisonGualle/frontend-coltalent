@@ -64,7 +64,7 @@ const Sidebar = () => {
               </Link>
             </li>
 
-            {(userRole === 'administrador' || userRole === 'superadministrador' || userRole === 'empleado') && (
+            {(userRole === 'Administrador' || userRole === 'superadministrador' || userRole === 'empleado') && (
               <li className="group">
                 <button
                   onClick={handleProfileClick}
@@ -75,7 +75,7 @@ const Sidebar = () => {
               </li>
             )}
 
-            {(userRole === 'administrador' || userRole === 'superadministrador') && (
+            {(userRole === 'Administrador' || userRole === 'superadministrador') && (
               <li className="group">
                 <Link
                   to="/empleados"
@@ -85,7 +85,7 @@ const Sidebar = () => {
                 </Link>
               </li>
             )}
-            {(userRole === 'administrador' || userRole === 'superadministrador') && (
+            {(userRole === 'Administrador' || userRole === 'superadministrador') && (
               <li className="group">
                 <Link
                   to="/usuarios"
@@ -96,7 +96,7 @@ const Sidebar = () => {
               </li>
             )}
 
-            {(userRole === 'administrador' || userRole === 'superadministrador') && (
+            {(userRole === 'Administrador' || userRole === 'superadministrador') && (
               <li className="group">
                 <button
                   onClick={() => toggleSubMenu(3)}
@@ -124,11 +124,20 @@ const Sidebar = () => {
                   </li>
                   <li>
                     <Link
-                      to="/autorizaciones"
+                      to="/permisos/autorizaciones"
                       className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
                     >
                       <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
                       Autorizaciones
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/permisos/tipos"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
+                    >
+                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
+                      Tipos de Permisos
                     </Link>
                   </li>
                   <li>
@@ -145,7 +154,7 @@ const Sidebar = () => {
               </li>
             )}
 
-            {(userRole === 'administrador' || userRole === 'superadministrador') && (
+            {(userRole === 'Administrador' || userRole === 'superadministrador') && (
               <li className="group">
                 <button
                   onClick={() => toggleSubMenu(1)}
@@ -193,7 +202,7 @@ const Sidebar = () => {
               </li>
             )}
 
-            {(userRole === 'administrador' || userRole === 'superadministrador') && (
+            {(userRole === 'Administrador' || userRole === 'superadministrador') && (
               <li className="group">
                 <Link
                   to="/configuraciones"

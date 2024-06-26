@@ -43,7 +43,8 @@ import Attendance from "./pages/admin/Attendance/Index";
 // Permisos
 import LeaveIndex from "./pages/admin/Leave/LeaveIndex";
 import RejectionReason from "./pages/admin/Leave/RejectionReason/RejectionReason";
-
+import LeaveType from "./pages/admin/Leave/LeaveType/LeaveType";
+import AssignedLeaves from "./pages/admin/Leave/Authorization/AssignedLeaves";
 
 //Configuracion
 import Configurations from "./pages/Configurations";
@@ -78,6 +79,9 @@ function App() {
                 {/* Permisos */}
                 <Route path="/permisos/*" element={<LeaveIndex />} />
                 <Route path="/permisos/motivos-rechazo" element={<RejectionReason />} />
+                <Route path="/permisos/tipos" element={<LeaveType />} />
+                <Route path="/permisos/autorizaciones" element={<AssignedLeaves />} />
+
                 
                 {/* Configuraciones perfil */}
                 <Route path="/perfil/configuracion" element={<Setting />} />
