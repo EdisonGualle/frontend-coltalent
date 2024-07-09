@@ -26,23 +26,34 @@ export const fetchEmployee = createAsyncThunk(
   }
 );
 
-// createNewEmployee es una acción asíncrona que crea un nuevo empleado
 export const createNewEmployee = createAsyncThunk(
   "employees/createNewEmployee",
-  async (newEmployee) => {
-    const response = await createEmployee(newEmployee);
-    return response.data;
+  async (newEmployee, { rejectWithValue }) => {
+    try {
+      const response = await createEmployee(newEmployee);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   }
 );
+
+
 
 // updateOneEmployee es una acción asíncrona que actualiza un empleado existente
 export const updateOneEmployee = createAsyncThunk(
   "employees/updateOneEmployee",
-  async (updatedData) => {
-    const response = await updateEmployee(updatedData);
-    return response;
+  async ({ id, employee }, { rejectWithValue }) => {
+    try {
+      const response = await updateEmployee(id, employee);  // Pasamos el id y el objeto employee
+      return response;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   }
 );
+
+
 
 // deleteOneEmployee es una acción asíncrona que elimina un empleado existente
 export const deleteOneEmployee = createAsyncThunk(
@@ -101,7 +112,7 @@ export const employeeSlice = createSlice({
       })
       .addCase(createNewEmployee.rejected, (state, action) => {
         state.status = "failed";
-        state.error = JSON.parse(action.error.message);
+        state.error = action.payload.message || action.payload;
       })
       .addCase(updateOneEmployee.pending, (state) => {
         state.status = "loading";
@@ -118,7 +129,7 @@ export const employeeSlice = createSlice({
       })
       .addCase(updateOneEmployee.rejected, (state, action) => {
         state.status = "failed";
-        state.error = JSON.parse(action.error.message);
+        state.error = action.payload.message || action.payload;
       })
       .addCase(deleteOneEmployee.pending, (state) => {
         state.status = "loading";

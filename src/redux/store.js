@@ -20,6 +20,8 @@ import rejectionReasonReducer from './Leave/rejectionReasonSlince';
 import leaveTypeReducer from './Leave/leaveTypeSlince';
 import leaveReducer from './Leave/leaveSince';
 import assignedLeavesReducer from './Leave/assignedLeavesSlice';
+import leaveCommentReducer from './Leave/leaveCommentSlince';
+import leaveHistoryReducer from './Leave/LeaveHistorySlince';
 
 export default configureStore({
   reducer: {
@@ -44,5 +46,7 @@ export default configureStore({
     leaveType: leaveTypeReducer,
     leave: leaveReducer,
     assignedLeaves: assignedLeavesReducer,
+    leaveComment: leaveCommentReducer,
+    leaveHistory: leaveHistoryReducer,
   },
 });

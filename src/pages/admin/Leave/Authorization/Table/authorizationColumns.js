@@ -1,24 +1,392 @@
-// Columnas para el Administrador en authorizationColumns.js
-
 export const adminColumns = {
-  default: [
-    { id: 'employee.identification', label: 'Cédula' },
-    { id: 'employee.name', label: 'Solicitante' },
-    { id: 'employee.organization_details', label: 'Organización' },
-    { id: 'employee.position_name', label: 'Cargo' },
-    { id: 'created_at', label: 'Fecha de solicitud' },
-    { id: 'leave_type.name', label: 'Tipo de permiso' },
-    { id: 'requested_period', label: 'Fecha Solicitada' },
-    { id: 'state.name', label: 'Estado' },
-    { id: 'reason', label: 'Motivo' },
-    { id: 'comentario_1.commented_by_full_name', label: 'Evaluador' },
-    { id: 'comentario_1.action', label: 'Estado de evaluación' },
+  pendientes: [
+    { id: "employee.identification", label: "Cédula" },
+    { id: "employee.full_name", label: "Solicitante" },
+    {
+      id: "employee.position_name",
+      label: "Datos Laborales",
+      showIcon: true,
+      modalTitle: "Datos Laborales", 
+      modalConfig: [
+        { key: "employee.direction_name", label: "Dirección" },
+        { key: "employee.unit_name", label: "Unidad" },
+        { key: "employee.position_name", label: "Cargo" },
+      ],
+    },
+    { id: "created_at", label: "Fecha de solicitud", autoWidth: true },
+    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "requested_period", label: "Fecha Solicitada", autoWidth: true },
+    { id: "duration", label: "Duración", autoWidth: true },
+    { id: "state.name", label: "Estado" },
+    {
+      id: "reason",
+      label: "Motivo",
+      showIcon: true,
+      modalConfig: [
+        { key: "reason", label: "Motivo" },
+      ],
+    },
+    {
+      id: "attachment",
+      label: "Archivo adjunto",
+      showIcon: true,
+    },
+    { id: "comentario_1.commented_by_name", label: "Evaluador" },
+    {
+      id: "comentario_2.action",
+      label: "Detalles de evaluación",
+      modalTitle: "Detalles de evaluación", 
+      showIcon: true,
+      modalConfig: [
+        { key: "comentario_1.commented_by_name", label: "Evaluador" },
+        { key: "comentario_1.commented_by_position", label: "Cargo" },
+        { key: "comentario_1.action", label: "Estado de evaluación" },
+        { key: "comentario_1.comment", label: "Comentario" },
+        { key: "comentario_1.interaction_date", label: "Fecha de evalución" },
+      ],
+    },
   ],
-  pending: [
-    // columnas específicas para el filtro 'pending' para el administrador
+  aprobados: [
+    { id: "employee.identification", label: "Cédula" },
+    { id: "employee.full_name", label: "Solicitante" },
+    {
+      id: "employee.position_name",
+      label: "Datos Laborales",
+      showIcon: true,
+      modalTitle: "Datos Laborales", 
+      modalConfig: [
+        { key: "employee.direction_name", label: "Dirección" },
+        { key: "employee.unit_name", label: "Unidad" },
+        { key: "employee.position_name", label: "Cargo" },
+      ],
+    },
+    { id: "created_at", label: "Fecha de solicitud", autoWidth: true },
+    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "requested_period", label: "Fecha Solicitada", autoWidth: true },
+    { id: "duration", label: "Duración", autoWidth: true },
+    { id: "state.name", label: "Estado" },
+    {
+      id: "reason",
+      label: "Motivo",
+      showIcon: true,
+      modalConfig: [
+        { key: "reason", label: "Motivo" },
+      ],
+    },
+    {
+      id: "attachment",
+      label: "Archivo adjunto",
+      showIcon: true,
+    },
+    {
+      id: "comentario_2.commented_by_name",
+      label: "Detalles de evaluación",
+      showIcon: true,
+      modalTitle: "Detalles de evaluación",
+      modalConfig: [
+        { key: "comentario_2.commented_by_name", label: "Evaluador" },
+        { key: "comentario_2.action", label: "Estado de evaluación" },
+        { key: "comentario_2.comment", label: "Comentario" },
+        { key: "comentario_2.interaction_date", label: "Fecha de evalución" },
+      ],
+    },
   ],
-  approved: [
-    // columnas específicas para el filtro 'approved' para el administrador
+  rechazados: [
+    { id: "employee.identification", label: "Cédula" },
+    { id: "employee.full_name", label: "Solicitante" },
+    {
+      id: "employee.position_name",
+      label: "Datos Laborales",
+      showIcon: true,
+      modalTitle: "Datos Laborales",
+      modalConfig: [
+        { key: "employee.direction_name", label: "Dirección" },
+        { key: "employee.unit_name", label: "Unidad" },
+        { key: "employee.position_name", label: "Cargo" },
+      ],
+    },
+    { id: "created_at", label: "Fecha de solicitud", autoWidth: true },
+    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "requested_period", label: "Fecha Solicitada", autoWidth: true },
+    { id: "duration", label: "Duración", autoWidth: true },
+    { id: "state.name", label: "Estado" },
+    {
+      id: "reason",
+      label: "Motivo",
+      showIcon: true,
+      modalConfig: [
+        { key: "reason", label: "Motivo" },
+      ],
+    },
+    {
+      id: "attachment",
+      label: "Archivo adjunto",
+      showIcon: true,
+    },
+    {
+      id: "comentario_2.commented_by_name",
+      label: "Detalles de evaluación",
+      showIcon: true,
+      modalTitle: "Detalles de evaluación",
+      modalConfig: [
+        { key: "comentario_2.commented_by_name", label: "Evaluador" },
+        { key: "comentario_2.action", label: "Estado de evaluación" },
+        { key: "comentario_2.rejection_reason", label: "Motivo de rechazo" },
+        { key: "comentario_2.comment", label: "Comentario" },
+        { key: "comentario_2.interaction_date", label: "Fecha de evalución" },
+      ],
+    },
   ],
-  // Agregar más filtros si es necesario
+  historial: [
+    { id: "employee.identification", label: "Cédula" },
+    { id: "employee.full_name", label: "Solicitante" },
+    {
+      id: "employee.position_name",
+      label: "Datos Laborales",
+      showIcon: true,
+      modalTitle: "Datos Laborales",
+      modalConfig: [
+        { key: "employee.direction_name", label: "Dirección" },
+        { key: "employee.unit_name", label: "Unidad" },
+        { key: "employee.position_name", label: "Cargo" },
+      ],
+    },
+    { id: "created_at", label: "Fecha de solicitud", autoWidth: true },
+    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "requested_period", label: "Fecha Solicitada", autoWidth: true },
+    { id: "duration", label: "Duración", autoWidth: true },
+    { id: "state.name", label: "Estado" },
+    {
+      id: "reason",
+      label: "Motivo",
+      showIcon: true,
+      modalConfig: [
+        { key: "reason", label: "Motivo" }
+      ],
+    },
+    {
+      id: "attachment",
+      label: "Archivo adjunto",
+      showIcon: true,
+    },
+    {
+      id: "combined_evaluators",
+      label: "Evaluadores",
+      combineFields: ["comentario_1.commented_by_name", "comentario_2.commented_by_name"],
+    },
+    {
+      id: "evaluadores",
+      label: "Detalles de Evaluación",
+      showIcon: true,
+      modalTitle: "Detalles de Evaluación",
+      modalConfig: [
+        [
+          { key: "comentario_1.commented_by_name", label: "Evaluador" },
+          { key: "comentario_1.commented_by_position", label: "Cargo" },
+          { key: "comentario_1.action", label: "Estado de Evaluación" },
+          { key: "comentario_1.comment", label: "Comentario" },
+          { key: "comentario_1.interaction_date", label: "Fecha de evalución" },
+        ],
+        [
+          { key: "comentario_2.commented_by_name", label: "Evaluador" },
+          { key: "comentario_2.commented_by_position", label: "Cargo" },
+          { key: "comentario_2.action", label: "Estado de Evaluación" },
+          { key: "comentario_2.rejection_reason", label: "Motivo de rechazo" },
+          { key: "comentario_2.comment", label: "Comentario" },
+          { key: "comentario_2.interaction_date", label: "Fecha de evalución" },
+        ],
+      ],
+    },
+  ],
+};
+
+export const jefeDireccionColumns = {
+  pendientes: [
+    { id: "employee.identification", label: "Cédula" },
+    { id: "employee.full_name", label: "Solicitante" },
+    {
+      id: "employee.position_name",
+      label: "Datos Laborales",
+      showIcon: true,
+      modalTitle: "Datos Laborales", 
+      modalConfig: [
+        { key: "employee.direction_name", label: "Dirección" },
+        { key: "employee.unit_name", label: "Unidad" },
+        { key: "employee.position_name", label: "Cargo" },
+      ],
+    },
+    { id: "created_at", label: "Fecha de solicitud", autoWidth: true },
+    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "requested_period", label: "Fecha Solicitada", autoWidth: true },
+    { id: "duration", label: "Duración", autoWidth: true },
+    { id: "state.name", label: "Estado" },
+    {
+      id: "reason",
+      label: "Motivo",
+      showIcon: true,
+      modalConfig: [
+        { key: "reason", label: "Motivo" },
+        { key: "duration", label: "Duración" },
+      ],
+    },
+    {
+      id: "attachment",
+      label: "Archivo adjunto",
+      showIcon: true,
+    },
+  ],
+  aprobados: [
+    { id: "employee.identification", label: "Cédula" },
+    { id: "employee.full_name", label: "Solicitante" },
+    {
+      id: "employee.position_name",
+      label: "Datos Laborales",
+      showIcon: true,
+      modalTitle: "Datos Laborales", 
+      modalConfig: [
+        { key: "employee.direction_name", label: "Dirección" },
+        { key: "employee.unit_name", label: "Unidad" },
+        { key: "employee.position_name", label: "Cargo" },
+      ],
+    },
+    { id: "created_at", label: "Fecha de solicitud", autoWidth: true },
+    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "requested_period", label: "Fecha Solicitada", autoWidth: true },
+    { id: "duration", label: "Duración", autoWidth: true },
+    { id: "state.name", label: "Estado" },
+    {
+      id: "reason",
+      label: "Motivo",
+      showIcon: true,
+      modalConfig: [
+        { key: "reason", label: "Motivo" },
+      ],
+    },
+    {
+      id: "attachment",
+      label: "Archivo adjunto",
+      showIcon: true,
+    },
+    {
+      id: "comentario_1.commented_by_name",
+      label: "Detalles de evaluación",
+      showIcon: true,
+      modalTitle: "Detalles de evaluación",
+      modalConfig: [
+        { key: "comentario_1.commented_by_name", label: "Evaluador" },
+        { key: "comentario_1.action", label: "Estado de evaluación" },
+        { key: "comentario_1.comment", label: "Comentario" },
+        { key: "comentario_1.interaction_date", label: "Fecha de evalución" },
+      ],
+    },
+  ],
+  rechazados: [
+    { id: "employee.identification", label: "Cédula" },
+    { id: "employee.full_name", label: "Solicitante" },
+    {
+      id: "employee.position_name",
+      label: "Datos Laborales",
+      showIcon: true,
+      modalTitle: "Datos Laborales",
+      modalConfig: [
+        { key: "employee.direction_name", label: "Dirección" },
+        { key: "employee.unit_name", label: "Unidad" },
+        { key: "employee.position_name", label: "Cargo" },
+      ],
+    },
+    { id: "created_at", label: "Fecha de solicitud", autoWidth: true },
+    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "requested_period", label: "Fecha Solicitada", autoWidth: true },
+    { id: "duration", label: "Duración", autoWidth: true },
+    { id: "state.name", label: "Estado" },
+    {
+      id: "reason",
+      label: "Motivo",
+      showIcon: true,
+      modalConfig: [
+        { key: "reason", label: "Motivo" },
+      ],
+    },
+    {
+      id: "attachment",
+      label: "Archivo adjunto",
+      showIcon: true,
+    },
+    {
+      id: "comentario_1.commented_by_name",
+      label: "Detalles de evaluación",
+      showIcon: true,
+      modalTitle: "Detalles de evaluación",
+      modalConfig: [
+        { key: "comentario_1.commented_by_name", label: "Evaluador" },
+        { key: "comentario_1.action", label: "Estado de evaluación" },
+        { key: "comentario_1.rejection_reason", label: "Motivo de rechazo" },
+        { key: "comentario_1.comment", label: "Comentario" },
+        { key: "comentario_1.interaction_date", label: "Fecha de evalución" },
+      ],
+    },
+  ],
+  historial: [
+    { id: "employee.identification", label: "Cédula" },
+    { id: "employee.full_name", label: "Solicitante" },
+    {
+      id: "employee.position_name",
+      label: "Datos Laborales",
+      showIcon: true,
+      modalConfig: [
+        { key: "employee.direction_name", label: "Dirección" },
+        { key: "employee.unit_name", label: "Unidad" },
+        { key: "employee.position_name", label: "Cargo" },
+      ],
+    },
+    { id: "created_at", label: "Fecha de solicitud", autoWidth: true },
+    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "requested_period", label: "Fecha Solicitada", autoWidth: true },
+    { id: "duration", label: "Duración", autoWidth: true },
+    { id: "state.name", label: "Estado" },
+    {
+      id: "reason",
+      label: "Motivo",
+      showIcon: true,
+      modalConfig: [
+        { key: "reason", label: "Motivo" },
+        { key: "duration", label: "Duración" },
+      ],
+    },
+    {
+      id: "attachment",
+      label: "Archivo adjunto",
+      showIcon: true,
+    },
+    {
+      id: "combined_evaluators",
+      label: "Evaluadores",
+      combineFields: ["comentario_1.commented_by_name", "comentario_2.commented_by_name"],
+    },
+    {
+      id: "evaluadores",
+      label: "Detalles de Evaluación",
+      showIcon: true,
+      modalTitle: "Detalles de Evaluación",
+      modalConfig: [
+        [
+          { key: "comentario_1.commented_by_name", label: "Evaluador" },
+          { key: "comentario_1.commented_by_position", label: "Cargo" },
+          { key: "comentario_1.action", label: "Estado de Evaluación" },
+          { key: "comentario_1.rejection_reason", label: "Motivo de rechazo" },
+          { key: "comentario_1.comment", label: "Comentario" },
+          { key: "comentario_1.interaction_date", label: "Fecha de evalución" },
+
+        ],
+        [
+          { key: "comentario_2.commented_by_name", label: "Evaluador" },
+          { key: "comentario_2.commented_by_position", label: "Cargo" },
+          { key: "comentario_2.action", label: "Estado de Evaluación" },
+          { key: "comentario_2.rejection_reason", label: "Motivo de rechazo" },
+          { key: "comentario_2.comment", label: "Comentario" },
+          { key: "comentario_2.interaction_date", label: "Fecha de evalución" },
+        ],
+      ],
+    },
+  ],
 };

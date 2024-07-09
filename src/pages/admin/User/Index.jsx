@@ -9,7 +9,6 @@ import UserForm from './components/UserForm';
 import { fetchUsers } from '../../../redux/User/userSlice';
 import { createUser } from '../../../services/User/UserService';
 import { AlertContext } from '../../../contexts/AlertContext';
-import { fetchEmployees } from '../../../redux/Employee/employeSlice';
 
 
 // Componente principal de la pagina de usuarios
@@ -24,10 +23,6 @@ const UserIndex = () => {
   // Contexto para mostrar alertas
   const { showAlert } = useContext(AlertContext);
 
-  // Hook useEffect para ejecutar fetchEmployee cuando se carga el componente
-  useEffect(() => {
-    dispatch(fetchEmployees());
-  }, [dispatch]);
 
   // Función para cambiar la vista de la lista de usuarios
   const handleViewChange = (view) => {

@@ -3,7 +3,6 @@ import { Routes, Route, useParams, Navigate } from "react-router-dom";
 
 import PerfilSidebar from "./components/common/PerfilSidebar";
 import PerfilHeader from "./components/common/PerfilHeader";
-import Dashboard from "./Dashboard";
 
 import PersonalData from "./Information/PersonalData";
 import Education from "./Ability/Education";
@@ -62,8 +61,7 @@ const Perfil = () => {
         <PerfilHeader />
         <div className=" flex-1  overflow-auto custom-scrollbar">
           <Routes>
-            <Route index element={<Dashboard />} />
-            <Route path="datos-personales" element={<PersonalData />} />
+            <Route path="datos-personales" index element={<PersonalData />} />
             <Route path="educacion" element={<Education />} />
             <Route path="idiomas" element={<Language />} />
             <Route path="publicaciones" element={<Publication />} />

@@ -14,11 +14,10 @@ const getEmployees = async () => {
       const response = await AxiosInstance.post("/employees", newEmployee);
       return response.data;
     } catch (error) {
-      // Crear un objeto personalizado con u campo de mensaje que sea una cadena JSON del objeto de error
-      const customError = new Error(JSON.stringify(error.response.data));
-      throw customError;
+      throw error.response ? error.response.data : error.message;
     }
   };
+  
 
  const getEmployee = async (employee) => {
     try {
@@ -29,18 +28,16 @@ const getEmployees = async () => {
     }
   }
 
-  const updateEmployee = async (updateEmployee) => {
+  const updateEmployee = async (id, employee) => {
     try {
-      const { id, data } = updateEmployee;
-      const response = await AxiosInstance.put(`/employees/${id}`, data);
+      const response = await AxiosInstance.put(`/employees/${id}`, { employee });
       return response.data;
     } catch (error) {
-      // Crear un objeto de error personalizado con un campo de mensaje que sea una cadena JSON del objeto de error
-      const customError = new Error(JSON.stringify(error.response.data));
-      throw customError;
+      throw error.response ? error.response.data : error.message;
     }
   };
-
+  
+  
   const deleteEmployee = async (employee) => {
     try {
       const response = await AxiosInstance.delete(`/employees/${employee}`)

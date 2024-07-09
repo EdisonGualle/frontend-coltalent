@@ -65,6 +65,7 @@ export const rejectionReasonSlice = createSlice({
     rejectionReason: {},
     status: "idle",
     error: null,
+    hasFetchedOnce: false
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -75,10 +76,12 @@ export const rejectionReasonSlice = createSlice({
         .addCase(fetchRejectionReasons.fulfilled, (state, action) => {
             state.status = "succeeded";
             state.rejectionReasons = action.payload;
+            state.hasFetchedOnce = true;
         })
         .addCase(fetchRejectionReasons.rejected, (state, action) => {
             state.status = "failed";
             state.error = action.error.message;
+            state.hasFetchedOnce = false;
         })
         .addCase(fetchRejectionReason.pending, (state) => {
             state.status = "loading";

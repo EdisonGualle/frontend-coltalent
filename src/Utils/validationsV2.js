@@ -25,7 +25,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const validateEmail = (email) => {
   // Verificar si el correo electrónico está vacío
   if (!email.trim()) {
-    return 'Por favor, ingresa un correo electrónico.';
+    return 'El correo electrónico es requerido.';
   }
 
   // Verificar si cumple con la expresión regular de correo electrónico
@@ -77,12 +77,12 @@ const mobilePhoneRegex = /^(?:\+593|0)9\d{8}$/;
 export const validateMobilePhone = (phone) => {
   // Verificar si el número de teléfono está vacío
   if (!phone.trim()) {
-    return 'Por favor, ingresa un número de teléfono.';
+    return 'El número de celular es requerido.';
   }
 
   // Verificar si cumple con la expresión regular
   if (!mobilePhoneRegex.test(phone)) {
-    return 'El número de teléfono móvil no es válido. Debe comenzar con 09 o +593 seguido de 8 dígitos.';
+    return 'El número de celular no es válido.';
   }
 
   // Si pasa todas las validaciones, retornar null (sin errores)
@@ -121,11 +121,11 @@ export const validateNames = (name) => {
   return null;
 };
 
-export const validateDescripcion = (name) => {
-  // Verificar si cumple con la expresión regular (solo letras y espacios)
-  if (!nameRegex.test(name)) {
-    return 'La descripción solo puede contener letras y espacios.';
-  }
+// Expresión regular para validar la descripción
+const descriptionRegex = /^[a-zA-Z\s.,;:!?'()-]+$/;
+
+// Función para validar la descripción
+export const validateDescripcion = (description) => {
 
   // Si pasa todas las validaciones, retornar null (sin errores)
   return null;

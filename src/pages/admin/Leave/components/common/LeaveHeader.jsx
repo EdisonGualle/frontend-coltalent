@@ -1,32 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { useParams } from "react-router-dom";
+
+import { useDispatch, useSelector } from "react-redux";
 import { FaRegClipboard } from "react-icons/fa";
+import { fetchLeaveStatistics } from "../../../../../redux/Leave/leaveSince";
 
 const LeaveHeader = () => {
-  const [totalPermissions, setTotalPermissions] = useState(0);
-  const [approvedPermissions, setApprovedPermissions] = useState(0);
-  const [disapprovedPermissions, setDisapprovedPermissions] = useState(0);
+  const { id: employeeId } = useParams(); // Obtener employeeId desde la ruta
+  const dispatch = useDispatch();
+  const { statistics, loading, error } = useSelector((state) => state.leave);
 
   useEffect(() => {
-    // Simulating data fetching from backend
-    const fetchData = async () => {
-      // Simulated backend data
-      const backendData = {
-        totalPermissions: 15,
-        approvedPermissions: 10,
-        disapprovedPermissions: 2
-      };
+    if (employeeId) {
+      dispatch(fetchLeaveStatistics(employeeId));
+    }
+  }, [dispatch, employeeId]);
 
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+  console.log(statistics);
+  if (loading) {
+    return <div></div>;
+  }
 
-      // Set state with fetched data
-      setTotalPermissions(backendData.totalPermissions || 0);
-      setApprovedPermissions(backendData.approvedPermissions || 0);
-      setDisapprovedPermissions(backendData.disapprovedPermissions || 0);
-    };
 
-    fetchData();
-  }, []);
 
   return (
     <div className="flex items-center shadow rounded-t-lg p-4">
@@ -36,19 +31,19 @@ const LeaveHeader = () => {
         <div className="text-center">
           <span className="block text-xs text-gray-500">Permisos Totales</span>
           <span className="block bg-gray-100 text-gray-600 text-lg font-semibold px-4 py-0.5 rounded-full">
-            {totalPermissions}
+            {statistics?.totalPermissions || 0}
           </span>
         </div>
         <div className="text-center">
           <span className="block text-xs text-gray-500">Permisos Aprobados</span>
           <span className="block bg-green-100 text-green-600 text-lg font-semibold px-4 py-0.5 rounded-full">
-            {approvedPermissions}
+            {statistics?.approvedPermissions || 0}
           </span>
         </div>
         <div className="text-center">
           <span className="block text-xs text-gray-500">Permisos Desaprobados</span>
           <span className="block bg-red-100 text-red-500 text-lg font-semibold px-4 py-0.5 rounded-full">
-            {disapprovedPermissions}
+            {statistics?.disapprovedPermissions || 0}
           </span>
         </div>
       </div>

@@ -18,7 +18,7 @@ import { getLeaveTypeCellStyle } from './Table/leaveTypeColumnStyles';
 const LeaveType = () => {
     const dispatch = useDispatch();
     const { showAlert } = useContext(AlertContext);
-    const { leaveTypes, status } = useSelector((state) => state.leaveType);
+    const { leaveTypes, status ,  hasFetchedOnce } = useSelector((state) => state.leaveType);
     const [data, setData] = useState([]);
     const [isLoadingInitial, setIsLoadingInitial] = useState(true);
     const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
@@ -35,16 +35,21 @@ const LeaveType = () => {
     const [currentLeaveType, setCurrentLeaveType] = useState(null);
   
     useEffect(() => {
-      dispatch(fetchLeaveTypes())
-        .then(unwrapResult)
-        .then(() => {
-          setIsLoadingInitial(false);
-        })
-        .catch(() => {
-          setIsLoadingInitial(false);
-        });
-      setFormErrors({});
-    }, [dispatch]);
+      if (!hasFetchedOnce) {  // Solo cargar datos si no se han cargado previamente
+        setIsLoadingInitial(true); // Asegúrate de iniciar la carga
+        dispatch(fetchLeaveTypes())
+          .then(unwrapResult)
+          .then(() => {
+            setIsLoadingInitial(false); // Desactivar la carga inicial después de cargar datos
+          })
+          .catch(error => {
+            setIsLoadingInitial(false); // Asegurarse de desactivar la carga en caso de error
+          });
+      } else {
+        setIsLoadingInitial(false); // Asegúrate de desactivar la carga si los datos ya están disponibles
+      }
+    }, [dispatch, hasFetchedOnce]);
+    
   
     // Actualizar los datos cuando se carguen
     useEffect(() => {
@@ -164,7 +169,7 @@ const LeaveType = () => {
         </CardHeader>
   
         <div className=''>
-          {isLoadingInitial ? (
+        {isLoadingInitial && !leaveTypes.length ? (
             <SkeletonTable
               columns={leaveTypeColumns}
               showFilters={false}

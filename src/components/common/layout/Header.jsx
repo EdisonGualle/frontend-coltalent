@@ -1,6 +1,5 @@
 import React from "react";
 import { useAuth } from "../../../hooks/useAuth";
-
 import {
   RiArrowDownSLine,
   RiSettings3Line,
@@ -10,6 +9,7 @@ import { Menu, MenuItem, MenuButton } from "@szhsin/react-menu";
 import "@szhsin/react-menu/dist/index.css";
 import "@szhsin/react-menu/dist/transitions/slide.css";
 import { Link } from "react-router-dom";
+import Notifications from "../../Notifications";
 
 const Header = () => {
   const { logout, user } = useAuth();
@@ -19,12 +19,12 @@ const Header = () => {
   };
 
   return (
-
     <header className="h-[7vh] md:h-[10vh] border-b border-secondary-100 p-8 flex items-center justify-end bg-gray-800">
       <nav className="flex items-center gap-2">
+        <Notifications />
         <Menu
           menuButton={
-            <MenuButton className="flex items-center gap-x-2 p-2 rounded-lg transition-colors hover:bg-secondary-100 group">
+            <MenuButton className="flex items-center gap-x-2 p-2 rounded-lg transition-colors hover:bg-secondary-50 group">
               <img
                 src={`${import.meta.env.VITE_STORAGE_URL}/${user.photo}`}
                 className="w-6 h-6 object-cover rounded-full"

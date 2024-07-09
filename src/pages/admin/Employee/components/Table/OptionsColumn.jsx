@@ -13,6 +13,9 @@ import {
   RiDeleteBin6Line,
   RiKeyLine,
 } from 'react-icons/ri';
+import ModalForm from '../../../../../components/ui/ModalForm';
+import EmployeeForm from '../../EmployeeForm';
+import { updateOneEmployee } from '../../../../../redux/Employee/employeSlice';
 
 const OptionsColumn = ({ employee, updateEmployees }) => {
   const dispatch = useDispatch();
@@ -39,7 +42,6 @@ const OptionsColumn = ({ employee, updateEmployees }) => {
       updateEmployees();
       showAlert('Empleado eliminado correctamente', 'success');
     } catch (error) {
-      console.error('Error deleting employee:', error);
       showAlert('Error al eliminar el empleado', 'error');
     }
   };
@@ -51,6 +53,28 @@ const OptionsColumn = ({ employee, updateEmployees }) => {
       await handleDelete();
       setIsOpenDialog2(false);
   };
+
+
+  // Función para manejar la actualización de empleados
+  const handleEditSubmit = async (submissionData) => {
+    try {
+      await dispatch(updateOneEmployee(submissionData)).unwrap();
+      updateEmployees();
+      showAlert('Empleado actualizado correctamente.', 'success');
+      setIsOpenEditModal(false);
+    } catch (error) {
+      if (error.errors) {
+        console.log("Error: ", error.errors);
+        setFormErrors(error.errors);
+        showAlert('Por favor corrija los errores en el formulario.', 'error');
+      } else {
+        showAlert('Ocurrió un error en el servidor. Inténtelo de nuevo más tarde.', 'error');
+      }
+    }
+  };
+  
+  
+  
 
   return (
     <>
@@ -77,7 +101,10 @@ const OptionsColumn = ({ employee, updateEmployees }) => {
             </Link>
           </MenuItem>
           <MenuItem className="p-0 hover:bg-transparent">
-            <button className="w-full rounded-lg transition-colors text-xs hover:bg-teal-50 flex items-center gap-x-2 p-2">
+           <button
+              className="w-full rounded-lg transition-colors text-xs hover:bg-teal-50 flex items-center gap-x-2 p-2"
+              onClick={() => setIsOpenEditModal(true)}
+            >
               <RiEdit2Line className="text-green-500" />
               <span className="truncate">Editar</span>
             </button>
@@ -111,6 +138,22 @@ const OptionsColumn = ({ employee, updateEmployees }) => {
           <RiDeleteBin6Line className="w-10 h-10 flex items-center justify-center rounded-full text-red-500" />
         }
       />
+        <ModalForm
+        isOpen={isOpenEditModal}
+       maxWidth='max-w-4xl'
+        setIsOpen={setIsOpenEditModal}
+        title="Editar empleado"
+        icon={<RiEdit2Line className="w-6 h-6 flex items-center justify-center rounded-full text-blue-500" />} // Icono para el modal de edición
+      >
+        <EmployeeForm
+          onSubmit={handleEditSubmit}
+          onCancel={() => setIsOpenEditModal(false)}
+          formErrors={formErrors}
+          initialData={{ id: employee.id, ...employee }} 
+          isEditMode={true}
+        
+        />
+      </ModalForm>
     </>
   );
 };

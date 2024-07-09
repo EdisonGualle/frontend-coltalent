@@ -1,4 +1,4 @@
-import React, {useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../../hooks/useAuth";
@@ -23,15 +23,15 @@ const Sidebar = () => {
 
   const [activeSubmenu, setActiveSubmenu] = useState(null);
 
-  const { logout, userRole, user} = useAuth();
+  const { logout, userRole, user } = useAuth();
 
   const navigate = useNavigate();
 
   const toggleSubMenu = (index) => {
     if (activeSubmenu === index) {
-      setActiveSubmenu(null); 
+      setActiveSubmenu(null);
     } else {
-      setActiveSubmenu(index); 
+      setActiveSubmenu(index);
     }
   };
 
@@ -40,9 +40,12 @@ const Sidebar = () => {
   };
 
   const handleProfileClick = () => {
-    navigate(`/perfil/${user.employee_id}`);
+    navigate(`/perfil/${user.employee_id}/datos-personales`);
   };
 
+  const handlePermisosClick = () => {
+    navigate(`/permisos/${user.employee_id}/solicitar`);
+  };
 
   return (
     <>
@@ -64,18 +67,18 @@ const Sidebar = () => {
               </Link>
             </li>
 
-            {(userRole === 'Administrador' || userRole === 'superadministrador' || userRole === 'empleado') && (
-              <li className="group">
-                <button
-                  onClick={handleProfileClick}
-                  className=" w-full flex text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
-                >
-                  <RiUser3Line className="text-primary text-xl group-hover:text-yellow-500" /> Mi Perfil
-                </button>
-              </li>
-            )}
+            {/* Todos */}
+            <li className="group">
+              <button
+                onClick={handleProfileClick}
+                className=" w-full flex text-secondary-100 items-center gap-4 py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
+              >
+                <RiUser3Line className="text-primary text-xl group-hover:text-yellow-500" /> Mi Perfil
+              </button>
+            </li>
 
-            {(userRole === 'Administrador' || userRole === 'superadministrador') && (
+
+            {(userRole === 'Administrador') && (
               <li className="group">
                 <Link
                   to="/empleados"
@@ -85,7 +88,9 @@ const Sidebar = () => {
                 </Link>
               </li>
             )}
-            {(userRole === 'Administrador' || userRole === 'superadministrador') && (
+
+
+            {(userRole === 'Administrador') && (
               <li className="group">
                 <Link
                   to="/usuarios"
@@ -96,32 +101,33 @@ const Sidebar = () => {
               </li>
             )}
 
-            {(userRole === 'Administrador' || userRole === 'superadministrador') && (
-              <li className="group">
-                <button
-                  onClick={() => toggleSubMenu(3)}
-                  className="w-full flex text-secondary-100 items-center justify-between py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
-                >
-                  <span className="flex items-center gap-4">
-                    <RiShieldUserLine className="text-primary text-xl group-hover:text-yellow-500" />{" "}
-                    Permisos
-                  </span>
-                  <RiArrowRightSLine
-                    className={`mt-1 ${activeSubmenu === 3 && "rotate-90"} transition-all`}
-                  />
-                </button>
-                <ul
-                  className={` ${activeSubmenu === 3 ? "h-auto" : "h-0"} overflow-y-hidden transition-all`}
-                >
-                  <li>
-                    <Link
-                      to="/permisos"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
-                    >
-                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
-                      Solicitudes
-                    </Link>
-                  </li>
+
+            <li className="group">
+              <button
+                onClick={() => toggleSubMenu(3)}
+                className="w-full flex text-secondary-100 items-center justify-between py-2 px-4 rounded-lg hover:bg-secondary-100 hover:text-black transition-colors"
+              >
+                <span className="flex items-center gap-4">
+                  <RiShieldUserLine className="text-primary text-xl group-hover:text-yellow-500" />{" "}
+                  Permisos
+                </span>
+                <RiArrowRightSLine
+                  className={`mt-1 ${activeSubmenu === 3 && "rotate-90"} transition-all`}
+                />
+              </button>
+              <ul
+                className={` ${activeSubmenu === 3 ? "h-auto" : "h-0"} overflow-y-hidden transition-all`}
+              >
+                <li>
+                  <button
+                     onClick={handlePermisosClick}
+                    className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
+                  >
+                    <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
+                    Solicitudes
+                  </button>
+                </li>
+                {(userRole === 'Administrador' || userRole === 'Jefe Dirección' || userRole === 'Jefe Unidad' || userRole === 'Jefe General') && (
                   <li>
                     <Link
                       to="/permisos/autorizaciones"
@@ -131,30 +137,32 @@ const Sidebar = () => {
                       Autorizaciones
                     </Link>
                   </li>
-                  <li>
-                    <Link
-                      to="/permisos/tipos"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
-                    >
-                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
-                      Tipos de Permisos
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/permisos/motivos-rechazo"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
-                    >
-                      <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
-                      Motivos de Rechazo
-                    </Link>
-                  </li>
-                 
-                </ul>
-              </li>
-            )}
-
-            {(userRole === 'Administrador' || userRole === 'superadministrador') && (
+                )}
+                  {(userRole === 'Administrador') && (
+                <li>
+                  <Link
+                    to="/permisos/tipos"
+                    className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
+                  >
+                    <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
+                    Tipos de Permisos
+                  </Link>
+                </li>
+                )}
+                  {(userRole === 'Administrador') && (
+                <li>
+                  <Link
+                    to="/permisos/motivos-rechazo"
+                    className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
+                  >
+                    <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
+                    Motivos de Rechazo
+                  </Link>
+                </li>
+                )}
+              </ul>
+            </li>
+            {(userRole === 'Administrador' ) && (
               <li className="group">
                 <button
                   onClick={() => toggleSubMenu(1)}
@@ -202,7 +210,7 @@ const Sidebar = () => {
               </li>
             )}
 
-            {(userRole === 'Administrador' || userRole === 'superadministrador') && (
+            {(userRole === 'Administrador') && (
               <li className="group">
                 <Link
                   to="/configuraciones"

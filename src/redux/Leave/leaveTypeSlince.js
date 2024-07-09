@@ -62,6 +62,7 @@ export const leaveTypeSlice = createSlice({
     leaveType: {},
     status: "idle",
     error: null,
+    hasFetchedOnce: false
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -72,10 +73,12 @@ export const leaveTypeSlice = createSlice({
       .addCase(fetchLeaveTypes.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.leaveTypes = action.payload;
+        state.hasFetchedOnce = true;
       })
       .addCase(fetchLeaveTypes.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
+        state.hasFetchedOnce = false;
       })
       .addCase(fetchLeaveType.pending, (state) => {
         state.status = "loading";

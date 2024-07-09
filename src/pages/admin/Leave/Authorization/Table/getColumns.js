@@ -1,9 +1,16 @@
-import { adminColumns } from "./authorizationColumns";
+import { adminColumns, jefeDireccionColumns } from "./authorizationColumns";
 
 export const getColumns = (role, filter) => {
-    if (role === 'Administrador') {
-        return adminColumns[filter] || adminColumns.default;
-    } 
-    // Agregar más roles si es necesario
-    return [];
+  switch (role) {
+    case "Administrador":
+      return adminColumns[filter] ||  adminColumns.pendientes;
+    case "Jefe Dirección":
+      return jefeDireccionColumns[filter] || jefeDireccionColumns.pendientes;
+    case "Jefe Unidad":
+      return jefeDireccionColumns[filter] || jefeDireccionColumns.pendientes;
+    case "Jefe General":
+      return jefeDireccionColumns[filter] || jefeDireccionColumns.pendientes;
+    default:
+      return [];
+  }
 };

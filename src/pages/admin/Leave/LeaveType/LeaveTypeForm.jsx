@@ -2,6 +2,39 @@ import React, { useState, useEffect } from "react";
 import Input from "../../../../components/ui/Input";
 import Textarea from "../../../../components/ui/Textarea";
 import { validateDescripcion, validateNames } from "../../../../Utils/validationsV2";
+import { FaHouseDamage, FaUmbrellaBeach, FaBriefcaseMedical, FaHome, FaUserMd, FaUniversity, FaPlus, FaPlane, FaHospital, FaChild, FaGraduationCap, FaSuitcase, FaRegClock } from 'react-icons/fa';
+import { FaHandshakeAngle } from "react-icons/fa6";
+import Select from 'react-select';
+
+// Mapeo de nombres de iconos a componentes de iconos
+const iconOptions = {
+    FaUmbrellaBeach,        // Vacaciones
+    FaBriefcaseMedical,     // Atención médica
+    FaHandshakeAngle,       // Compensación
+    FaHouseDamage,          // Calamidad doméstica
+    FaHome,                 // Trabajo remoto
+    FaUserMd,               // Médico
+    FaUniversity,           // Institucional
+    FaPlus,                 // Por defecto
+    FaPlane,                // Viaje
+    FaHospital,             // Hospitalización
+    FaChild,                // Cuidado de hijos
+    FaGraduationCap,        // Estudio
+    FaSuitcase,             // Trabajo
+    FaRegClock              // Compensación de tiempo
+};
+
+const options = Object.keys(iconOptions).map(key => ({
+    value: key,
+    label: (
+        <div className="flex items-center">
+            {React.createElement(iconOptions[key], { className: 'mr-2' })}
+            <span>{key}</span>
+        </div>
+    ),
+    icon: React.createElement(iconOptions[key])
+}));
+
 
 const NAME_REQUIRED = "Por favor, ingrese el nombre del tipo de permiso.";
 const DESCRIPTION_REQUIRED = "Por favor, ingrese la descripción del tipo de permiso.";
@@ -9,6 +42,7 @@ const ADVANCE_NOTICE_DAYS_REQUIRED = "Por favor, ingrese los días de anticipaci
 const REQUIRES_DOCUMENT_REQUIRED = "Por favor, seleccione si requiere documentación.";
 const TIME_UNIT_REQUIRED = "Por favor, seleccione la unidad de tiempo.";
 const MAX_DURATION_REQUIRED = "Por favor, ingrese la duración máxima.";
+const ICON_REQUIRED = "Por favor, seleccione un icono.";
 
 const LeaveTypeForm = ({
     leaveType,
@@ -30,6 +64,7 @@ const LeaveTypeForm = ({
         time_unit: "",
         requires_document: "",
         advance_notice_days: "",
+        icon: "",
     });
     const [errors, setErrors] = useState({
         name: "",
@@ -38,9 +73,10 @@ const LeaveTypeForm = ({
         time_unit: "",
         requires_document: "",
         advance_notice_days: "",
+        icon: "",
     });
 
-    const { name, description, max_duration, time_unit, requires_document, advance_notice_days } = formData;
+    const { name, description, max_duration, time_unit, requires_document, advance_notice_days, icon } = formData;
 
     useEffect(() => {
         setErrors(formErrors);
@@ -60,6 +96,7 @@ const LeaveTypeForm = ({
                 time_unit: leaveType.time_unit,
                 requires_document: leaveType.requires_document,
                 advance_notice_days: leaveType.advance_notice_days,
+                icon: leaveType.icon,
             });
 
             setErrors({
@@ -69,6 +106,7 @@ const LeaveTypeForm = ({
                 time_unit: "",
                 requires_document: "",
                 advance_notice_days: "",
+                icon: "", // Inicializar el error de icono en el estado de errores
             });
         }
     }, [isEditing, leaveType]);
@@ -102,6 +140,9 @@ const LeaveTypeForm = ({
                 case "max_duration":
                     error = MAX_DURATION_REQUIRED;
                     break;
+                case "icon":
+                    error = ICON_REQUIRED;
+                    break;
                 default:
                     break;
             }
@@ -127,6 +168,17 @@ const LeaveTypeForm = ({
         });
     };
 
+    const handleIconChange = (selectedOption) => {
+        setFormData({
+            ...formData,
+            icon: selectedOption ? selectedOption.value : "",
+        });
+        setErrors({
+            ...errors,
+            icon: selectedOption ? "" : ICON_REQUIRED, // Añadir validación de error para icono
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -141,7 +193,7 @@ const LeaveTypeForm = ({
             return;
         }
 
-        if (!name || !description || !advance_notice_days || !requires_document || !time_unit || !max_duration) {
+        if (!name || !description || !advance_notice_days || !requires_document || !time_unit || !max_duration || !icon) {
             setErrors({
                 name: !name ? NAME_REQUIRED : "",
                 description: !description ? DESCRIPTION_REQUIRED : "",
@@ -149,6 +201,7 @@ const LeaveTypeForm = ({
                 requires_document: !requires_document ? REQUIRES_DOCUMENT_REQUIRED : "",
                 time_unit: !time_unit ? TIME_UNIT_REQUIRED : "",
                 max_duration: !max_duration ? MAX_DURATION_REQUIRED : "",
+                icon: !icon ? ICON_REQUIRED : "", // Añadir error de icono
             });
             return;
         }
@@ -274,6 +327,47 @@ const LeaveTypeForm = ({
                         min="1"
                         max="10"
                     />
+                </div>
+                <div className="flex flex-col">
+                    <label className="mb-1 text-gray-800 font-semibold">Icono</label>
+                    <Select
+                        options={options}
+                        value={options.find(option => option.value === icon)}
+                        onChange={handleIconChange}
+                        className="border border-gray-300 rounded-lg p-2 w-full"
+                        placeholder="Seleccione un icono"
+                        menuPortalTarget={document.body}
+                        styles={{
+                            menuPortal: base => ({ ...base, zIndex: 9999 }),
+                            menu: base => ({ ...base, zIndex: 9999 }),
+                            menuList: base => ({
+                                ...base,
+                                maxHeight: 160,
+                                overflowY: 'auto',
+                            }),
+                            control: base => ({
+                                ...base,
+                                overflow: 'visible'
+                            }),
+                            container: base => ({
+                                ...base,
+                                position: 'relative',
+                                zIndex: 9999,
+                            }),
+                            dropdownIndicator: base => ({
+                                ...base,
+                                zIndex: 9999,
+                            }),
+                        }}
+                        menuPlacement="auto"
+                        menuPosition="fixed"
+                    />
+
+
+
+                    {errors.icon && (
+                        <span className="text-red-500 text-xs">{errors.icon}</span>
+                    )}
                 </div>
             </div>
             <div className="flex items-center gap-x-2 mt-4">

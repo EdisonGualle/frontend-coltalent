@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaEllipsisV } from 'react-icons/fa';
+import { FaEllipsisV, FaEye } from 'react-icons/fa';
 import { MdSearch, MdFilterList, MdOutlineFileDownload } from 'react-icons/md';
 import { HiOutlinePlus } from 'react-icons/hi';
 import Pagination from './Pagination';
@@ -8,6 +8,13 @@ import ExportOptions from './ExportOptions';
 import ColumnVisibilityOptions from './ColumnVisibilityOptions';
 import useColumnVisibility from './useColumnVisibility';
 import { AiOutlineControl } from "react-icons/ai";
+import FlexibleModal from './FlexibleModal';
+import FileViewer from './FileViewer';
+
+// Utilidad para acceder a campos anidados
+const getNestedValue = (obj, path) => {
+  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+};
 
 const LeaveTable = ({
   allColumns,
@@ -37,6 +44,8 @@ const LeaveTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filteredData, setFilteredData] = useState([]);
+  const [modalContent, setModalContent] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
@@ -51,7 +60,7 @@ const LeaveTable = ({
 
   const displayedData = Array.isArray(filteredData) ? filteredData.filter(row => {
     const matchesSearchTerm = visibleColumns.some(column =>
-      (row[column.id] !== undefined && row[column.id] !== null) && row[column.id].toString().toLowerCase().includes(searchTerm.toLowerCase())
+      (getNestedValue(row, column.id) !== undefined && getNestedValue(row, column.id) !== null) && getNestedValue(row, column.id).toString().toLowerCase().includes(searchTerm.toLowerCase())
     );
     const matchesFromDate = fromDate ? new Date(row.date) >= new Date(fromDate) : true;
     const matchesToDate = toDate ? new Date(row.date) <= new Date(toDate) : true;
@@ -115,6 +124,11 @@ const LeaveTable = ({
     }
   };
 
+  const openModal = (data, config, title) => {
+    setModalContent({ data, config, title });
+    setIsModalOpen(true);
+  };
+
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
@@ -135,33 +149,45 @@ const LeaveTable = ({
   const noneSelected = selectedCount === 0;
   const someSelected = selectedCount > 0 && !allSelected;
 
+  const formatCellContent = (content) => {
+    if (typeof content === 'string' && content.includes('\n')) {
+      return content.split('\n').map((item, key) => (
+        <React.Fragment key={key}>
+          {item}
+          <br />
+        </React.Fragment>
+      ));
+    }
+    return content;
+  };
+
+  const formatCombinedEvaluators = (row, fields) => {
+    return fields.map(field => getNestedValue(row, field)).filter(Boolean).join('\n');
+  };
+
+
+  const isExpanded = actions.length > 2;
+
   return (
     <div className="table-container">
       <div className="table-header sticky top-0 bg-white z-10 py-2">
         <div className="flex justify-between items-center py-2">
           <div className="flex items-center space-x-2">
-            <MdSearch className="text-gray-500" />
-            <input
-              type="text"
-              placeholder="Buscar..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-2 py-1 border rounded-md focus:outline-none focus:ring"
-            />
-            <input
-              type="date"
-              placeholder="Desde"
-              value={fromDate}
-              onChange={(e) => setFromDate(e.target.value)}
-              className="px-2 py-1 border rounded-md focus:outline-none focus:ring"
-            />
-            <input
-              type="date"
-              placeholder="Hasta"
-              value={toDate}
-              onChange={(e) => setToDate(e.target.value)}
-              className="px-2 py-1 border rounded-md focus:outline-none focus:ring"
-            />
+            <div className="relative flex items-center justify-center max-w-md mx-auto h-6 group">
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 opacity-50 blur-lg group-hover:opacity-75 transition-all duration-300"></div>
+              <div className="relative w-full bg-white bg-opacity-30 backdrop-blur-sm rounded-lg shadow-md overflow-hidden border border-white border-opacity-50 group-hover:shadow-lg transition-all duration-300">
+                <input
+                  type="text"
+                  placeholder="Buscar..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-4 pr-12 py-2 text-base text-gray-800 bg-transparent placeholder-gray-500 focus:outline-none focus:ring-0"
+                />
+                <button className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2  bg-gray-200 bg-opacity-50 rounded-md text-gray-600 overflow-hidden transition-all duration-300 hover:bg-opacity-75 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                  <MdSearch className="w-5 h-5 transform transition-transform duration-300 group-hover:rotate-90 group-hover:scale-110" />
+                </button>
+              </div>
+            </div>
           </div>
           <div className="relative flex items-center">
             {showExport && exportFunction && (
@@ -307,8 +333,9 @@ const LeaveTable = ({
                 </th>
               ))}
               {showActions && (
-                <th className="py-4 px-6 text-left text-xs sticky top-0 right-0 bg-gray-100 z-10" style={{ minWidth: '50px' }}>
-                  {/* Acciones */}
+                <th className="py-4 px-6 text-left text-xs right-0 bg-gray-100 z-10"
+                  style={{ minWidth: '50px', maxWidth: '150px', width: 'auto' }}>
+                  {isExpanded && <span style={{ visibility: 'hidden' }}>Acciones</span>}
                 </th>
               )}
             </tr>
@@ -322,7 +349,7 @@ const LeaveTable = ({
                   style={{ minHeight: '50px' }}
                 >
                   {onDelete && (
-                    <td className="py-4 px-6 text-left whitespace-nowrap group-hover:bg-gray-100" style={{ minHeight: '50px' }}>
+                    <td className="py-3 px-6 text-left whitespace-nowrap group-hover:bg-gray-100" style={{ minHeight: '50px' }}>
                       <input
                         type="checkbox"
                         checked={!!selectedRows[row.id]}
@@ -333,16 +360,32 @@ const LeaveTable = ({
                   {visibleColumns.map((column) => (
                     <td
                       key={column.id}
-                      className="py-4 px-6 text-left text-xs group-hover:bg-gray-100"
+                      className={`py-3 px-6 text-left text-xs group-hover:bg-gray-100 ${column.autoWidth ? 'whitespace-nowrap auto-width' : ''}`}
                       style={{ minHeight: '50px' }}
                     >
-                      <span className={`rounded-full px-2 py-1 inline-block ${getCellStyle(column.id, row[column.id] || '')}`}>
-                        {(row[column.id] !== undefined && row[column.id] !== null) ? row[column.id].toString() : ''}
-                      </span>
+                      {column.showIcon ? (
+                        column.id === 'attachment' ? (
+                          <div className="flex justify-center items-center h-full">
+                            <FileViewer filename={getNestedValue(row, column.id)} />
+                          </div>
+                        ) : (
+                          <FaEye className="cursor-pointer mx-auto text-base text-gray-500 hover:text-gray-700" onClick={() => openModal(row, column.modalConfig, column.modalTitle)} />
+                        )
+                      ) : (
+                        column.id === 'combined_evaluators' ? (
+                          <span className="whitespace-pre-line">
+                            {formatCombinedEvaluators(row, column.combineFields)}
+                          </span>
+                        ) : (
+                          <span className={`rounded-full px-2 py-1 inline-block ${getCellStyle(column.id, getNestedValue(row, column.id) || '')}`}>
+                            {(getNestedValue(row, column.id) !== undefined && getNestedValue(row, column.id) !== null) ? formatCellContent(getNestedValue(row, column.id)) : ''}
+                          </span>
+                        )
+                      )}
                     </td>
                   ))}
                   {showActions && (
-                    <td className="py-4 px-4 text-center text-xs bg-white z-10 group-hover:bg-gray-100" style={{ minWidth: '50px' }}>
+                    <td className="py-3 px-4 text-center text-xs bg-white z-10 group-hover:bg-gray-100" style={{ minWidth: '50px', maxWidth: '300px', width: 'auto' }}>
                       {actions.map(action => (
                         <button
                           key={action.label}
@@ -377,6 +420,14 @@ const LeaveTable = ({
           onRowsPerPageChange={setRowsPerPage}
         />
       </div>
+      {isModalOpen && (
+        <FlexibleModal
+          data={modalContent.data}
+          config={modalContent.config}
+          title={modalContent.title}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

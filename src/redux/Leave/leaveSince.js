@@ -1,54 +1,63 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getLeavesByFilter } from "../../services/Leave/leaveService";
 
-export const fetchLeaves = createAsyncThunk(
-    "leaves/fetchLeaves",
-    async ({ employeeId, filter }, { getState }) => {
-        const { cache } = getState().leaves;
+import {
+    createLeave,
+    getLeaveStatistics
+} from "../../services/Leave/leaveService";
 
-        if (cache[filter]) {
-            return { data: cache[filter], filter };
-        }
-
-        const response = await getLeavesByFilter(employeeId, filter);
-        return { data: response.data, filter };
+// createLeave es una acción asíncrona que crea un nuevo permiso
+export const createOneLeave = createAsyncThunk(
+    "leave/createLeave",
+    async ({ employeeId, leave }) => {
+        const response = await createLeave(employeeId, leave);
+        return response.data;
     }
 );
 
-const leavesSlice = createSlice({
+// Acción asíncrona para obtener estadísticas de permisos de un empleado
+export const fetchLeaveStatistics = createAsyncThunk(
+    "leave/getLeaveStatistics",
+    async (employeeId) => {
+        const response = await getLeaveStatistics(employeeId);
+        return response.data;
+    }
+);
+
+
+// leaveSlice es un slice de Redux que maneja el estado de los permisos en nuestra aplicación
+// Este slice contiene los reducers y actions necesarios para manejar los permisos
+const leaveSlice = createSlice({
     name: "leaves",
     initialState: {
         loading: false,
-        leaves: [],
-        error: "",
-        filter: "todas",
-        cache: {}
+        error: null,
+        statistics: null
     },
-    reducers: {
-        setLeaveFilter: (state, action) => {
-            state.filter = action.payload;
-            state.leaves = state.cache[action.payload] || [];
-        }
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(fetchLeaves.pending, (state) => {
+            .addCase(createOneLeave.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(fetchLeaves.fulfilled, (state, action) => {
+            .addCase(createOneLeave.fulfilled, (state) => {
                 state.loading = false;
-                state.leaves = action.payload.data;
-                state.cache[action.payload.filter] = action.payload.data;
-                state.error = "";
             })
-            .addCase(fetchLeaves.rejected, (state, action) => {
+            .addCase(createOneLeave.rejected, (state, action) => {
                 state.loading = false;
-                state.leaves = [];
-                state.error = action.error.message;
+                state.error = JSON.parse(action.error.message);
+            })
+            .addCase(fetchLeaveStatistics.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchLeaveStatistics.fulfilled, (state, action) => {
+                state.loading = false;
+                state.statistics = action.payload;
+            })
+            .addCase(fetchLeaveStatistics.rejected, (state, action) => {
+                state.loading = false;
+                state.error = JSON.parse(action.error.message);
             });
     }
 });
 
-export const { setLeaveFilter } = leavesSlice.actions;
-
-export default leavesSlice.reducer;
+export default leaveSlice.reducer;

@@ -7,11 +7,13 @@ export const AlertProvider = ({ children }) => {
   const [isOpenAlert, setIsOpenAlert] = useState(false);
   const [message, setMessage] = useState('');
   const [type, setType] = useState('success');
+  const [duration, setDuration] = useState(1500);
 
-  const showAlert = (message, type = 'success') => {
+  const showAlert = (message, type = 'success', duration) => {
     setMessage(message);
     setType(type);
     setIsOpenAlert(true);
+    setDuration(duration || 1500);
   };
 
   const hideAlert = () => {
@@ -27,6 +29,7 @@ export const AlertProvider = ({ children }) => {
         message={message}
         type={type}
         onConfirm={hideAlert}
+        duration={duration}
       />
     </AlertContext.Provider>
   );

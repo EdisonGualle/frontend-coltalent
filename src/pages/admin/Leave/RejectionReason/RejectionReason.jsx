@@ -16,7 +16,7 @@ import RejectionReasonForm from './RejectionReasonForm';
 const RejectionReason = () => {
   const dispatch = useDispatch();
   const { showAlert } = useContext(AlertContext);
-  const { rejectionReasons, status } = useSelector((state) => state.rejectionReason);
+  const { rejectionReasons, status, hasFetchedOnce  } = useSelector((state) => state.rejectionReason);
   const [data, setData] = useState([]);
   const [isLoadingInitial, setIsLoadingInitial] = useState(true);
   const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
@@ -33,16 +33,20 @@ const RejectionReason = () => {
   const [currentRejectionReason, setCurrentRejectionReason] = useState(null);
 
   useEffect(() => {
-    dispatch(fetchRejectionReasons())
-      .then(unwrapResult)
-      .then(() => {
-        setIsLoadingInitial(false);
-      })
-      .catch(() => {
-        setIsLoadingInitial(false);
-      });
-    setFormErrors({});
-  }, [dispatch]);
+    if (!hasFetchedOnce) {
+      setIsLoadingInitial(true);
+      dispatch(fetchRejectionReasons())
+        .then(unwrapResult)
+        .then(() => {
+          setIsLoadingInitial(false);
+        })
+        .catch(() => {
+          setIsLoadingInitial(false);
+        });
+    } else {
+      setIsLoadingInitial(false);
+    }
+  }, [dispatch, hasFetchedOnce]);
 
   // Actualizar los datos cuando se carguen
   useEffect(() => {
@@ -168,7 +172,7 @@ const RejectionReason = () => {
       </CardHeader>
 
       <div className=''>
-        {isLoadingInitial ? (
+      {isLoadingInitial && !rejectionReasons.length ? (
           <SkeletonTable
             columns={rejectionReasonColumns}
             showFilters={false}

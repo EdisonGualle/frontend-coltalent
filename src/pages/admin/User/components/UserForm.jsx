@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import Input from '../../../../components/ui/Input';
 import { RiUserLine, RiMailLine } from 'react-icons/ri';
 import { validateUsername, validateEmail } from '../../../../Utils/validationsV2.js';

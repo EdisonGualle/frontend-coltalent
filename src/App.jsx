@@ -20,7 +20,7 @@ import PrivateRoute from "./components/common/routing/PrivateRoute";
 import PublicRoute from "./components/common/routing/PublicRoute";
 
 // Employee
-import EmployeeIndex from "./pages/admin/Employee/Index";
+import EmployeeIndex from "./pages/admin/Employee/index";
 import Setting from "./pages/Setting/Setting";
 
 // User
@@ -49,7 +49,6 @@ import AssignedLeaves from "./pages/admin/Leave/Authorization/AssignedLeaves";
 //Configuracion
 import Configurations from "./pages/Configurations";
 
-
 function App() {
   return (
     <Provider store={store}>
@@ -77,7 +76,7 @@ function App() {
                 <Route path="/perfil/:id/*" element={<Perfil />} />
 
                 {/* Permisos */}
-                <Route path="/permisos/*" element={<LeaveIndex />} />
+                <Route path="/permisos/:id/*" element={<LeaveIndex />} />
                 <Route path="/permisos/motivos-rechazo" element={<RejectionReason />} />
                 <Route path="/permisos/tipos" element={<LeaveType />} />
                 <Route path="/permisos/autorizaciones" element={<AssignedLeaves />} />
@@ -91,7 +90,6 @@ function App() {
                 <Route path="/direcciones" element={<DepartmentIndex />} />
                 <Route path="/unidades" element={<UnitIndex />} />
                 <Route path="/cargos" element={<PositionIndex />} />
-              
 
                 {/* Configuraciones */}
                 <Route path="/configuraciones" element={<Configurations />} />              

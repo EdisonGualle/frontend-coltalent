@@ -1,17 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getLeavesByFilter } from "../../services/Leave/leaveService";
+import { getleavesHistoryByFilter } from "../../services/Leave/leaveService";
 
-// Acción asíncrona para obtener las solicitudes de permisos asignadas a un empleado
-export const fetchAssignedLeaves = createAsyncThunk(
-    "assignedLeaves/fetchAssignedLeaves",
+// Acción asíncrona para obtener el historial de permisos de un empleado
+export const fetchLeaveHistory = createAsyncThunk(
+    "leaveHistory/fetchLeaveHistory",
     async ({ employeeId, filter }) => {
-        const response = await getLeavesByFilter(employeeId, filter);
+        const response = await getleavesHistoryByFilter(employeeId, filter);
         return { data: response.data, filter };
     }
 );
 
-const assignedLeavesSlice = createSlice({
-    name: "assignedLeaves",
+const leaveHistorySlice = createSlice({
+    name: "leaveHistory",
     initialState: {
         loading: false,
         leaves: [],
@@ -20,7 +20,7 @@ const assignedLeavesSlice = createSlice({
         cache: {}
     },
     reducers: {
-        setAssignedLeaveFilter: (state, action) => {
+        setLeaveHistoryFilter: (state, action) => {
             state.filter = action.payload;
             state.leaves = state.cache[action.payload] || [];
         },
@@ -33,16 +33,16 @@ const assignedLeavesSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchAssignedLeaves.pending, (state) => {
+            .addCase(fetchLeaveHistory.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(fetchAssignedLeaves.fulfilled, (state, action) => {
+            .addCase(fetchLeaveHistory.fulfilled, (state, action) => {
                 state.loading = false;
                 state.leaves = action.payload.data;
                 state.cache[action.payload.filter] = action.payload.data;
                 state.error = "";
             })
-            .addCase(fetchAssignedLeaves.rejected, (state, action) => {
+            .addCase(fetchLeaveHistory.rejected, (state, action) => {
                 state.loading = false;
                 state.leaves = [];
                 state.error = action.error.message;
@@ -50,6 +50,6 @@ const assignedLeavesSlice = createSlice({
     }
 });
 
-export const { setAssignedLeaveFilter, clearCache, updateCache } = assignedLeavesSlice.actions;
+export const { setLeaveHistoryFilter, clearCache, updateCache } = leaveHistorySlice.actions;
 
-export default assignedLeavesSlice.reducer;
+export default leaveHistorySlice.reducer;

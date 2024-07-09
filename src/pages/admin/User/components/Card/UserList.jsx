@@ -98,7 +98,7 @@ const UserList = () => {
         />
       </div>
 
-      <div className='h-[60vh] overflow-auto custom-scrollbar'>
+      <div className=''>
       {filteredUsers.length > 0 ? (
         <div className="grid grid-cols-5 gap-6">
           {filteredUsers.map((user) => (
