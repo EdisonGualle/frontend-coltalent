@@ -43,9 +43,9 @@ const UserIndex = () => {
       // Muestra una alerta de éxito
       showAlert('Usuario creado correctamente', 'success');
       // Cierra el modal de creación de usuarios
-      setIsOpenCreateModal(false); 
+      setIsOpenCreateModal(false);
       // Limpia los errores del formulario
-      setFormErrors({}); 
+      setFormErrors({});
       // Actualiza la lista de usuarios
       dispatch(fetchUsers());
     } catch (error) {
@@ -73,7 +73,8 @@ const UserIndex = () => {
 
   return (
     <>
-      <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0">
+    <div className='flex flex-col h-full overflow-auto'>
+    <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0">
         <div className="mb-2 flex items-center justify-between gap-8">
           <div>
             <Typography variant="h5" color="blue-gray" className="font-semibold">
@@ -99,11 +100,14 @@ const UserIndex = () => {
           </div>
         </div>
       </CardHeader>
-      {showList ? (
-        <UserList />
-      ) : (
-        <UserTable />
-      )}
+
+      <div className='flex-1 overflow-y-auto'>
+        {showList ? (
+          <UserList />
+        ) : (
+          <UserTable />
+        )}
+      </div>
       <ModalForm
         isOpen={isOpenCreateModal}
         setIsOpen={setIsOpenCreateModal}
@@ -117,6 +121,8 @@ const UserIndex = () => {
           formErrors={formErrors}
         />
       </ModalForm>
+
+    </div>
     </>
   );
 };

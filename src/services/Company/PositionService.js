@@ -9,6 +9,15 @@ const getPositions = async () => {
   }
 };
 
+const getAllPositionsIncludingDeleted = async () => {
+  try {
+    const response = await AxiosInstance.get('/positions-all');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const createPosition = async (newPosition) => {
   try {
     const response = await AxiosInstance.post("/positions", newPosition);
@@ -50,4 +59,13 @@ const deletePosition = async (position) => {
   }
 };
 
-export { getPositions, createPosition, getPosition, deletePosition, updatePosition };
+const togglePositionStatus = async (id) => {
+  try {
+    const response = await AxiosInstance.post(`/positions/toggle-status/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { getPositions, createPosition, getPosition, deletePosition, updatePosition,  getAllPositionsIncludingDeleted, togglePositionStatus };

@@ -385,19 +385,20 @@ const LeaveTable = ({
                     </td>
                   ))}
                   {showActions && (
-                    <td className="py-3 px-4 text-center text-xs bg-white z-10 group-hover:bg-gray-100" style={{ minWidth: '50px', maxWidth: '300px', width: 'auto' }}>
-                      {actions.map(action => (
-                        <button
-                          key={action.label}
-                          className={`m-1 p-1 rounded ${action.className}`}
-                          onClick={() => action.onClick(row)}
-                          aria-label={action.label}
-                          title={action.label}
-                        >
-                          {action.icon}
-                        </button>
-                      ))}
-                    </td>
+                   <td className="py-3 px-4 text-center text-xs bg-white z-10 group-hover:bg-gray-100" style={{ minWidth: '50px', maxWidth: '300px', width: 'auto' }}>
+                   {(typeof actions === 'function' ? actions(row) : actions).map(action => (
+                     <button
+                       key={action.label}
+                       className={`m-1 p-1 rounded ${action.className}`}
+                       onClick={() => action.onClick(row)}
+                       aria-label={action.label}
+                       title={action.label}
+                     >
+                       {action.icon}
+                     </button>
+                   ))}
+                 </td>
+                 
                   )}
                 </tr>
               ))

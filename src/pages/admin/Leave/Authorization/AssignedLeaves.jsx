@@ -60,12 +60,12 @@ const AssignedLeaves = () => {
       onClick: (leave) => handleActionClick(leave, 'Rechazar'),
       className: 'bg-red-100 hover:bg-red-200 cursor-pointer',
     },
-    {
-      label: 'Corregir',
-      icon: <RiIndeterminateCircleLine className="text-orange-600 h-4 w-4" />,
-      onClick: (leave) => handleActionClick(leave, 'Corregir'),
-      className: 'bg-orange-100 hover:bg-orange-200 cursor-pointer',
-    }
+    // {
+    //   label: 'Corregir',
+    //   icon: <RiIndeterminateCircleLine className="text-orange-600 h-4 w-4" />,
+    //   onClick: (leave) => handleActionClick(leave, 'Corregir'),
+    //   className: 'bg-orange-100 hover:bg-orange-200 cursor-pointer',
+    // }
   ];
 
   const handleFilterChange = (filter) => {

@@ -226,7 +226,6 @@ export const jefeDireccionColumns = {
       showIcon: true,
       modalConfig: [
         { key: "reason", label: "Motivo" },
-        { key: "duration", label: "Duración" },
       ],
     },
     {
@@ -350,7 +349,6 @@ export const jefeDireccionColumns = {
       showIcon: true,
       modalConfig: [
         { key: "reason", label: "Motivo" },
-        { key: "duration", label: "Duración" },
       ],
     },
     {

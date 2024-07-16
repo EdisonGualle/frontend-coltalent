@@ -2,13 +2,16 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { CardHeader, Typography } from "@material-tailwind/react";
-import { RiEdit2Line} from 'react-icons/ri';
+import { RiEdit2Line, RiCheckboxCircleLine,  RiCloseCircleLine  } from 'react-icons/ri';
 import LeaveTable from '../components/Table/LeaveTable';
 import leaveTypeColumns from './Table/leaveTypeColumns';
 import Dialog2 from '../../../../components/ui/Dialog2';
 import { AlertContext } from '../../../../contexts/AlertContext';
 import SkeletonTable from '../components/Table/SkeletonTable';
-import { fetchLeaveTypes, deleteOneLeaveType, updateOneLeaveType, createNewLeaveType } from '../../../../redux/Leave/leaveTypeSlince';
+import { 
+  fetchLeaveTypes, deleteOneLeaveType, 
+  updateOneLeaveType, createNewLeaveType,
+fetchAllLeaveTypesIncludingDeleted, toggleOneLeaveTypeStatus } from '../../../../redux/Leave/leaveTypeSlince';
 import LeaveTypeForm from './LeaveTypeForm';
 import ModalForm from '../../../../components/ui/ModalForm';
 import { FaClipboardList } from "react-icons/fa";
@@ -18,10 +21,12 @@ import { getLeaveTypeCellStyle } from './Table/leaveTypeColumnStyles';
 const LeaveType = () => {
     const dispatch = useDispatch();
     const { showAlert } = useContext(AlertContext);
-    const { leaveTypes, status ,  hasFetchedOnce } = useSelector((state) => state.leaveType);
+    const { status ,  hasFetchedOnce, allLeaveTypes } = useSelector((state) => state.leaveType);
     const [data, setData] = useState([]);
     const [isLoadingInitial, setIsLoadingInitial] = useState(true);
     const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
+    const [selectedReason, setSelectedReason] = useState(null);
+    const [isOpenToggleDialog, setIsOpenToggleDialog] = useState(false);
   
     // Estado para almacenar los IDs de los registros seleccionados para eliminar
     const [selectedIds, setSelectedIds] = useState([]);
@@ -37,7 +42,7 @@ const LeaveType = () => {
     useEffect(() => {
       if (!hasFetchedOnce) {  // Solo cargar datos si no se han cargado previamente
         setIsLoadingInitial(true); // Asegúrate de iniciar la carga
-        dispatch(fetchLeaveTypes())
+        dispatch(fetchAllLeaveTypesIncludingDeleted())
           .then(unwrapResult)
           .then(() => {
             setIsLoadingInitial(false); // Desactivar la carga inicial después de cargar datos
@@ -54,31 +59,31 @@ const LeaveType = () => {
     // Actualizar los datos cuando se carguen
     useEffect(() => {
       if (status === 'succeeded') {
-        setData(leaveTypes);
+        setData(allLeaveTypes);
       }
-    }, [leaveTypes, status]);
+    }, [allLeaveTypes, status]);
   
-    const handleCancelDelete = () => setIsOpenDialogDelete(false);
-    const handleClickDelete = (ids) => {
-      setSelectedIds(ids);
-      setIsOpenDialogDelete(true);
-    };
+    // const handleCancelDelete = () => setIsOpenDialogDelete(false);
+    // const handleClickDelete = (ids) => {
+    //   setSelectedIds(ids);
+    //   setIsOpenDialogDelete(true);
+    // };
   
-    const handleConfirmDelete = async () => {
-      try {
-        for (const leaveTypeId of selectedIds) {
-          const resultAction = await dispatch(deleteOneLeaveType(leaveTypeId));
-          unwrapResult(resultAction);
-        }
-        setSelectedIds([]);
-        dispatch(fetchLeaveTypes());
-        showAlert(`Registro${selectedIds.length > 1 ? 's' : ''} eliminado${selectedIds.length > 1 ? 's' : ''} correctamente`, 'success');
-      } catch (error) {
-        showAlert('Ocurrió un error al intentar eliminar el registro', 'error');
-      } finally {
-        setIsOpenDialogDelete(false);
-      }
-    };
+    // const handleConfirmDelete = async () => {
+    //   try {
+    //     for (const leaveTypeId of selectedIds) {
+    //       const resultAction = await dispatch(deleteOneLeaveType(leaveTypeId));
+    //       unwrapResult(resultAction);
+    //     }
+    //     setSelectedIds([]);
+    //     dispatch(fetchLeaveTypes());
+    //     showAlert(`Registro${selectedIds.length > 1 ? 's' : ''} eliminado${selectedIds.length > 1 ? 's' : ''} correctamente`, 'success');
+    //   } catch (error) {
+    //     showAlert('Ocurrió un error al intentar eliminar el registro', 'error');
+    //   } finally {
+    //     setIsOpenDialogDelete(false);
+    //   }
+    // };
   
     const handleOpenModalForm = () => {
       setIsEditing(false);
@@ -138,20 +143,68 @@ const LeaveType = () => {
     };
   
     const handleEdit = (row) => {
-      const leaveType = leaveTypes.find(type => type.id === row.id);
+      const leaveType = allLeaveTypes.find(type => type.id === row.id);
       if (leaveType) {
         handleOpenEditModalForm(leaveType);
       }
     };
   
-    const actions = [
+    const handleToggleClick = (row) => {
+      setSelectedReason(row);
+      setIsOpenToggleDialog(true);
+    };
+    
+    const handleConfirmToggle = async () => {
+      try {
+        const resultAction = await dispatch(toggleOneLeaveTypeStatus(selectedReason.id));
+        unwrapResult(resultAction);
+        showAlert('Estado del tipo de permiso actualizado correctamente', 'success');
+        dispatch(fetchAllLeaveTypesIncludingDeleted());
+      } catch (error) {
+        showAlert('Error al actualizar el estado del tipo de permiso.', 'error');
+      } finally {
+        setIsOpenToggleDialog(false);
+      }
+    };
+    
+    const handleCancelToggle = () => setIsOpenToggleDialog(false);
+    
+    const getToggleMessage = (status) => {
+      if (status === 'Activo') {
+        return {
+          title: '¿Desactivar tipo de permiso?',
+          description: 'Desactivar este tipo de permiso puede afectar los procesos asociados. ¿Está seguro que desea continuar?',
+          confirmButtonText: 'Sí, desactivar',
+          confirmButtonColor: 'bg-yellow-500',
+          icon: <RiCloseCircleLine className="w-10 h-10 flex items-center justify-center rounded-full text-yellow-500" />
+        };
+      } else {
+        return {
+          title: '¿Activar tipo de permiso?',
+          description: 'Activar este tipo de permiso permitirá que los procesos asociados puedan utilizarlo nuevamente. ¿Está seguro que desea continuar?',
+          confirmButtonText: 'Sí, activar',
+          confirmButtonColor: 'bg-green-500',
+          icon: <RiCheckboxCircleLine className="w-10 h-10 flex items-center justify-center rounded-full text-green-500" />
+        };
+      }
+    };
+
+    const renderActions = (row) => [
       {
         label: 'Editar',
         icon: <RiEdit2Line className="text-green-600 h-4 w-4" />,
-        onClick: handleEdit,
+        onClick: () => handleEdit(row),
         className: 'bg-green-100 hover:bg-green-200 cursor-pointer',
+      },
+      {
+        label: row.status === 'Activo' ? 'Desactivar' : 'Activar',
+        icon: row.status === 'Activo' ? <RiCloseCircleLine className="text-yellow-600 h-4 w-4" /> : <RiCheckboxCircleLine className="text-green-600 h-4 w-4" />,
+        onClick: () => handleToggleClick(row),
+        className: row.status === 'Activo' ? 'bg-yellow-100 hover:bg-yellow-200 cursor-pointer' : 'bg-green-100 hover:bg-green-200 cursor-pointer',
       }
     ];
+    
+    
   
     return (
       <div>
@@ -169,31 +222,31 @@ const LeaveType = () => {
         </CardHeader>
   
         <div className=''>
-        {isLoadingInitial && !leaveTypes.length ? (
+        {isLoadingInitial && !allLeaveTypes.length ? (
             <SkeletonTable
               columns={leaveTypeColumns}
               showFilters={false}
               showExport={false}
               showAddNew={true}
               showColumnOptions={false}
-              actions={actions}
+              actions={renderActions}
             />
           ) : (
             <LeaveTable
               columns={leaveTypeColumns}
               data={data}
               getCellStyle={getLeaveTypeCellStyle}
-              actions={actions}
+              actions={renderActions}
               onAddNew={handleOpenModalForm}
               showFilters={false}
               showExport={false}
               showAddNew={true}
               showColumnOptions={false}
               showActions={true}
-              onDelete={handleClickDelete}
+              onDelete={null}
             />
           )}
-          <Dialog2
+          {/* <Dialog2
             isOpen={isOpenDialogDelete}
             setIsOpen={setIsOpenDialogDelete}
             title={`¿Eliminar ${selectedIds.length > 1 ? 'los registros seleccionados' : 'el registro seleccionado'}?`}
@@ -204,7 +257,21 @@ const LeaveType = () => {
             onConfirm={handleConfirmDelete}
             confirmButtonColor="bg-red-500"
             cancelButtonColor="border-gray-400"
-          />
+          /> */}
+
+<Dialog2
+  isOpen={isOpenToggleDialog}
+  setIsOpen={setIsOpenToggleDialog}
+  title={getToggleMessage(selectedReason?.status).title}
+  description={getToggleMessage(selectedReason?.status).description}
+  confirmButtonText={getToggleMessage(selectedReason?.status).confirmButtonText}
+  cancelButtonText="Cancelar"
+  onConfirm={handleConfirmToggle}
+  onCancel={handleCancelToggle}
+  confirmButtonColor={getToggleMessage(selectedReason?.status).confirmButtonColor}
+  cancelButtonColor="border-gray-400"
+  icon={getToggleMessage(selectedReason?.status).icon}
+/>
   
           <ModalForm
             isOpen={isOpenModalForm}

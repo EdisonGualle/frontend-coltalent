@@ -16,6 +16,16 @@ export const getLeaveTypeCellStyle = (columnId, value) => {
         return 'bg-pink-100 text-pink-600'; 
       }
     }
+
+    if (columnId === 'status') {
+      if (value === 'Activo') {
+        return 'bg-green-100 text-green-700';
+      }
+      if (value === 'Inactivo') {
+        return 'bg-yellow-100 text-yellow-700';
+      }
+      
+    }
   
     return '';
   };

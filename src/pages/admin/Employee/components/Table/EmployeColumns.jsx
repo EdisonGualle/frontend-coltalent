@@ -9,19 +9,19 @@ export const EmployeeColumns = [
     identification: "identification",
   },
   {
+    Header: "Fecha de Nacimiento",
+    accessor: 'date_of_birth',
+  },
+  {
     Header: "Genero",
     accessor: 'gender',
   },
   {
-    Header: "Estado Civil",
-    accessor: 'marital_status',
-  },
-  {
-    Header: "Celular",
+    Header: "Celular Personal",
     accessor: 'contact.personal_phone',
   },
   {
-    Header: "Correo",
+    Header: "Correo Personal",
     accessor: 'contact.personal_email',
   },
   {

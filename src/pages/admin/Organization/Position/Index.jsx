@@ -7,7 +7,7 @@ import ModalForm from '../../../../components/ui/ModalForm';
 import PositionForm from './PositionForm';
 import { AlertContext } from '../../../../contexts/AlertContext';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { createNewPosition, fetchPositions } from '../../../../redux/Organization/PositionSlice';
+import { createNewPosition, fetchAllPositionsIncludingDeleted } from '../../../../redux/Organization/PositionSlice';
 
 const PositionIndex = () => {
   const dispatch = useDispatch();
@@ -18,7 +18,7 @@ const PositionIndex = () => {
 
   useEffect(() => {
     if (status === 'idle') {
-      dispatch(fetchPositions());
+      dispatch(fetchAllPositionsIncludingDeleted());
     }
   }, [status, dispatch]);
 
@@ -53,7 +53,7 @@ const PositionIndex = () => {
   };
 
   return (
-    <>
+    <div className='flex flex-col h-full overflow-auto'>
       <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0">
         <div className="mb-2 flex items-center justify-between gap-8">
           <div>
@@ -75,7 +75,11 @@ const PositionIndex = () => {
       </CardHeader>
 
       {/* Tabla */}
-      <PositionTable />
+      <div className='flex-1 overflow-y-auto'>
+        <PositionTable />
+      </div>
+
+
 
       {/* Modal para crear un nuevo cargo */}
       <ModalForm
@@ -92,7 +96,7 @@ const PositionIndex = () => {
           formErrors={formErrors}
         />
       </ModalForm>
-    </>
+    </div>
   );
 };
 

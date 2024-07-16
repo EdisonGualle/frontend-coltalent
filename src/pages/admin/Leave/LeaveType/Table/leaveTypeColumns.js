@@ -5,6 +5,7 @@ const leaveTypeColumns = [
     {id: 'max_duration', label: 'Duración máxima'},
     {id: 'advance_notice_days', label: 'Días de anticipación'},
     {id: 'requires_document', label: 'Requiere documentación'},
+    { id: 'status', label: 'Estado' }
 ]
 
 export default leaveTypeColumns;

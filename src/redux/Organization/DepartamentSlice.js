@@ -5,6 +5,8 @@ import {
   getDepartment,
   getDepartments,
   updateDepartment,
+  getAllDepartmentsIncludingDeleted,
+  toggleDepartmentStatus
 } from "../../services/Company/DepartamentService";
 
 // fetchDepartments es una acción asíncrona que obtiene todos los departamentos
@@ -12,6 +14,14 @@ export const fetchDepartments = createAsyncThunk(
   "departments/fetchDepartments",
   async () => {
     const response = await getDepartments();
+    return response.data;
+  }
+);
+
+export const fetchAllDepartmentsIncludingDeleted = createAsyncThunk(
+  "departments/fetchAllDepartmentsIncludingDeleted",
+  async () => {
+    const response = await getAllDepartmentsIncludingDeleted();
     return response.data;
   }
 );
@@ -52,12 +62,24 @@ export const deleteOneDepartment = createAsyncThunk(
   }
 );
 
+
+
+export const toggleOneDepartmentStatus = createAsyncThunk(
+  "departments/toggleOneDepartmentStatus",
+  async (id) => {
+    const response = await toggleDepartmentStatus(id);
+    return response;
+  }
+);
+
+
 // departamentSlice es un slice de Redux que maneja el estado de los departamentos en nuestra aplicación
 // Este slice contiene los reducers y actions necesarios para manejar los departamentos
 export const departamentSlice = createSlice({
   name: "departments",
   initialState: {
     departments: [],
+    allDepartments: [],
     department: {},
     status: "idle",
     error: null,
@@ -92,8 +114,12 @@ export const departamentSlice = createSlice({
       })
       .addCase(createNewDepartment.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.departments.push(action.payload);
-      })
+        const newDepartment = action.payload;
+        state.allDepartments.push(newDepartment);
+        if (newDepartment.status === 'Activo') {
+          state.departments.push(newDepartment);
+        }
+      })      
       .addCase(createNewDepartment.rejected, (state, action) => {
         state.status = "failed";
         state.error = JSON.parse(action.error.message);
@@ -104,13 +130,26 @@ export const departamentSlice = createSlice({
       .addCase(updateOneDepartment.fulfilled, (state, action) => {
         state.status = "succeeded";
         const updatedDepartment = action.payload;
-        state.departments = state.departments.map((department) => {
-          if (department.id === updatedDepartment.id) {
-            return updatedDepartment;
+      
+        // Actualizar en `departments`
+        if (updatedDepartment.status === 'Activo') {
+          const index = state.departments.findIndex(department => department.id === updatedDepartment.id);
+          if (index !== -1) {
+            state.departments[index] = updatedDepartment;
+          } else {
+            state.departments.push(updatedDepartment);
           }
-          return department;
-        });
+        } else {
+          state.departments = state.departments.filter(department => department.id !== updatedDepartment.id);
+        }
+      
+        // Actualizar en `allDepartments`
+        const allIndex = state.allDepartments.findIndex(department => department.id === updatedDepartment.id);
+        if (allIndex !== -1) {
+          state.allDepartments[allIndex] = updatedDepartment;
+        }
       })
+      
       .addCase(updateOneDepartment.rejected, (state, action) => {
         state.status = "failed";
         state.error = JSON.parse(action.error.message);
@@ -129,7 +168,48 @@ export const departamentSlice = createSlice({
       .addCase(deleteOneDepartment.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
-      });
+      })
+      .addCase(fetchAllDepartmentsIncludingDeleted.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchAllDepartmentsIncludingDeleted.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.allDepartments = action.payload;
+      })
+      .addCase(fetchAllDepartmentsIncludingDeleted.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(toggleOneDepartmentStatus.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(toggleOneDepartmentStatus.fulfilled, (state, action) => {
+        const updatedDepartment = action.payload;
+
+        // Actualizar en `departments` (solo si está activo)
+        const index = state.departments.findIndex(department => department.id === updatedDepartment.id);
+        if (index !== -1) {
+          if (updatedDepartment.status === 'Activo') {
+            state.departments[index] = updatedDepartment;
+          } else {
+            state.departments.splice(index, 1); // Eliminar si se desactiva
+          }
+        } else if (updatedDepartment.status === 'Activo') {
+          state.departments.push(updatedDepartment); // Añadir si se activa
+        }
+
+        // Actualizar en `allDepartments`
+        const allIndex = state.allDepartments.findIndex(department => department.id === updatedDepartment.id);
+        if (allIndex !== -1) {
+          state.allDepartments[allIndex] = updatedDepartment;
+        }
+
+        state.status = "succeeded";
+      })
+      .addCase(toggleOneDepartmentStatus.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.status = "failed";
+      })
   },
 });
 

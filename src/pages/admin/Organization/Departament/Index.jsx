@@ -7,13 +7,13 @@ import DepartamentTable from './Table/DepartamentTable';
 import ModalForm from '../../../../components/ui/ModalForm';
 import { AlertContext } from '../../../../contexts/AlertContext';
 import DepartmentForm from './DepartmentForm';
-import { createNewDepartment, fetchDepartments } from '../../../../redux/Organization/DepartamentSlice';
+import { createNewDepartment, fetchAllDepartmentsIncludingDeleted } from '../../../../redux/Organization/DepartamentSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
 
 const DepartamentIndex = () => {
   const dispatch = useDispatch();
   // Selector para obtener el estado de los departamentos
-  const {status} = useSelector(state => state.departament);
+  const { status } = useSelector(state => state.departament);
   const [isOpen, setIsOpen] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const { showAlert } = useContext(AlertContext);
@@ -22,7 +22,7 @@ const DepartamentIndex = () => {
   useEffect(() => {
     // Si el estado es idle, se realiza la petición para obtener los departamentos
     if (status === 'idle') {
-      dispatch(fetchDepartments());
+      dispatch(fetchAllDepartmentsIncludingDeleted());
     }
   }, [status, dispatch]);
 
@@ -59,7 +59,7 @@ const DepartamentIndex = () => {
 
 
   return (
-    <>
+    <div className='flex flex-col h-full overflow-auto'>
       <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0">
         <div className="mb-2 flex items-center justify-between gap-8">
           <div>
@@ -71,8 +71,8 @@ const DepartamentIndex = () => {
             </Typography>
           </div>
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-            <Button className="flex items-center gap-3 bg-secondary-500 text-white hover:bg-secondary-600 transition-colors rounded-xl py-2 px-5" size="sm" 
-            onClick={handleOpen}>
+            <Button className="flex items-center gap-3 bg-secondary-500 text-white hover:bg-secondary-600 transition-colors rounded-xl py-2 px-5" size="sm"
+              onClick={handleOpen}>
               <RiAddLine className="h-5 w-5" />
               <span className="font-semibold">Nueva Dirección</span>
             </Button>
@@ -81,8 +81,9 @@ const DepartamentIndex = () => {
       </CardHeader>
 
       {/* Tabla*/}
-      <DepartamentTable />
-      
+      <div className='flex-1 overflow-y-auto'>
+        <DepartamentTable />
+      </div>
       {/* Formulario */}
       <ModalForm
         isOpen={isOpen}
@@ -97,7 +98,7 @@ const DepartamentIndex = () => {
           formErrors={formErrors}
         />
       </ModalForm>
-    </>
+    </div>
   );
 };
 

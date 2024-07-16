@@ -9,6 +9,15 @@ const getRejectionReasons = async () => {
     }
 }; 
 
+const getAllRejectionReasonsIncludingDeleted = async () => {
+    try {
+        const response = await AxiosInstance.get("leaves/rejection-reasons-all");
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 const createRejectionReason = async (newRejectionReason) => { 
     try {
         const response = await AxiosInstance.post("leaves/rejection-reasons", newRejectionReason);
@@ -47,5 +56,14 @@ const deleteRejectionReason = async (rejectionReasonId) => {
     }
 };
 
-export { getRejectionReasons, createRejectionReason, getRejectionReason, updateRejectionReason, deleteRejectionReason };
+const toggleRejectionReasonStatus = async (id) => {
+    try {
+        const response = await AxiosInstance.post(`leaves/rejection-reasons/toggle-status/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export { getRejectionReasons, createRejectionReason, getRejectionReason, updateRejectionReason, deleteRejectionReason, getAllRejectionReasonsIncludingDeleted, toggleRejectionReasonStatus };
 

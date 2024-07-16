@@ -63,7 +63,7 @@ const EmployeeList = () => {
     );
   }
 
-  
+
   return (
     <div className="h-full flex flex-col">
       <div className=" my-2">

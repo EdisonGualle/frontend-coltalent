@@ -93,7 +93,7 @@ const OptionsColumn = ({ employee, updateEmployees }) => {
         <div className="scroll-editado overflow-y-auto h-[13vh]">
           <MenuItem className="p-0 hover:bg-transparent">
             <Link
-              to="/employee/profile"
+              to={`/perfil/${employee.id}/datos-personales`}
               className="w-full rounded-lg transition-colors text-xs hover:bg-teal-50 flex items-center gap-x-2 p-2"
             >
               <RiUserLine className="text-gray-900" />

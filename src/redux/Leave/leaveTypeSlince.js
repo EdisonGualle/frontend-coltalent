@@ -6,6 +6,8 @@ import {
   getLeaveType,
   getLeaveTypes,
   updateLeaveType as updateLeaveTypeService,
+  getLeaveTypesIncludingDeleted,
+  toggleLeaveTypeStatus,
 } from "../../services/Leave/leaveTypeService";
 
 // fetchLeaveTypes es una acción asíncrona que obtiene todos los tipos de permisos
@@ -13,6 +15,15 @@ export const fetchLeaveTypes = createAsyncThunk(
   "leaveTypes/fetchLeaveTypes",
   async () => {
     const response = await getLeaveTypes();
+    return response.data;
+  }
+);
+
+// fetchAllLeaveTypesIncludingDeleted es una acción asíncrona que obtiene todos los tipos de permisos, incluyendo los eliminados
+export const fetchAllLeaveTypesIncludingDeleted = createAsyncThunk(
+  "leaveTypes/fetchAllLeaveTypesIncludingDeleted",
+  async () => {
+    const response = await getLeaveTypesIncludingDeleted();
     return response.data;
   }
 );
@@ -53,16 +64,26 @@ export const deleteOneLeaveType = createAsyncThunk(
   }
 );
 
+// toggleLeaveTypeStatus es una acción asíncrona que cambia el estado de un tipo de permiso
+export const toggleOneLeaveTypeStatus = createAsyncThunk(
+  "leaveTypes/toggleOneLeaveTypeStatus",
+  async (id) => {
+    const response = await toggleLeaveTypeStatus(id);
+    return response.data;
+  }
+);
+
 // leaveTypeSlice es un slice de Redux que maneja el estado de los tipos de permisos en nuestra aplicación
 // Este slice contiene los reducers y actions necesarios para manejar los tipos de permisos
 export const leaveTypeSlice = createSlice({
   name: "leaveTypes",
   initialState: {
     leaveTypes: [],
+    allLeaveTypes: [],
     leaveType: {},
     status: "idle",
     error: null,
-    hasFetchedOnce: false
+    hasFetchedOnce: false,
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -96,7 +117,11 @@ export const leaveTypeSlice = createSlice({
       })
       .addCase(createNewLeaveType.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.leaveTypes.push(action.payload);
+        const newLeaveType = action.payload;
+        state.allLeaveTypes.push(newLeaveType);
+        if (newLeaveType.status === "Activo") {
+          state.leaveTypes.push(newLeaveType);
+        }
       })
       .addCase(createNewLeaveType.rejected, (state, action) => {
         state.status = "failed";
@@ -108,12 +133,30 @@ export const leaveTypeSlice = createSlice({
       .addCase(updateOneLeaveType.fulfilled, (state, action) => {
         state.status = "succeeded";
         const updatedLeaveType = action.payload;
-        state.leaveTypes = state.leaveTypes.map((leaveType) => {
-          if (leaveType.id === updatedLeaveType.id) {
-            return updatedLeaveType;
+
+        // Actualizar en `leaveTypes`
+        if (updatedLeaveType.status === "Activo") {
+          const index = state.leaveTypes.findIndex(
+            (leaveType) => leaveType.id === updatedLeaveType.id
+          );
+          if (index !== -1) {
+            state.leaveTypes[index] = updatedLeaveType;
+          } else {
+            state.leaveTypes.push(updatedLeaveType);
           }
-          return leaveType;
-        });
+        } else {
+          state.leaveTypes = state.leaveTypes.filter(
+            (leaveType) => leaveType.id !== updatedLeaveType.id
+          );
+        }
+
+        // Actualizar en `allLeaveTypes`
+        const allIndex = state.allLeaveTypes.findIndex(
+          (leaveType) => leaveType.id === updatedLeaveType.id
+        );
+        if (allIndex !== -1) {
+          state.allLeaveTypes[allIndex] = updatedLeaveType;
+        }
       })
       .addCase(updateOneLeaveType.rejected, (state, action) => {
         state.status = "failed";
@@ -131,6 +174,54 @@ export const leaveTypeSlice = createSlice({
         state.status = "succeeded";
       })
       .addCase(deleteOneLeaveType.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(fetchAllLeaveTypesIncludingDeleted.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(
+        fetchAllLeaveTypesIncludingDeleted.fulfilled,
+        (state, action) => {
+          state.status = "succeeded";
+          state.allLeaveTypes = action.payload;
+        }
+      )
+      .addCase(fetchAllLeaveTypesIncludingDeleted.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(toggleOneLeaveTypeStatus.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(toggleOneLeaveTypeStatus.fulfilled, (state, action) => {
+        const updatedLeaveType = action.payload;
+
+        // Actualizar en `leaveTypes` (solo si está activo)
+        const index = state.leaveTypes.findIndex(
+          (leaveType) => leaveType.id === updatedLeaveType.id
+        );
+        if (index !== -1) {
+          if (updatedLeaveType.status === "Activo") {
+            state.leaveTypes[index] = updatedLeaveType;
+          } else {
+            state.leaveTypes.splice(index, 1); // Eliminar si se desactiva
+          }
+        } else if (updatedLeaveType.status === "Activo") {
+          state.leaveTypes.push(updatedLeaveType); // Añadir si se activa
+        }
+
+        // Actualizar en `allLeaveTypes`
+        const allIndex = state.allLeaveTypes.findIndex(
+          (leaveType) => leaveType.id === updatedLeaveType.id
+        );
+        if (allIndex !== -1) {
+          state.allLeaveTypes[allIndex] = updatedLeaveType;
+        }
+
+        state.status = "succeeded";
+      })
+      .addCase(toggleOneLeaveTypeStatus.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       });

@@ -7,13 +7,13 @@ import { SortIcon, SortUpIcon, SortDownIcon } from '../../../../../assets/Icons'
 import { RiArrowLeftDoubleLine, RiArrowLeftSLine, RiArrowRightSLine, RiArrowRightDoubleLine } from "react-icons/ri";
 import OptionsColumn from './OptionsColumn';
 import { UnitColumns } from './UnitColumns';
-import { fetchUnits } from '../../../../../redux/Organization/UnitSlince';
+import { fetchAllUnitsIncludingDeleted } from '../../../../../redux/Organization/UnitSlince';
 import Skeleton from '../../../../../components/Table/Skeleton';
 
 
 function UnitTable({ }) {
   const dispatch = useDispatch();
-  const units = useSelector(state => state.unit.units);
+  const allUnits = useSelector(state => state.unit.allUnits);
   const status = useSelector(state => state.unit.status);
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -21,18 +21,18 @@ function UnitTable({ }) {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        await dispatch(fetchUnits());
+        await dispatch(fetchAllUnitsIncludingDeleted());
       } catch (error) {
-        console.error('Error fetching units:', error);
+        console.error('Error fetching positions:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (units.length === 0 && !isLoading) {
+    if (status === 'idle') {
       fetchData();
     }
-  }, [dispatch, units, isLoading]);
+  }, [dispatch, status]);
 
   const {
     getTableProps,
@@ -54,8 +54,8 @@ function UnitTable({ }) {
   } = useTable(
     {
       columns: UnitColumns,
-      data: units,
-      initialState: { pageIndex: 0, pageSize: 5 },
+      data: allUnits,
+      initialState: { pageIndex: 0, pageSize: 10 },
     },
     useFilters,
     useGlobalFilter,
@@ -64,7 +64,7 @@ function UnitTable({ }) {
   );
 
   const fetchUnitsAction = () => {
-    dispatch(fetchUnits());
+    dispatch(fetchAllUnitsIncludingDeleted());
   };
 
   if (isLoading) {
@@ -72,8 +72,9 @@ function UnitTable({ }) {
   }
 
   return (
-    <>
-      <div className="sm:flex sm:gap-x-2">
+    <div className='flex flex-col h-full'>
+     <div className='sticky top-0 bg-white z-10'>
+     <div className="flex flex-wrap items-center space-x-4">
         <GlobalFilter
           preGlobalFilteredRows={preGlobalFilteredRows}
           globalFilter={state.globalFilter}
@@ -89,12 +90,13 @@ function UnitTable({ }) {
           )
         )}
       </div>
+     </div>
       {/* table */}
-      <div className=" h-[50vh] mt-4 flex flex-col overflow-y-scroll">
-        <div className="-my-2 overflow-x-auto -mx-4 sm:-mx-6 lg:-mx-8">
-          <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+      <div className=" flex-1 overflow-y-auto">
+        <div className="overflow-x-auto custom-scrollbar">
+          <div className="inline-block min-w-full align-middle">
             <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-              <table {...getTableProps()} className="min-w-full divide-y divide-gray-200">
+              <table {...getTableProps()} className="min-w-full divide-y divide-gray-200 table-fixed">
                 <thead className="bg-gray-200">
                   {headerGroups.map(headerGroup => (
                     <tr {...headerGroup.getHeaderGroupProps()}>
@@ -137,7 +139,7 @@ function UnitTable({ }) {
                           return (
                             <td
                               {...cell.getCellProps()}
-                              className="px-6 py-3 whitespace-nowrap"
+                              className="px-6 py-3 text-sm whitespace-normal break-words"
                               role="cell"
                             >
                               {cell.column.Cell.name === "defaultRenderer"
@@ -161,56 +163,75 @@ function UnitTable({ }) {
         </div>
       </div>
       {/* Pagination */}
-      <div className="flex items-center justify-between mt-1 pb-2">
-        <div className="flex-1 flex justify-between sm:hidden">
-          <Button onClick={() => previousPage()} disabled={!canPreviousPage}>Previous</Button>
-          <Button onClick={() => nextPage()} disabled={!canNextPage}>Next</Button>
+      <div className="flex flex-col sm:flex-row items-center justify-between  pt-2  border-t-2">
+        <div className="flex-1 flex justify-between sm:hidden mb-4 sm:mb-0">
+          <Button onClick={() => previousPage()} disabled={!canPreviousPage} className="px-3 py-1 text-xs">
+            Anterior
+          </Button>
+          <Button onClick={() => nextPage()} disabled={!canNextPage} className="px-3 py-1 text-xs">
+            Siguiente
+          </Button>
         </div>
-        <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-          <div className="flex gap-x-2 items-baseline">
+        <div className="w-full sm:flex-1 sm:flex sm:items-center sm:justify-between">
+          <div className="flex flex-col sm:flex-row gap-y-2 sm:gap-x-4 items-baseline mb-4 sm:mb-0">
             <span className="text-sm text-gray-700">
               Página <span className="font-medium">{state.pageIndex + 1}</span> de <span className="font-medium">{pageOptions.length}</span>
             </span>
-            <label>
-              <span className="sr-only">Items Por página</span>
+            <label className="flex items-center">
+              <span className="mr-2 text-sm text-gray-700">Mostrar</span>
               <select
-                className=" text-sm block w-full rounded-lg "
+                className="text-sm   block rounded-lg border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 value={state.pageSize}
-                onChange={e => {
-                  setPageSize(Number(e.target.value))
-                }}
+                onChange={e => setPageSize(Number(e.target.value))}
               >
-                {[5, 6].map(pageSize => (
-                  <option key={pageSize} value={pageSize} className='text-sm'>
-                    Ver {pageSize}
+                {[10, 20, 50].map(pageSize => (
+                  <option key={pageSize} value={pageSize}>
+                    {pageSize}
                   </option>
                 ))}
               </select>
+              <span className="ml-2 text-sm text-gray-700">por página</span>
             </label>
           </div>
           <div>
-            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-              <PageButton className="rounded-l-md p-1" onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
-                <span className="sr-only">First</span>
-                <RiArrowLeftDoubleLine className="h-4 w-4 text-gray-400" aria-hidden="true" />
+            <nav className="relative z-0 inline-flex rounded-md shadow-sm" aria-label="Paginación">
+              <PageButton
+                className="rounded-l-md px-2 py-1"
+                onClick={() => gotoPage(0)}
+                disabled={!canPreviousPage}
+              >
+                <span className="sr-only">Primera</span>
+                <RiArrowLeftDoubleLine className="h-3 w-3" aria-hidden="true" />
               </PageButton>
-              <PageButton className="p-1" onClick={() => previousPage()} disabled={!canPreviousPage}>
-                <span className="sr-only">Previous</span>
-                <RiArrowLeftSLine className="h-4 w-4 text-gray-400" aria-hidden="true" />
+              <PageButton
+                className="px-2 py-1"
+                onClick={() => previousPage()}
+                disabled={!canPreviousPage}
+              >
+                <span className="sr-only">Anterior</span>
+                <RiArrowLeftSLine className="h-3 w-3" aria-hidden="true" />
               </PageButton>
-              <PageButton className="p-1" onClick={() => nextPage()} disabled={!canNextPage}>
-                <span className="sr-only">Next</span>
-                <RiArrowRightSLine className="h-4 w-4 text-gray-400" aria-hidden="true" />
+              <PageButton
+                className="px-2 py-1"
+                onClick={() => nextPage()}
+                disabled={!canNextPage}
+              >
+                <span className="sr-only">Siguiente</span>
+                <RiArrowRightSLine className="h-3 w-3" aria-hidden="true" />
               </PageButton>
-              <PageButton className="rounded-r-md p-1" onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
-                <span className="sr-only">Last</span>
-                <RiArrowRightDoubleLine className="h-4 w-4 text-gray-400" aria-hidden="true" />
+              <PageButton
+                className="rounded-r-md px-2 py-1"
+                onClick={() => gotoPage(pageCount - 1)}
+                disabled={!canNextPage}
+              >
+                <span className="sr-only">Última</span>
+                <RiArrowRightDoubleLine className="h-3 w-3" aria-hidden="true" />
               </PageButton>
             </nav>
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

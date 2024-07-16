@@ -7,19 +7,19 @@ import ModalForm from '../../../../components/ui/ModalForm';
 import { AlertContext } from '../../../../contexts/AlertContext';
 import UnitForm from './UnitForm';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { createNewUnit, fetchUnits } from '../../../../redux/Organization/UnitSlince';
+import { createNewUnit,  fetchAllUnitsIncludingDeleted } from '../../../../redux/Organization/UnitSlince';
 import { PiOfficeChairLight } from "react-icons/pi";
 
 const UnitIndex = () => {
   const dispatch = useDispatch();
-  const {status} = useSelector(state => state.unit);
+  const { status } = useSelector(state => state.unit);
   const [isOpen, setIsOpen] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const { showAlert } = useContext(AlertContext);
 
   useEffect(() => {
     if (status === 'idle') {
-      dispatch(fetchUnits());
+      dispatch(fetchAllUnitsIncludingDeleted());
     }
   }, [status, dispatch]);
 
@@ -52,7 +52,7 @@ const UnitIndex = () => {
   };
 
   return (
-    <>
+    <div className='flex flex-col h-full overflow-auto'>
       <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0">
         <div className="mb-2 flex items-center justify-between gap-8">
           <div>
@@ -65,7 +65,7 @@ const UnitIndex = () => {
           </div>
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
             <Button className="flex items-center gap-3 bg-secondary-500 text-white hover:bg-secondary-600 transition-colors rounded-xl py-2 px-5" size="sm"
-            onClick={handleOpen}>
+              onClick={handleOpen}>
               <RiAddLine className="h-5 w-5" />
               <span className="font-semibold">Nueva unidad</span>
             </Button>
@@ -73,7 +73,9 @@ const UnitIndex = () => {
         </div>
       </CardHeader>
 
-      <UnitTable/>
+      <div className='flex-1 overflow-y-auto'>
+        <UnitTable />
+      </div>
 
       <ModalForm
         isOpen={isOpen}
@@ -89,7 +91,7 @@ const UnitIndex = () => {
           formErrors={formErrors}
         />
       </ModalForm>
-    </>
+    </div>
   );
 };
 

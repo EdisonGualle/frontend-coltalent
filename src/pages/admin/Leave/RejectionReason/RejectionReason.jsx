@@ -2,24 +2,30 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { CardHeader, Typography } from "@material-tailwind/react";
-import { RiEdit2Line} from 'react-icons/ri';
+import { RiEdit2Line, RiCheckboxCircleLine,  RiCloseCircleLine  } from 'react-icons/ri';
 import LeaveTable from '../components/Table/LeaveTable';
 import rejectionReasonColumns from './Table/rejectionReasonColumns';
 import Dialog2 from '../../../../components/ui/Dialog2';
 import { AlertContext } from '../../../../contexts/AlertContext';
-import { fetchRejectionReasons, deleteOneRejectionReason, updateOneRejectionReason, createNewRejectionReason } from '../../../../redux/Leave/rejectionReasonSlince';
+import {
+  fetchRejectionReasons, deleteOneRejectionReason,
+  updateOneRejectionReason, createNewRejectionReason,
+  fetchAllRejectionReasonsIncludingDeleted, toggleOneRejectionReasonStatus
+} from '../../../../redux/Leave/rejectionReasonSlince';
 import SkeletonTable from '../components/Table/SkeletonTable';
 import ModalForm from '../../../../components/ui/ModalForm';
 import { TbMessageX } from "react-icons/tb";
 import RejectionReasonForm from './RejectionReasonForm';
-
+import { getCellStyle} from './Table/getCellStyle';
 const RejectionReason = () => {
   const dispatch = useDispatch();
   const { showAlert } = useContext(AlertContext);
-  const { rejectionReasons, status, hasFetchedOnce  } = useSelector((state) => state.rejectionReason);
+  const { status, hasFetchedOnce, allRejectionReasons } = useSelector((state) => state.rejectionReason);
   const [data, setData] = useState([]);
   const [isLoadingInitial, setIsLoadingInitial] = useState(true);
   const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
+  const [selectedReason, setSelectedReason] = useState(null);
+  const [isOpenToggleDialog, setIsOpenToggleDialog] = useState(false);
 
   // Estado para almacenar los IDs de los registros seleccionados para eliminar
   const [selectedIds, setSelectedIds] = useState([]);
@@ -35,7 +41,7 @@ const RejectionReason = () => {
   useEffect(() => {
     if (!hasFetchedOnce) {
       setIsLoadingInitial(true);
-      dispatch(fetchRejectionReasons())
+      dispatch(fetchAllRejectionReasonsIncludingDeleted())
         .then(unwrapResult)
         .then(() => {
           setIsLoadingInitial(false);
@@ -51,9 +57,9 @@ const RejectionReason = () => {
   // Actualizar los datos cuando se carguen
   useEffect(() => {
     if (status === 'succeeded') {
-      setData(rejectionReasons);
+      setData(allRejectionReasons);
     }
-  }, [rejectionReasons, status]);
+  }, [allRejectionReasons, status]);
 
   // Funciones para manejar el formulario modal de creación y edición
   const handleOpenModalForm = () => {
@@ -77,7 +83,7 @@ const RejectionReason = () => {
     try {
       if (isEditing && currentRejectionReason) {
         const { reason } = formData;
-  
+
         const updatedRejectionReasonData = {
           rejectionReasonId: currentRejectionReason.id,
           updateRejectionReason: { reason },
@@ -96,11 +102,11 @@ const RejectionReason = () => {
     } catch (error) {
       const errorObject = JSON.parse(error.message);
       const { errors = {} } = errorObject || {};
-  
+
       const formErrors = {
         reason: errors.reason ? errors.reason[0] : '',
       };
-  
+
       if (Object.values(formErrors).some(Boolean)) {
         setFormErrors(formErrors);
       } else {
@@ -109,52 +115,92 @@ const RejectionReason = () => {
       }
     }
   };
-  
-  const handleCancelDelete = () => setIsOpenDialogDelete(false);
-  const handleClickDelete = (ids) => {
-    setSelectedIds(ids);
-    setIsOpenDialogDelete(true);
-  };
 
-  const handleConfirmDelete = async () => {
-    try {
-      for (const rejectionReasonId of selectedIds) {
-        const resultAction = await dispatch(deleteOneRejectionReason(rejectionReasonId));
-        unwrapResult(resultAction);
-      }
-      setSelectedIds([]); // Limpiar los IDs seleccionados después de eliminar
-      dispatch(fetchRejectionReasons());
-      showAlert(`Registro${selectedIds.length > 1 ? 's' : ''} eliminado${selectedIds.length > 1 ? 's' : ''} correctamente`, 'success');
-    } catch (error) {
-      showAlert('Ocurrió un error al intentar eliminar el registro', 'error');
-    } finally {
-      setIsOpenDialogDelete(false);
-    }
-  };
+  // const handleCancelDelete = () => setIsOpenDialogDelete(false);
+  // const handleClickDelete = (ids) => {
+  //   setSelectedIds(ids);
+  //   setIsOpenDialogDelete(true);
+  // };
+
+  // const handleConfirmDelete = async () => {
+  //   try {
+  //     for (const rejectionReasonId of selectedIds) {
+  //       const resultAction = await dispatch(deleteOneRejectionReason(rejectionReasonId));
+  //       unwrapResult(resultAction);
+  //     }
+  //     setSelectedIds([]); // Limpiar los IDs seleccionados después de eliminar
+  //     dispatch(fetchAllRejectionReasonsIncludingDeleted());
+  //     showAlert(`Registro${selectedIds.length > 1 ? 's' : ''} eliminado${selectedIds.length > 1 ? 's' : ''} correctamente`, 'success');
+  //   } catch (error) {
+  //     showAlert('Ocurrió un error al intentar eliminar el registro', 'error');
+  //   } finally {
+  //     setIsOpenDialogDelete(false);
+  //   }
+  // };
 
   const handleEdit = (row) => {
-    const rejectionReason = rejectionReasons.find(reason => reason.id === row.id);
+    const rejectionReason =  allRejectionReasons.find(reason => reason.id === row.id);
     if (rejectionReason) {
       handleOpenEditModalForm(rejectionReason);
     }
   };
 
-  const handleView = (row) => {
-    const rejectionReason = rejectionReasons.find(reason => reason.id === row.id);
-    if (rejectionReason) {
-      // Aquí puedes manejar la visualización del motivo de rechazo si es necesario
-      console.log('Ver motivo de rechazo:', rejectionReason);
+
+  const handleToggleClick = (row) => {
+    setSelectedReason(row);
+    setIsOpenToggleDialog(true);
+  };
+
+  const handleConfirmToggle = async () => {
+    try {
+      const resultAction = await dispatch(toggleOneRejectionReasonStatus(selectedReason.id));
+      unwrapResult(resultAction);
+      showAlert('Estado del motivo de rechazo actualizado correctamente', 'success');
+      dispatch(fetchAllRejectionReasonsIncludingDeleted());
+    } catch (error) {
+      showAlert('Error al actualizar el estado del motivo de rechazo.', 'error');
+    } finally {
+      setIsOpenToggleDialog(false);
     }
   };
 
-  const actions = [
+  const handleCancelToggle = () => setIsOpenToggleDialog(false);
+
+  const getToggleMessage = (status) => {
+    if (status === 'Activo') {
+      return {
+        title: '¿Desactivar motivo de rechazo?',
+        description: 'Desactivar este motivo de rechazo puede afectar los procesos asociados. ¿Está seguro que desea continuar?',
+        confirmButtonText: 'Sí, desactivar',
+        confirmButtonColor: 'bg-yellow-500',
+        icon: <RiCloseCircleLine className="w-10 h-10 flex items-center justify-center rounded-full text-yellow-500" />
+      };
+    } else {
+      return {
+        title: '¿Activar motivo de rechazo?',
+        description: 'Activar este motivo de rechazo permitirá que los procesos asociados puedan utilizarlo nuevamente. ¿Está seguro que desea continuar?',
+        confirmButtonText: 'Sí, activar',
+        confirmButtonColor: 'bg-green-500',
+        icon: <RiCheckboxCircleLine className="w-10 h-10 flex items-center justify-center rounded-full text-green-500" />
+      };
+    }
+  };
+
+  const renderActions = (row) => [
     {
       label: 'Editar',
       icon: <RiEdit2Line className="text-green-600 h-4 w-4" />,
-      onClick: handleEdit,
+      onClick: () => handleEdit(row),
       className: 'bg-green-100 hover:bg-green-200 cursor-pointer',
+    },
+    {
+      label: row.status === 'Activo' ? 'Desactivar' : 'Activar',
+      icon: row.status === 'Activo' ? <RiCloseCircleLine className="text-yellow-600 h-4 w-4" /> : <RiCheckboxCircleLine className="text-green-600 h-4 w-4" />,
+      onClick: () => handleToggleClick(row),
+      className: row.status === 'Activo' ? 'bg-yellow-100 hover:bg-yellow-200 cursor-pointer' : 'bg-green-100 hover:bg-green-200 cursor-pointer',
     }
   ];
+  
 
   return (
     <div>
@@ -172,30 +218,31 @@ const RejectionReason = () => {
       </CardHeader>
 
       <div className=''>
-      {isLoadingInitial && !rejectionReasons.length ? (
+        {isLoadingInitial && !allRejectionReasons.length ? (
           <SkeletonTable
             columns={rejectionReasonColumns}
             showFilters={false}
             showExport={false}
             showAddNew={true}
             showColumnOptions={false}
-            actions={actions}
+            actions={renderActions}
           />
         ) : (
           <LeaveTable
             columns={rejectionReasonColumns}
             data={data}
-            actions={actions}
+            actions={renderActions}
             onAddNew={handleOpenModalForm}
             showFilters={false}
             showExport={false}
             showAddNew={true}
             showColumnOptions={false}
             showActions={true}
-            onDelete={handleClickDelete}
+            onDelete={null}
+            getCellStyle={getCellStyle}
           />
         )}
-        <Dialog2
+        {/* <Dialog2
           isOpen={isOpenDialogDelete}
           setIsOpen={setIsOpenDialogDelete}
           title={`¿Eliminar ${selectedIds.length > 1 ? 'los registros seleccionados' : 'el registro seleccionado'}?`}
@@ -206,6 +253,20 @@ const RejectionReason = () => {
           onConfirm={handleConfirmDelete}
           confirmButtonColor="bg-red-500"
           cancelButtonColor="border-gray-400"
+        /> */}
+
+<Dialog2
+          isOpen={isOpenToggleDialog}
+          setIsOpen={setIsOpenToggleDialog}
+          title={getToggleMessage(selectedReason?.status).title}
+          description={getToggleMessage(selectedReason?.status).description}
+          confirmButtonText={getToggleMessage(selectedReason?.status).confirmButtonText}
+          cancelButtonText="Cancelar"
+          onConfirm={handleConfirmToggle}
+          onCancel={handleCancelToggle}
+          confirmButtonColor={getToggleMessage(selectedReason?.status).confirmButtonColor}
+          cancelButtonColor="border-gray-400"
+          icon={getToggleMessage(selectedReason?.status).icon}
         />
 
         <ModalForm

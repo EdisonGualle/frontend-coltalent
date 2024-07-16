@@ -5,6 +5,8 @@ import {
   getUnit,
   getUnits,
   updateUnit,
+  getAllUnitsIncludingDeleted,
+  toggleUnitStatus,
 } from "../../services/Company/UnitService";
 
 // fetchUnits es una acción asíncrona que obtiene todas las unidades
@@ -12,6 +14,15 @@ export const fetchUnits = createAsyncThunk("units/fetchUnits", async () => {
   const response = await getUnits();
   return response.data;
 });
+
+// fetchAllUnitsIncludingDeleted es una acción asíncrona que obtiene todas las unidades, incluyendo las eliminadas
+export const fetchAllUnitsIncludingDeleted = createAsyncThunk(
+  "units/fetchAllUnitsIncludingDeleted",
+  async () => {
+    const response = await getAllUnitsIncludingDeleted();
+    return response.data;
+  }
+);
 
 // fetchUnit es una acción asíncrona que obtiene una unidad por su id
 export const fetchUnit = createAsyncThunk("units/fetchUnit", async (id) => {
@@ -46,12 +57,22 @@ export const deleteOneUnit = createAsyncThunk(
   }
 );
 
+// toggleOneUnitStatus es una acción asíncrona que alterna el estado de activación de una unidad
+export const toggleOneUnitStatus = createAsyncThunk(
+  "units/toggleOneUnitStatus",
+  async (id) => {
+    const response = await toggleUnitStatus(id);
+    return response;
+  }
+);
+
 // unitSlice es un slice de Redux que maneja el estado de las unidades en nuestra aplicación
 // Este slice contiene los reducers y actions necesarios para manejar las unidades
 export const unitSlice = createSlice({
   name: "units",
   initialState: {
     units: [],
+    allUnits: [],
     unit: {},
     status: "idle",
     error: null,
@@ -86,7 +107,11 @@ export const unitSlice = createSlice({
       })
       .addCase(createNewUnit.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.units.push(action.payload);
+        const newUnit = action.payload;
+        state.allUnits.push(newUnit);
+        if (newUnit.status === "Activo") {
+          state.units.push(newUnit);
+        }
       })
       .addCase(createNewUnit.rejected, (state, action) => {
         state.status = "failed";
@@ -97,13 +122,31 @@ export const unitSlice = createSlice({
       })
       .addCase(updateOneUnit.fulfilled, (state, action) => {
         state.status = "succeeded";
-        const updateUnit = action.payload;
-        state.units = state.units.map((unit) => {
-          if (unit.id === updateUnit.id) {
-            return updateUnit;
+        const updatedUnit = action.payload;
+
+        // Actualizar en `units`
+        if (updatedUnit.status === "Activo") {
+          const index = state.units.findIndex(
+            (unit) => unit.id === updatedUnit.id
+          );
+          if (index !== -1) {
+            state.units[index] = updatedUnit;
+          } else {
+            state.units.push(updatedUnit);
           }
-          return unit;
-        });
+        } else {
+          state.units = state.units.filter(
+            (unit) => unit.id !== updatedUnit.id
+          );
+        }
+
+        // Actualizar en `allUnits`
+        const allIndex = state.allUnits.findIndex(
+          (unit) => unit.id === updatedUnit.id
+        );
+        if (allIndex !== -1) {
+          state.allUnits[allIndex] = updatedUnit;
+        }
       })
       .addCase(updateOneUnit.rejected, (state, action) => {
         state.status = "failed";
@@ -123,6 +166,51 @@ export const unitSlice = createSlice({
       .addCase(deleteOneUnit.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
+      })
+      .addCase(fetchAllUnitsIncludingDeleted.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchAllUnitsIncludingDeleted.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.allUnits = action.payload;
+      })
+      .addCase(fetchAllUnitsIncludingDeleted.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(toggleOneUnitStatus.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(toggleOneUnitStatus.fulfilled, (state, action) => {
+        const updatedUnit = action.payload;
+
+        // Actualizar en `units` (solo si está activo)
+        const index = state.units.findIndex(
+          (unit) => unit.id === updatedUnit.id
+        );
+        if (index !== -1) {
+          if (updatedUnit.status === "Activo") {
+            state.units[index] = updatedUnit;
+          } else {
+            state.units.splice(index, 1); // Eliminar si se desactiva
+          }
+        } else if (updatedUnit.status === "Activo") {
+          state.units.push(updatedUnit); // Añadir si se activa
+        }
+
+        // Actualizar en `allUnits`
+        const allIndex = state.allUnits.findIndex(
+          (unit) => unit.id === updatedUnit.id
+        );
+        if (allIndex !== -1) {
+          state.allUnits[allIndex] = updatedUnit;
+        }
+
+        state.status = "succeeded";
+      })
+      .addCase(toggleOneUnitStatus.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.status = "failed";
       });
   },
 });

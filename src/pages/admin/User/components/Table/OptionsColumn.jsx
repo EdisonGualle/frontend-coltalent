@@ -184,7 +184,7 @@ const OptionsColumn = ({ user, updateUsers }) => {
               <span className="truncate">Activar</span>
             </button>
           </MenuItem>
-          <MenuItem
+          {/* <MenuItem
             className="p-0 hover:bg-transparent"
             onClick={() => handleActionClick('eliminar')}
           >
@@ -192,7 +192,7 @@ const OptionsColumn = ({ user, updateUsers }) => {
               <RiDeleteBin6Line className="text-red-500" />
               <span className="truncate">Eliminar</span>
             </button>
-          </MenuItem>
+          </MenuItem> */}
         </div>
       </Menu>
       <Dialog2

@@ -9,26 +9,24 @@ const UserCard = ({ user, updateUsers }) => {
   const photoUrl = photo ? `${import.meta.env.VITE_STORAGE_URL}/${photo}` : null;
 
   return (
-    <Card className="bg-gray-100 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105 transform">
-      <CardBody className="flex flex-col items-center gap-2 p-4 relative">
+    <Card className="bg-gray-100 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-secondary-100 relative group border-b-4 border-b-gradient-to-r hover:border-blue-200">
+      <CardBody className="flex flex-col items-center gap-2 p-4">
         <div className="relative">
           {photoUrl ? (
-            // Si el usuario tiene una foto, la mostramos
             <Avatar src={photoUrl} className="w-16 h-16 rounded-full border-2 border-blue-500 shadow-lg" />
           ) : (
-            // Si no tiene foto, mostramos las iniciales del nombre
             <div className="w-16 h-16 rounded-full border-2 border-blue-500 shadow-lg flex items-center justify-center bg-gray-200">
-              <Typography variant="h2" className="text-gray-600">
+              <Typography variant="h3" className="text-gray-600">
                 {name.charAt(0).toUpperCase()}
               </Typography>
             </div>
           )}
         </div>
-        <div className="text-center w-full">
-          <Typography variant="h6" className="text-gray-800 mb-1 truncate">
+        <div className="text-center">
+          <Typography variant="h6" className="text-gray-800 mb-1 textse">
             {name}
           </Typography>
-          <Typography color="blue-gray" className="text-sm truncate">
+          <Typography color="blue-gray" className="text-xs">
             {email}
           </Typography>
         </div>

@@ -9,4 +9,5 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  base: '/', // Añade esta línea para asegurarte de que las rutas estén correctas
 })

@@ -5,13 +5,25 @@ import {
   getPosition,
   getPositions,
   updatePosition,
+  getAllPositionsIncludingDeleted,
+  togglePositionStatus
 } from "../../services/Company/PositionService";
+import { all } from "axios";
 
 // fetchPositions es una acción asíncrona que obtiene todas las posiciones
 export const fetchPositions = createAsyncThunk(
   "positions/fetchPositions",
   async () => {
     const response = await getPositions();
+    return response.data;
+  }
+);
+
+// fetchAllPositionsIncludingDeleted es una acción asíncrona que obtiene todas las posiciones, incluyendo las eliminadas
+export const fetchAllPositionsIncludingDeleted = createAsyncThunk(
+  "positions/fetchAllPositionsIncludingDeleted",
+  async () => {
+    const response = await getAllPositionsIncludingDeleted();
     return response.data;
   }
 );
@@ -52,12 +64,22 @@ export const deleteOnePosition = createAsyncThunk(
   }
 );
 
+// toggleOnePositionStatus es una acción asíncrona que alterna el estado de activación de una posición
+export const toggleOnePositionStatus = createAsyncThunk(
+  "positions/toggleOnePositionStatus",
+  async (id) => {
+    const response = await togglePositionStatus(id);
+    return response.data;
+  }
+);
+
 // positionSlice es un slice de Redux que maneja el estado de las posiciones en nuestra aplicación
 // Este slice contiene los reducers y actions necesarios para manejar las posiciones
 export const positionSlice = createSlice({
   name: "positions",
   initialState: {
     positions: [],
+    allPositions: [],
     position: {},
     status: "idle",
     error: null,
@@ -92,7 +114,11 @@ export const positionSlice = createSlice({
       })
       .addCase(createNewPosition.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.positions.push(action.payload);
+        const newPosition = action.payload;
+        state.allPositions.push(newPosition);
+        if (newPosition.status === 'Activo') {
+          state.positions.push(newPosition);
+        }
       })
       .addCase(createNewPosition.rejected, (state, action) => {
         state.status = "failed";
@@ -104,12 +130,24 @@ export const positionSlice = createSlice({
       .addCase(updateOnePosition.fulfilled, (state, action) => {
         state.status = "succeeded";
         const updatedPosition = action.payload;
-        state.positions = state.positions.map((position) => {
-          if (position.id === updatedPosition.id) {
-            return updatedPosition;
+      
+        // Actualizar en `positions`
+        if (updatedPosition.status === 'Activo') {
+          const index = state.positions.findIndex(position => position.id === updatedPosition.id);
+          if (index !== -1) {
+            state.positions[index] = updatedPosition;
+          } else {
+            state.positions.push(updatedPosition);
           }
-          return position;
-        });
+        } else {
+          state.positions = state.positions.filter(position => position.id !== updatedPosition.id);
+        }
+      
+        // Actualizar en `allPositions`
+        const allIndex = state.allPositions.findIndex(position => position.id === updatedPosition.id);
+        if (allIndex !== -1) {
+          state.allPositions[allIndex] = updatedPosition;
+        }
       })
       .addCase(updateOnePosition.rejected, (state, action) => {
         state.status = "failed";
@@ -129,7 +167,48 @@ export const positionSlice = createSlice({
       .addCase(deleteOnePosition.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
-      });
+      })
+      .addCase(fetchAllPositionsIncludingDeleted.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchAllPositionsIncludingDeleted.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.allPositions = action.payload;
+      })
+      .addCase(fetchAllPositionsIncludingDeleted.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(toggleOnePositionStatus.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(toggleOnePositionStatus.fulfilled, (state, action) => {
+        const updatedPosition = action.payload;
+
+        // Actualizar en `positions` (solo si está activo)
+        const index = state.positions.findIndex(position => position.id === updatedPosition.id);
+        if (index !== -1) {
+          if (updatedPosition.status === 'Activo') {
+            state.positions[index] = updatedPosition;
+          } else {
+            state.positions.splice(index, 1); // Eliminar si se desactiva
+          }
+        } else if (updatedPosition.status === 'Activo') {
+          state.positions.push(updatedPosition); // Añadir si se activa
+        }
+
+        // Actualizar en `allPositions`
+        const allIndex = state.allPositions.findIndex(position => position.id === updatedPosition.id);
+        if (allIndex !== -1) {
+          state.allPositions[allIndex] = updatedPosition;
+        }
+
+        state.status = "succeeded";
+      })
+      .addCase(toggleOnePositionStatus.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.status = "failed";
+      })
   },
 });
 

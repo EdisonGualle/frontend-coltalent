@@ -738,7 +738,7 @@ const handlePositionChange = (e) => {
               error={errors['employee.address.secondary_street']}
             />
             <Input
-              label="Número"
+              label="Número de casa"
               id="number"
               name="number"
               type='number'

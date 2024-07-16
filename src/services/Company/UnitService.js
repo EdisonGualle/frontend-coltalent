@@ -1,7 +1,16 @@
 import AxiosInstance from "../axiosInstance";
 const getUnits = async () => {
   try {
-    const response = await AxiosInstance.get('/units');
+    const response = await AxiosInstance.get("/units");
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getAllUnitsIncludingDeleted = async () => {
+  try {
+    const response = await AxiosInstance.get("/units-all");
     return response.data;
   } catch (error) {
     throw error;
@@ -10,8 +19,8 @@ const getUnits = async () => {
 
 const createUnit = async (newUnit) => {
   try {
-    console.log(newUnit)
-    const response = await AxiosInstance.post('/units', newUnit);
+    console.log(newUnit);
+    const response = await AxiosInstance.post("/units", newUnit);
     return response.data;
   } catch (error) {
     // Crear un objeto de error personalizado con un campo de mensaje que sea una cadena JSON del objeto de error
@@ -20,7 +29,6 @@ const createUnit = async (newUnit) => {
   }
 };
 
-
 const getUnit = async (id) => {
   try {
     const response = await AxiosInstance.get(`/units/${id}`);
@@ -28,7 +36,7 @@ const getUnit = async (id) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 const updateUnit = async (updatedData) => {
   try {
@@ -51,4 +59,21 @@ const deleteUnit = async (unit) => {
   }
 };
 
-export { getUnits, getUnit, createUnit, deleteUnit, updateUnit};
+const toggleUnitStatus = async (id) => {
+  try {
+    const response = await AxiosInstance.post(`/units/toggle-status/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export {
+  getUnits,
+  getUnit,
+  createUnit,
+  deleteUnit,
+  updateUnit,
+  getAllUnitsIncludingDeleted,
+  toggleUnitStatus,
+};

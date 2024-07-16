@@ -20,7 +20,7 @@ import PrivateRoute from "./components/common/routing/PrivateRoute";
 import PublicRoute from "./components/common/routing/PublicRoute";
 
 // Employee
-import EmployeeIndex from "./pages/admin/Employee/index";
+import EmployeeIndex from "./pages/admin/Employee/Index";
 import Setting from "./pages/Setting/Setting";
 
 // User

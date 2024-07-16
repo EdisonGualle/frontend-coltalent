@@ -12,7 +12,7 @@ const DepartmentForm = ({
   isEditing,
   onSubmit,
   onCancel,
-  confirmButtonText = isEditing ? 'Guardar cambios' : 'Crear departamento',
+  confirmButtonText = isEditing ? 'Guardar cambios' : 'Crear Dirección',
   cancelButtonText = 'Cancelar',
   confirmButtonColor = 'bg-blue-500',
   cancelButtonColor = 'border-gray-400',
