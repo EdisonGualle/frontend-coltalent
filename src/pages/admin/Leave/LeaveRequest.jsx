@@ -16,6 +16,8 @@ import { fetchLeaveTypes } from '../../../redux/Leave/leaveTypeSlince';
 import { createOneLeave } from '../../../redux/Leave/leaveSince';
 import { AlertContext } from '../../../contexts/AlertContext';
 import ConfirmationModal from './Request/ConfirmationModal';
+import { BsCalendarCheck, BsCalendarX } from "react-icons/bs";
+import { BsClock, BsClockHistory } from "react-icons/bs";
 
 
 // Mapping of string names to icon components
@@ -505,9 +507,10 @@ const Request = () => {
                 <div className="w-1/2">
 
                   <Input
-                    label="Fecha de solicitud"
+                    label="Fecha de solicitud del permiso"
                     id="startDate"
                     type="date"
+                    icon={BsCalendarCheck}
                     value={startDate}
                     onChange={handleStartDateChange}
                     error={errors.start_date}
@@ -518,6 +521,7 @@ const Request = () => {
                     label="Hora de inicio"
                     id="startTime"
                     type="time"
+                    icon={BsClock}
                     value={startTime}
                     onChange={handleStartTimeChange}
                     error={errors.start_time}
@@ -528,6 +532,7 @@ const Request = () => {
                     label="Hora de fin"
                     id="endTime"
                     type="time"
+                    icon={BsClockHistory}
                     value={endTime}
                     onChange={handleEndTimeChange}
                     error={errors.end_time}
@@ -541,9 +546,10 @@ const Request = () => {
               <div className="flex space-x-4">
                 <div className="w-1/2">
                   <Input
-                    label="Fecha de inicio"
+                    label="Fecha de inicio del permiso"
                     id="startDate"
                     type="date"
+                    icon={BsCalendarCheck}
                     value={startDate}
                     onChange={handleStartDateChange}
                     error={errors.start_date}
@@ -551,9 +557,10 @@ const Request = () => {
                 </div>
                 <div className="w-1/2">
                   <Input
-                    label="Fecha de fin"
+                    label="Fecha de fin del permiso"
                     id="endDate"
                     type="date"
+                    icon={BsCalendarX}
                     value={endDate}
                     onChange={handleEndDateChange}
                     error={errors.end_date}

@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
 import { motion } from 'framer-motion';
 import Input from '../../../components/ui/Input';
 import { isValidCI } from '../../../Utils/validationCedula.js';
 import { isValidName, isValidDateOfBirth, isValidEthnicity, isValidNationality, isValidGender, isValidCanton, isValidProvince, isValidParish, isValidNumber, isValidDirection, isValidPosition, isValidUnit } from '../../../Utils/validationEmployee.js';
 import { validateEmail, validateLandlinePhone, validateMobilePhone } from '../../../Utils/validationsV2.js';
-import { RiUserLine, RiMailLine, RiPhoneLine, RiHomeLine, RiBriefcaseLine, RiCalendarLine, RiUserAddLine, RiContactsLine, RiSmartphoneLine } from 'react-icons/ri';
+import { RiUserLine, RiMailLine, RiPhoneLine, RiHomeLine, RiBriefcaseLine, RiCalendarLine, RiSmartphoneLine } from 'react-icons/ri';
 import { getCantons, getParishes, getProvinces } from '../../../services/Employee/Address/addressService.js';
 import { getDirections, getUnitsAndPositions, getPositions } from '../../../services/Employee/Organization/organizationService.js';
 import { getEmployee } from '../../../services/Employee/EmployeService1.js';
+import {
+  BsPersonVcard, BsGlobeAmericas, BsPassport, BsGeoAlt,
+  BsSignpost, BsHouseDoor, BsSignpostSplit, BsCompass
+} from "react-icons/bs";
+
+
+import { fetchRoles } from '../../../redux/User/rolSlice.js';
+import CustomSelect from '../../../components/ui/Select.jsx';
+
 
 
 const steps = [
@@ -67,6 +78,29 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
   const [selectedDirection, setSelectedDirection] = useState('');
   const [selectedUnit, setSelectedUnit] = useState('');
 
+  const [selectedRole, setSelectedRole] = useState(null);
+
+
+
+  // Cargar roles al montar el componente, solo si no están ya en el estado global
+  const rolesState = useSelector((state) => state.role);
+  const roles = rolesState ? rolesState.roles : [];
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (roles.length === 0) {
+      dispatch(fetchRoles());
+    }
+  }, [dispatch, roles.length]);
+
+  const handleRoleChange = (option) => {
+    setSelectedRole(option);
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      user: { role_id: option ? '' : 'Por favor, selecciona un rol.' }
+    }));
+  };
+
 
   // Agregar este efecto para cargar los datos del empleado si initialData.id está presente
   useEffect(() => {
@@ -74,7 +108,32 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
       try {
         const response = await getEmployee(id);
         const employeeData = response.data;
-        setFormData({
+
+        // Preselect provinces, cantons, and parishes based on employee address
+        if (employeeData.address) {
+          const selectedProvinceId = employeeData.address.parish.canton.province.id;
+          const selectedCantonId = employeeData.address.parish.canton.id;
+          const selectedParishId = employeeData.address.parish.id;
+
+          // Load cantons and parishes based on the selected province and canton
+          const cantons = await getCantons(selectedProvinceId);
+          const parishes = await getParishes(selectedCantonId);
+
+          setSelectedProvince(selectedProvinceId);
+          setCantons(cantons);
+          setSelectedCanton(selectedCantonId);
+          setParishes(parishes);
+
+          setFormData(prevFormData => ({
+            ...prevFormData,
+            province: selectedProvinceId,
+            canton: selectedCantonId,
+            parish: selectedParishId,
+          }));
+        }
+
+        setFormData(prevFormData => ({
+          ...prevFormData,
           id: employeeData.id,
           gender: employeeData.gender || '',
           maritalStatus: employeeData.marital_status || '',
@@ -92,15 +151,12 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
           direction: employeeData.position?.direction?.id || '',
           unit: employeeData.position?.unit?.id || '',
           position: employeeData.position?.id || '',
-          province: employeeData.address?.province || '',
-          canton: employeeData.address?.canton || '',
-          parish: employeeData.address?.parish || '',
           sector: employeeData.address?.sector || '',
           main_street: employeeData.address?.main_street || '',
           secondary_street: employeeData.address?.secondary_street || '',
           number: employeeData.address?.number || '',
           reference: employeeData.address?.reference || ''
-        });
+        }));
 
         if (employeeData.position) {
           if (employeeData.position.unit_id) {
@@ -111,7 +167,17 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
           }
           setPositions([employeeData.position]);
         }
-  
+
+
+        // Preselect role
+        if (employeeData.role) {
+          setSelectedRole({
+            label: employeeData.role.name,
+            value: employeeData.role
+          });
+        }
+
+
       } catch (error) {
         console.error('Error loading employee data', error);
       }
@@ -246,8 +312,13 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
     const newErrors = {};
 
     if (currentStep === steps.length) {
+
       newErrors['employee.position'] = isValidPosition(formData.position);
       newErrors['employee.position_id'] = isValidPosition(formData.position);
+
+      if (!selectedRole) {
+        newErrors['user.role_id'] = 'Por favor, selecciona un rol.';
+      }
       setErrors((prevErrors) => ({
         ...prevErrors,
         ...newErrors,
@@ -284,7 +355,11 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
               parish_id: formData.parish,
             },
           },
+          user: {
+            role_id: selectedRole?.value?.id // Verifica que selectedRole y selectedRole.value estén definidos
+          }
         };
+
 
         onSubmit(submissionData);
       }
@@ -366,11 +441,11 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
     const directionId = e.target.value;
     setSelectedDirection(directionId);
     setFormData({ ...formData, direction: directionId, unit: '', position: '' });
-  
+
     if (directionId) {
       setErrors({ ...errors, 'employee.direction': '' });
     }
-  
+
     try {
       const data = await getUnitsAndPositions(directionId);
       setUnits(data.units);
@@ -379,16 +454,16 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
       console.error("Error fetching units and positions:", error);
     }
   };
-  
+
   const handleUnitChange = async (e) => {
     const unitId = e.target.value;
     setSelectedUnit(unitId);
     setFormData({ ...formData, unit: unitId, position: '' });
-  
+
     if (unitId) {
       setErrors({ ...errors, 'employee.unit': '' });
     }
-  
+
     try {
       const data = await getPositions(unitId);
       setPositions(data);
@@ -396,24 +471,23 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
       console.error("Error fetching positions:", error);
     }
   };
-  
-  
-// Asegúrate de que el método handlePositionChange gestione correctamente la posición
-// Asegúrate de que el método handlePositionChange gestione correctamente la posición
-const handlePositionChange = (e) => {
-  const positionId = e.target.value;
-  setFormData({ ...formData, position: positionId });
-
-  const errorMessage = isValidPosition(positionId);
-  setErrors(prevErrors => ({
-    ...prevErrors,
-    'employee.position': errorMessage,
-    'employee.position_id': errorMessage
-  }));
-};
 
 
-// Fetch directions on component mount
+  // Asegúrate de que el método handlePositionChange gestione correctamente la posición
+  const handlePositionChange = (e) => {
+    const positionId = e.target.value;
+    setFormData({ ...formData, position: positionId });
+
+    const errorMessage = isValidPosition(positionId);
+    setErrors(prevErrors => ({
+      ...prevErrors,
+      'employee.position': errorMessage,
+      'employee.position_id': errorMessage
+    }));
+  };
+
+
+  // Fetch directions on component mount
   useEffect(() => {
     const fetchDirections = async () => {
       try {
@@ -523,17 +597,17 @@ const handlePositionChange = (e) => {
               label="Cédula"
               id="identification"
               name="identification"
-              placeholder="Ingrese su cédula"
+              placeholder="Ingrese la cédula"
               value={formData.identification || ''}
               onChange={handleInputChange}
               error={errors['employee.identification']}
-              icon={RiUserAddLine}
+              icon={BsPersonVcard}
             />
             <Input
               label="Nombres"
               id="firstName"
               name="firstName"
-              placeholder="Ingrese sus nombres"
+              placeholder="Ingrese los nombres"
               value={formData.firstName || ''}
               onChange={handleInputChange}
               error={errors['employee.firstName']}
@@ -543,7 +617,7 @@ const handlePositionChange = (e) => {
               label="Apellidos"
               id="lastName"
               name="lastName"
-              placeholder="Ingrese sus apellidos"
+              placeholder="Ingrese los apellidos"
               value={formData.lastName || ''}
               onChange={handleInputChange}
               error={errors['employee.lastName']}
@@ -554,7 +628,7 @@ const handlePositionChange = (e) => {
               id="date_of_birth"
               name="date_of_birth"
               type="date"
-              placeholder="Ingrese su fecha de nacimiento"
+              placeholder="Ingrese la fecha de nacimiento"
               value={formData.date_of_birth || ''}
               onChange={handleInputChange}
               error={errors['employee.date_of_birth']}
@@ -569,7 +643,7 @@ const handlePositionChange = (e) => {
                 onChange={handleInputChange}
                 className={`mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.gender ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
               >
-                <option value="">Seleccione su género</option>
+                <option value="">Seleccione el género</option>
                 <option value="Hombre">Hombre</option>
                 <option value="Mujer">Mujer</option>
                 <option value="Otro">Otro</option>
@@ -586,7 +660,7 @@ const handlePositionChange = (e) => {
                 disabled={!formData.gender}
                 className="mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
               >
-                <option value="">Seleccione su estado civil</option>
+                <option value="">Seleccione el estado civil</option>
                 {maritalOptions.map((option, index) => (
                   <option key={index} value={option}>{option}</option>
                 ))}
@@ -597,19 +671,21 @@ const handlePositionChange = (e) => {
               label="Etnia"
               id="ethnicity"
               name="ethnicity"
-              placeholder="Ingrese su etnia"
+              placeholder="Ingrese la etnia"
               value={formData.ethnicity || ''}
               onChange={handleInputChange}
               error={errors['employee.ethnicity']}
+              icon={BsGlobeAmericas}
             />
             <Input
               label="Nacionalidad"
               id="nationality"
               name="nationality"
-              placeholder="Ingrese su nacionalidad"
+              placeholder="Ingrese la nacionalidad"
               value={formData.nationality || ''}
               onChange={handleInputChange}
               error={errors['employee.nationality']}
+              icon={BsPassport}
             />
           </div>
         )}
@@ -619,7 +695,7 @@ const handlePositionChange = (e) => {
               label="Correo Personal"
               id="personal_email"
               name="personal_email"
-              placeholder="Ingrese su correo personal"
+              placeholder="Ingrese el correo personal"
               value={formData.personal_email || ''}
               onChange={handleInputChange}
               error={errors['employee.contact.personal_email']}
@@ -629,7 +705,7 @@ const handlePositionChange = (e) => {
               label="Celular Personal"
               id="personal_phone"
               name="personal_phone"
-              placeholder="Ingrese su celular personal"
+              placeholder="Ingrese el celular personal"
               value={formData.personal_phone || ''}
               onChange={handleInputChange}
               error={errors['employee.contact.personal_phone']}
@@ -639,7 +715,7 @@ const handlePositionChange = (e) => {
               label="Teléfono de Casa"
               id="home_phone"
               name="home_phone"
-              placeholder="Ingrese su teléfono de casa"
+              placeholder="Ingrese el teléfono de casa"
               value={formData.home_phone || ''}
               onChange={handleInputChange}
               error={errors['employee.contact.home_phone']}
@@ -649,7 +725,7 @@ const handlePositionChange = (e) => {
               label="Teléfono de Trabajo"
               id="work_phone"
               name="work_phone"
-              placeholder="Ingrese su teléfono de trabajo"
+              placeholder="Ingrese el teléfono de trabajo"
               value={formData.work_phone || ''}
               onChange={handleInputChange}
               error={errors['employee.contact.work_phone']}
@@ -718,6 +794,7 @@ const handlePositionChange = (e) => {
               value={formData.sector || ''}
               onChange={handleInputChange}
               error={errors['employee.address.sector']}
+              icon={BsGeoAlt}
             />
             <Input
               label="Calle Principal"
@@ -727,6 +804,7 @@ const handlePositionChange = (e) => {
               value={formData.main_street || ''}
               onChange={handleInputChange}
               error={errors['employee.address.main_street']}
+              icon={BsSignpost}
             />
             <Input
               label="Calle Secundaria"
@@ -736,6 +814,7 @@ const handlePositionChange = (e) => {
               value={formData.secondary_street || ''}
               onChange={handleInputChange}
               error={errors['employee.address.secondary_street']}
+              icon={BsSignpostSplit}
             />
             <Input
               label="Número de casa"
@@ -746,6 +825,7 @@ const handlePositionChange = (e) => {
               value={formData.number || ''}
               onChange={handleInputChange}
               error={errors['employee.address.number']}
+              icon={BsHouseDoor}
             />
             <Input
               label="Referencia"
@@ -755,71 +835,81 @@ const handlePositionChange = (e) => {
               value={formData.reference || ''}
               onChange={handleInputChange}
               error={errors['employee.address.reference']}
+              icon={BsCompass}
             />
           </div>
         )}
 
+        {currentStep === 4 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label htmlFor="direction" className="block text-sm font-medium text-gray-700">Dirección</label>
+              <select
+                id="direction"
+                name="direction"
+                value={selectedDirection}
+                onChange={handleDirectionChange}
+                className={`mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.direction ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
+              >
+                <option value="">Seleccione la dirección</option>
+                {directions.map((direction) => (
+                  <option key={direction.id} value={direction.id}>{direction.name}</option>
+                ))}
+              </select>
+              {errors['employee.direction'] && <p className="mt-1 text-xs text-red-500">{errors['employee.direction']}</p>}
+            </div>
+            <div>
+              <label htmlFor="unit" className="block text-sm font-medium text-gray-700">Unidad</label>
+              <select
+                id="unit"
+                name="unit"
+                value={selectedUnit}
+                onChange={handleUnitChange}
+                disabled={!selectedDirection}
+                className={`mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.unit ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
+              >
+                <option value="">Seleccione la unidad</option>
+                {units.map((unit) => (
+                  <option key={unit.id} value={unit.id}>{unit.name}</option>
+                ))}
+              </select>
+              {errors['employee.unit'] && <p className="mt-1 text-xs text-red-500">{errors['employee.unit']}</p>}
+            </div>
+            <div>
+              <label htmlFor="position" className="block text-sm font-medium text-gray-700">Cargo</label>
+              <select
+                id="position"
+                name="position"
+                value={formData.position}
+                onChange={handlePositionChange}
+                disabled={!selectedDirection && !selectedUnit}
+                className={`mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.position ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
+              >
+                <option value="">Seleccione el cargo</option>
+                {positions.map((position) => (
+                  <option key={position.id} value={position.id}>{position.name}</option>
+                ))}
+              </select>
+              {(errors['employee.position'] || errors['employee.position_id']) && (
+                <p className="mt-1 text-xs text-red-500">
+                  {errors['employee.position'] || errors['employee.position_id']}
+                </p>
+              )}
+            </div>
 
-
-
-{currentStep === 4 && (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <div>
-      <label htmlFor="direction" className="block text-sm font-medium text-gray-700">Dirección</label>
-      <select
-        id="direction"
-        name="direction"
-        value={selectedDirection}
-        onChange={handleDirectionChange}
-        className={`mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.direction ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
-      >
-        <option value="">Seleccione la dirección</option>
-        {directions.map((direction) => (
-          <option key={direction.id} value={direction.id}>{direction.name}</option>
-        ))}
-      </select>
-      {errors['employee.direction'] && <p className="mt-1 text-xs text-red-500">{errors['employee.direction']}</p>}
-    </div>
-    <div>
-      <label htmlFor="unit" className="block text-sm font-medium text-gray-700">Unidad</label>
-      <select
-        id="unit"
-        name="unit"
-        value={selectedUnit}
-        onChange={handleUnitChange}
-        disabled={!selectedDirection}
-        className={`mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.unit ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
-      >
-        <option value="">Seleccione la unidad</option>
-        {units.map((unit) => (
-          <option key={unit.id} value={unit.id}>{unit.name}</option>
-        ))}
-      </select>
-      {errors['employee.unit'] && <p className="mt-1 text-xs text-red-500">{errors['employee.unit']}</p>}
-    </div>
-    <div>
-      <label htmlFor="position" className="block text-sm font-medium text-gray-700">Cargo</label>
-      <select
-        id="position"
-        name="position"
-        value={formData.position}
-        onChange={handlePositionChange}
-        disabled={!selectedDirection && !selectedUnit}
-        className={`mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.position ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
-      >
-        <option value="">Seleccione el cargo</option>
-        {positions.map((position) => (
-          <option key={position.id} value={position.id}>{position.name}</option>
-        ))}
-      </select>
-      {(errors['employee.position'] || errors['employee.position_id']) && (
-        <p className="mt-1 text-xs text-red-500">
-          {errors['employee.position'] || errors['employee.position_id']}
-        </p>
-      )}
-    </div>
-  </div>
-)}
+            <div>
+              <CustomSelect
+                label="Rol"
+                options={roles}
+                value={selectedRole}
+                onChange={handleRoleChange}
+                placeholder="Selecciona un rol"
+                error={errors.user?.role_id}
+                isSearchable={true}
+              />
+            </div>
+          </div>
+        )}
 
 
         <div className="flex justify-between mt-4">

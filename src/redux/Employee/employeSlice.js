@@ -43,9 +43,9 @@ export const createNewEmployee = createAsyncThunk(
 // updateOneEmployee es una acción asíncrona que actualiza un empleado existente
 export const updateOneEmployee = createAsyncThunk(
   "employees/updateOneEmployee",
-  async ({ id, employee }, { rejectWithValue }) => {
+  async ({ id, submissionData }, { rejectWithValue }) => {
     try {
-      const response = await updateEmployee(id, employee);  // Pasamos el id y el objeto employee
+      const response = await updateEmployee(id, submissionData);  // Pasamos el id y el objeto completo submissionData
       return response;
     } catch (error) {
       return rejectWithValue(error);
@@ -55,12 +55,21 @@ export const updateOneEmployee = createAsyncThunk(
 
 
 
+
 // deleteOneEmployee es una acción asíncrona que elimina un empleado existente
 export const deleteOneEmployee = createAsyncThunk(
   "employees/deleteOneEmployee",
-  async (employee) => {
-    await deleteEmployee(employee);
-    return employee.id; // Devuelve el ID del empleado eliminado
+  async (employeeId, { rejectWithValue }) => {
+    try {
+      const response = await deleteEmployee(employeeId);
+      return response;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data);
+      } else {
+        return rejectWithValue({ msg: 'Error al eliminar el empleado' });
+      }
+    }
   }
 );
 

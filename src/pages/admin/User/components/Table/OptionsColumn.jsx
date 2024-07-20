@@ -58,11 +58,11 @@ const OptionsColumn = ({ user, updateUsers }) => {
   const actionFunctions = {
     desactivar: async () => {
       try {
-        dispatch(disableUserAction(user.id));
+        await dispatch(disableUserAction(user.id)).unwrap();
         updateUsers(); 
         showAlert('Usuario desactivado correctamente', 'success');
       } catch (error) {
-        showAlert('Error al desactivar el usuario', 'error');
+        showAlert(error.msg || 'Error al desactivar el usuario', 'error');
       }
     },
     activar: async () => {

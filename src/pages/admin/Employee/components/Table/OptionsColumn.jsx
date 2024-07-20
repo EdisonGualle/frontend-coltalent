@@ -36,13 +36,13 @@ const OptionsColumn = ({ employee, updateEmployees }) => {
   const handleDelete = async () => {
     try {
       // Despachar la acción para eliminar el empleado
-      const actionResult = await dispatch(deleteOneEmployee(employee.id));
+      const actionResult = await dispatch(deleteOneEmployee(employee.id)).unwrap();
       // Desempaquetar el resultado de la acción
       unwrapResult(actionResult);
       updateEmployees();
       showAlert('Empleado eliminado correctamente', 'success');
     } catch (error) {
-      showAlert('Error al eliminar el empleado', 'error');
+      showAlert(error.msg || 'Error al eliminar el empleado', 'error');
     }
   };
 
@@ -58,7 +58,7 @@ const OptionsColumn = ({ employee, updateEmployees }) => {
   // Función para manejar la actualización de empleados
   const handleEditSubmit = async (submissionData) => {
     try {
-      await dispatch(updateOneEmployee(submissionData)).unwrap();
+      await dispatch(updateOneEmployee({ id: submissionData.id, submissionData })).unwrap();
       updateEmployees();
       showAlert('Empleado actualizado correctamente.', 'success');
       setIsOpenEditModal(false);

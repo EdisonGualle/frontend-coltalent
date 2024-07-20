@@ -28,9 +28,9 @@ const getEmployees = async () => {
     }
   }
 
-  const updateEmployee = async (id, employee) => {
+  const updateEmployee = async (id, submissionData) => {
     try {
-      const response = await AxiosInstance.put(`/employees/${id}`, { employee });
+      const response = await AxiosInstance.put(`/employees/${id}`, submissionData);
       return response.data;
     } catch (error) {
       throw error.response ? error.response.data : error.message;

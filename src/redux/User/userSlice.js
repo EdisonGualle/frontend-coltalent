@@ -47,11 +47,20 @@ export const enableUserAction = createAsyncThunk(
 // Acción asíncrona para deshabilitar un usuario
 export const disableUserAction = createAsyncThunk(
   "users/disableUser",
-  async (userId) => {
-    const response = await disableUser(userId);
-    return response.data;
+  async (userId, { rejectWithValue }) => {
+    try {
+      const response = await disableUser(userId);
+      return response;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data);
+      } else {
+        return rejectWithValue({ msg: 'Error al desactivar el usuario' });
+      }
+    }
   }
 );
+
 
 // Creamos un slice de redux para los usuarios
 const userSlice = createSlice({
