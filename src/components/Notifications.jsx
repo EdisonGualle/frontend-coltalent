@@ -8,8 +8,9 @@ import { RiNotification3Line, RiUser3Fill } from "react-icons/ri";
 import echo from "../config/echo";
 import { useAuth } from "../hooks/useAuth";
 import { getUnreadNotifications, markNotificationsAsRead } from "../services/NotificationService";
-import { useDispatch } from 'react-redux'; // Import useDispatch
-import { fetchAssignedLeaves, updateCache, clearCache } from '../redux/Leave/assignedLeavesSlice'; // Import actions
+import { useDispatch } from 'react-redux';
+import { fetchAssignedLeaves, updateCache, clearCache } from '../redux/Leave/assignedLeavesSlice';
+import { fetchLeaveHistory, updateCache as updateHistoryCache, clearCache as clearHistoryCache } from '../redux/Leave/leaveHistorySlince';
 
 const notificationTypeColors = {
     'Primera aprobación': 'text-blue-600',
@@ -29,14 +30,18 @@ const notificationTypeLabels = {
 
 const Notifications = () => {
     const { user } = useAuth();
-    const dispatch = useDispatch(); // Initialize useDispatch
+    const dispatch = useDispatch();
     const [notifications, setNotifications] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
 
     useEffect(() => {
         if (user) {
             // Obtener notificaciones no leídas
             getUnreadNotifications()
-                .then(data => setNotifications(data))
+                .then(data => {
+                    setNotifications(data);
+                    setUnreadCount(data.filter(notification => !notification.read_at).length);
+                })
                 .catch(error => console.error("Error al obtener notificaciones:", error));
 
             // Configurar canal de Echo para recibir nuevas notificaciones en tiempo real
@@ -44,14 +49,25 @@ const Notifications = () => {
 
             channel.listen('NotificationEvent', (event) => {
                 setNotifications((prev) => [event.notification, ...prev]);
+                setUnreadCount(prev => prev + 1);
 
-                // Dispatch action to update the assigned leaves
+                // Actualizar solicitudes asignadas
                 dispatch(clearCache());
                 ['pendientes', 'aprobados', 'rechazados'].forEach(filter => {
                     dispatch(fetchAssignedLeaves({ employeeId: user.employee_id, filter })).then(response => {
                         dispatch(updateCache({ filter, data: response.payload.data }));
                     });
                 });
+
+                // Actualizar historial de solicitudes para notificaciones específicas
+                if (['Primera aprobación', 'Aprobación final', 'Rechazado', 'Solicitud para corrección', 'Solicitud pendiente'].includes(event.notification.type)) {
+                    dispatch(clearHistoryCache());
+                    ['pendientes', 'aprobados', 'rechazados', 'Corregir', 'todas'].forEach(filter => {
+                        dispatch(fetchLeaveHistory({ employeeId: user.employee_id, filter })).then(response => {
+                            dispatch(updateHistoryCache({ filter, data: response.payload.data }));
+                        });
+                    });
+                }
             });
 
             return () => {
@@ -70,12 +86,15 @@ const Notifications = () => {
             markNotificationsAsRead(notificationIds)
                 .then(() => {
                     // Actualizar estado local para marcar las notificaciones como leídas
-                    setNotifications(notifications.map(notification => {
-                        if (notificationIds.includes(notification.id)) {
-                            return { ...notification, read_at: new Date().toISOString() };
-                        }
-                        return notification;
-                    }));
+                    setUnreadCount(0); // Reiniciar contador de notificaciones no leídas
+                    setNotifications(prevNotifications =>
+                        prevNotifications.map(notification => {
+                            if (notificationIds.includes(notification.id)) {
+                                return { ...notification, read_at: new Date().toISOString() };
+                            }
+                            return notification;
+                        })
+                    );
                 })
                 .catch(error => console.error("Error al marcar notificaciones como leídas:", error));
         }
@@ -86,9 +105,9 @@ const Notifications = () => {
             menuButton={
                 <MenuButton className="relative p-2 rounded-lg transition-colors group hover:bg-secondary-50">
                     <RiNotification3Line className="text-secondary-100 group-hover:text-black" />
-                    {notifications.filter(notification => !notification.read_at).length > 0 && (
+                    {unreadCount > 0 && (
                         <span className="absolute -top-0.5 right-0 bg-primary py-0.5 px-[5px] box-content text-black rounded-full text-[8px] font-bold">
-                            {notifications.filter(notification => !notification.read_at).length}
+                            {unreadCount}
                         </span>
                     )}
                 </MenuButton>
