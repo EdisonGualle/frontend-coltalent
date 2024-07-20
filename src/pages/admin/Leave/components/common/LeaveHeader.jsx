@@ -16,7 +16,6 @@ const LeaveHeader = () => {
     }
   }, [dispatch, employeeId]);
 
-  console.log(statistics);
   if (loading) {
     return <div></div>;
   }

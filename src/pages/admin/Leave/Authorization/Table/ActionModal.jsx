@@ -63,7 +63,7 @@ const ActionModal = ({ action, data, onClose, onSuccess }) => {
     };
 
     const handleReasonChange = (selectedOption) => {
-        setSelectedReason(selectedOption.value.id);
+        setSelectedReason(selectedOption);
         setShowReasonError(false);
     };
 
@@ -80,7 +80,7 @@ const ActionModal = ({ action, data, onClose, onSuccess }) => {
         };
 
         if (action === 'Rechazar') {
-            updatePayload.rejection_reason_id = selectedReason ? selectedReason : null;
+            updatePayload.rejection_reason_id = selectedReason ? selectedReason.value.id : null;
         }
 
    // Obtener el ID del comentario correcto basado en el rol del usuario
@@ -98,7 +98,7 @@ const ActionModal = ({ action, data, onClose, onSuccess }) => {
             })).unwrap();
         
             showAlert(`Permiso ${action.toLowerCase()} correctamente`, 'success');
-            onSuccess(); // Llama a la función onSuccess después de una acción exitosa
+            onSuccess();
             onClose();
         } catch (error) {
             const errorMessage = error.message ? JSON.parse(error.message).msg : 'Error al realizar la acción';

@@ -85,6 +85,21 @@ const uploadUserPhoto = async (user, photoFile) => {
   }
 };
 
-export { getUsers, getUserConfiguration, uploadUserPhoto, disableUser, enableUser, deleteUser, updateUser, createUser };
+
+const changePassword = async (currentPassword, newPassword, newPasswordConfirmation) => {
+  try {
+    const response = await AxiosInstance.post('/change-password', {
+      current_password: currentPassword,
+      new_password: newPassword,
+      new_password_confirmation: newPasswordConfirmation,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error al cambiar la contraseña:', error);
+    throw error;
+  }
+};
+
+export { getUsers, getUserConfiguration, uploadUserPhoto, disableUser, enableUser, deleteUser, updateUser, createUser, changePassword };
 
 

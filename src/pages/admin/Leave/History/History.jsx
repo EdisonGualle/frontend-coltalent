@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { CardHeader, Typography } from "@material-tailwind/react";
 import LeaveTable from '../components/Table/LeaveTable';
 import historyColumns from './historyColumns';
-import { fetchLeaveHistory, setLeaveHistoryFilter, updateCache, clearCache } from '../../../../redux/Leave/LeaveHistorySlince';
+import { fetchLeaveHistory, setLeaveHistoryFilter, updateCache, clearCache } from '../../../../redux/Leave/leaveHistorySlince';
 import { getHistoryCellStyle } from './historyComumnStyles';
 const History = () => {
   const { id: employeeId } = useParams(); // Obtener employeeId desde la ruta
