@@ -43,7 +43,6 @@ const Notifications = () => {
             const channel = echo.private(`notifications.${user.id}`);
 
             channel.listen('NotificationEvent', (event) => {
-                console.log("New notification received:", event.notification);
                 setNotifications((prev) => [event.notification, ...prev]);
 
                 // Dispatch action to update the assigned leaves
@@ -71,10 +70,12 @@ const Notifications = () => {
             markNotificationsAsRead(notificationIds)
                 .then(() => {
                     // Actualizar estado local para marcar las notificaciones como leídas
-                    setNotifications(notifications.map(notification => ({
-                        ...notification,
-                        read_at: new Date().toISOString(),
-                    })));
+                    setNotifications(notifications.map(notification => {
+                        if (notificationIds.includes(notification.id)) {
+                            return { ...notification, read_at: new Date().toISOString() };
+                        }
+                        return notification;
+                    }));
                 })
                 .catch(error => console.error("Error al marcar notificaciones como leídas:", error));
         }
@@ -85,9 +86,9 @@ const Notifications = () => {
             menuButton={
                 <MenuButton className="relative p-2 rounded-lg transition-colors group hover:bg-secondary-50">
                     <RiNotification3Line className="text-secondary-100 group-hover:text-black" />
-                    {notifications.length > 0 && (
+                    {notifications.filter(notification => !notification.read_at).length > 0 && (
                         <span className="absolute -top-0.5 right-0 bg-primary py-0.5 px-[5px] box-content text-black rounded-full text-[8px] font-bold">
-                            {notifications.length}
+                            {notifications.filter(notification => !notification.read_at).length}
                         </span>
                     )}
                 </MenuButton>
@@ -110,12 +111,12 @@ const Notifications = () => {
                     notifications.map((notification, index) => (
                         <MenuItem key={index} className="p-0 hover:bg-transparent">
                             <Link
-                                to={`/details/${notification.data.leave_id}`}
+                                // to={`/details/${notification.data.leave_id}`}
                                 className="text-gray-300 flex flex-1 items-center gap-4 py-2 px-4 hover:bg-secondary-50 transition-colors rounded-lg"
                             >
-                                {notification.data.approver_photo ? (
+                                {notification.data.approver_photo || notification.data.applicant_photo ? (
                                     <img
-                                        src={`${import.meta.env.VITE_STORAGE_URL}/${notification.data.approver_photo}`}
+                                        src={`${import.meta.env.VITE_STORAGE_URL}/${notification.data.approver_photo || notification.data.applicant_photo}`}
                                         className="w-8 h-8 object-cover rounded-full border border-slate-500"
                                         alt="Avatar"
                                     />
@@ -143,15 +144,6 @@ const Notifications = () => {
                     ))
                 )}
             </div>
-            {/* <hr className="my-4 border-gray-500 " /> */}
-            {/*<MenuItem className="p-0 hover:bg-transparent flex justify-center cursor-default">
-                <Link
-                    to="/all-notifications"
-                    className="text-sm hover:text-yellow-800 transition-colors text-back"
-                >
-                    Todas las notificaciones
-                </Link>
-            </MenuItem>*/}
         </Menu>
     );
 };
