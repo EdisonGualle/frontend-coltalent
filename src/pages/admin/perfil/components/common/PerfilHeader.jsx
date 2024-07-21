@@ -13,6 +13,12 @@ const PerfilHeader = () => {
     case "datos-personales":
       headerTitle = "Datos Personales";
       break;
+    case "datos-contacto":
+      headerTitle = "Datos de Contacto";
+      break;
+    case "datos-residencia":
+      headerTitle = "Datos de Residencia";
+      break;
     case "datos-laborales":
       headerTitle = "Datos Laborales";
       break;
@@ -39,18 +45,6 @@ const PerfilHeader = () => {
       break;
     case "permisos":
       headerTitle = "Permisos";
-      break;
-    case "salidas-a-campo":
-      headerTitle = "Salidas a Campo";
-      break;
-    case "configuracion":
-      headerTitle = "Configuración";
-      break;
-    case "cambiar-contrasena":
-      headerTitle = "Cambiar Contraseña";
-      break;
-    case "notificaciones":
-      headerTitle = "Notificaciones";
       break;
     default:
       headerTitle = "Tablero";

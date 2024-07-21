@@ -31,14 +31,14 @@ const SimpleInput = ({ label, id, type = 'text', placeholder, value, onChange, e
         id={id}
         className={inputClasses}
         placeholder={placeholder}
-        value={value}
+        value={value || ""}
         onChange={onChange}
         onFocus={handleFocus}
         onBlur={handleBlur}
         {...rest}
       />
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-      <style jsx>{`
+      <style>{`
         .relative input {
           margin-top: -0.25rem;
           position: relative;

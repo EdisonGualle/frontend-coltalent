@@ -9,10 +9,10 @@ import {
   FaBook,
   FaChalkboardTeacher,
   FaClipboardList,
-  FaFingerprint,
-  FaTable,
   FaGlobe,
-  FaUserTie
+  FaUserTie,
+  FaEnvelope,
+  FaHome
 } from 'react-icons/fa';
 
 const PerfilSidebar = () => {
@@ -79,6 +79,22 @@ const PerfilSidebar = () => {
             to={`/perfil/${id}/datos-personales`}
           >
             <FaUserCircle className="mr-2" /> Datos Personales
+          </Link>
+        </li>
+        <li>
+          <Link
+            className={`flex items-center text-sm ${isActive('/datos-contacto') ? 'text-blue-500 font-bold' : 'text-gray-700'} hover:text-blue-500`}
+            to={`/perfil/${id}/datos-contacto`}
+          >
+            <FaEnvelope className="mr-2" /> Datos de Contacto
+          </Link>
+        </li>
+        <li>
+          <Link
+            className={`flex items-center text-sm ${isActive('/datos-residencia') ? 'text-blue-500 font-bold' : 'text-gray-700'} hover:text-blue-500`}
+            to={`/perfil/${id}/datos-residencia`}
+          >
+            <FaHome className="mr-2" /> Datos de Residencia
           </Link>
         </li>
         <li>

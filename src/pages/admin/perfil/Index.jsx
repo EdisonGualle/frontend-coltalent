@@ -5,6 +5,10 @@ import PerfilSidebar from "./components/common/PerfilSidebar";
 import PerfilHeader from "./components/common/PerfilHeader";
 
 import PersonalData from "./Information/PersonalData";
+import PersonalContact from "./Information/PersonalContact";
+import PersonalAddress from "./Information/PersonalAddress";
+import WorkDetails from "./Information/WorkDetails";
+
 import Education from "./Ability/Education";
 import Language from "./Ability/Language";
 import Publication from "./Ability/Publication";
@@ -62,6 +66,9 @@ const Perfil = () => {
         <div className=" flex-1  overflow-auto custom-scrollbar">
           <Routes>
             <Route path="datos-personales" index element={<PersonalData />} />
+            <Route path="datos-contacto" element={<PersonalContact />} />
+            <Route path="datos-residencia" element={<PersonalAddress />} />
+            <Route path="datos-laborales" element={<WorkDetails />} />
             <Route path="educacion" element={<Education />} />
             <Route path="idiomas" element={<Language />} />
             <Route path="publicaciones" element={<Publication />} />

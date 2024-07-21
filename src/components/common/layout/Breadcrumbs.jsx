@@ -56,6 +56,12 @@ const Breadcrumbs = () => {
       case 'datos-personales':
         label = 'Datos Personales';
         break;
+      case 'datos-contacto':
+        label = 'Datos de Contacto';
+        break;
+      case 'datos-residencia':
+        label = 'Datos de Residencia';
+        break;
       case 'datos-laborales':
         label = 'Datos Laborales';
         break;
