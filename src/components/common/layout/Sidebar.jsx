@@ -16,7 +16,6 @@ import {
   RiShieldUserLine // Nuevo ícono para Permisos
 } from "react-icons/ri";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
-import ConfigCard from "../../ui/ConfigCard";
 
 const Sidebar = () => {
   const [showMenu, setShowMenu] = useState(false);

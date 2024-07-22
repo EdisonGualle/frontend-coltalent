@@ -74,12 +74,12 @@ const LeaveSidebar = () => {
           >
             <FaFolderOpen className="mr-2" /> Mis Permisos
           </Link>
-          <Link
+          {/* <Link
             to="/permisos/reporte-mensual"
             className={`flex items-center text-gray-700 text-sm px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-300 ${isActive('/permisos/reporte-mensual') ? 'bg-slate-300' : ''}`}
           >
             <FaClipboardList className="mr-2" /> Reporte Mensual
-          </Link>
+          </Link> */}
         </div>
       </div>
     </div>

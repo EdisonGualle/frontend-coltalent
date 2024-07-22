@@ -167,7 +167,7 @@ const PerfilSidebar = () => {
         <li>
           <Link
             className={`flex items-center text-sm ${isActive('/permisos') ? 'text-blue-500 font-bold' : 'text-gray-700'} hover:text-blue-500`}
-            to={`/perfil/${id}/permisos`}
+            to={`/permisos/${id}/solicitar`}
           >
             <FaClipboardList className="mr-2" /> Permisos
           </Link>

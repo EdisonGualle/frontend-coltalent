@@ -20,7 +20,6 @@ import { fetchRoles } from '../../../redux/User/rolSlice.js';
 import CustomSelect from '../../../components/ui/Select.jsx';
 
 
-
 const steps = [
   { number: 1, title: "Información Personal", icon: "👤" },
   { number: 2, title: "Información de Contacto", icon: "📞" },

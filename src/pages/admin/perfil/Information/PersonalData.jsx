@@ -7,6 +7,10 @@ import { RiEditLine } from 'react-icons/ri';
 import { getEmployee } from "../../../../services/Employee/EmployeService1";
 import { AlertContext } from "../../../../contexts/AlertContext";
 import { useAuth } from "../../../../hooks/useAuth";
+import EmployeeForm from "../../Employee/EmployeeForm";
+import ModalForm from "../../../../components/ui/ModalForm";
+import { useDispatch } from "react-redux";
+import { updateOneEmployee } from '../../../../redux/Employee/employeSlice';
 
 const PersonalData = () => {
   const { id } = useParams(); // Obtener el id de la URL
@@ -25,44 +29,65 @@ const PersonalData = () => {
   });
 
   const { user } = useAuth();
+  const dispatch = useDispatch();
+  const [isOpenEditModal, setIsOpenEditModal] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
 
-  useEffect(() => {
-    const fetchEmployeeData = async () => {
-      try {
-        const response = await getEmployee(id);
-        const data = response.data;
-        setEmployeeData({
-          ...data,
-          contact: {
-            personal_phone: data.contact?.personal_phone || "",
-            personal_email: data.contact?.personal_email || "",
-            home_phone: data.contact?.home_phone || "",
-            work_phone: data.contact?.work_phone || ""
-          },
-          address: {
-            sector: data.address?.sector || "",
-            main_street: data.address?.main_street || "",
-            secondary_street: data.address?.secondary_street || "",
-            number: data.address?.number || "",
-            reference: data.address?.reference || "",
-            parish: {
-              nombre: data.address?.parish?.nombre || "",
-              canton: {
-                name: data.address?.parish?.canton?.name || "",
-                province: {
-                  name: data.address?.parish?.canton?.province?.name || ""
-                }
+  const refreshEmployeeData = async () => {
+    try {
+      const response = await getEmployee(id);
+      const data = response.data;
+      setEmployeeData({
+        ...data,
+        contact: {
+          personal_phone: data.contact?.personal_phone || "",
+          personal_email: data.contact?.personal_email || "",
+          home_phone: data.contact?.home_phone || "",
+          work_phone: data.contact?.work_phone || ""
+        },
+        address: {
+          sector: data.address?.sector || "",
+          main_street: data.address?.main_street || "",
+          secondary_street: data.address?.secondary_street || "",
+          number: data.address?.number || "",
+          reference: data.address?.reference || "",
+          parish: {
+            nombre: data.address?.parish?.nombre || "",
+            canton: {
+              name: data.address?.parish?.canton?.name || "",
+              province: {
+                name: data.address?.parish?.canton?.province?.name || ""
               }
             }
           }
-        });
-      } catch (error) {
-        showAlert('Hubo un problema al cargar los datos del empleado. Por favor, intenta nuevamente.', 'error');
-      }
-    };
+        }
+      });
+    } catch (error) {
+      showAlert('Hubo un problema al cargar los datos del empleado. Por favor, intenta nuevamente.', 'error');
+    }
+  };
 
-    fetchEmployeeData();
+  useEffect(() => {
+    refreshEmployeeData();
   }, [id]);
+
+  const handleEditSubmit = async (submissionData) => {
+    try {
+      await dispatch(updateOneEmployee({ id: submissionData.id, submissionData })).unwrap();
+      setIsOpenEditModal(false);
+      showAlert('Empleado actualizado correctamente.', 'success');
+      refreshEmployeeData();
+    } catch (error) {
+      if (error.errors) {
+        setFormErrors(error.errors);
+        showAlert('Por favor corrija los errores en el formulario.', 'error');
+      } else {
+        showAlert('Ocurrió un error en el servidor. Inténtelo de nuevo más tarde.', 'error');
+      }
+    }
+  };
+
+
 
   return (
     <div className="bg-white p-4 shadow-md rounded-lg">
@@ -157,18 +182,35 @@ const PersonalData = () => {
           size="medium"
           disabled={true}
         />
-         {user.role === 'Administrador' && (
-                    <div className="sm:col-span-2 flex justify-end mb-2">
-                        <button
-                            className="flex items-center gap-3 bg-gray-200 text-white hover:bg-gray-300 transition-colors rounded-xl py-2 px-5"
-                            size="sm"
-                        >
-                            <RiEditLine className="h-5 w-5 text-gray-600" />
-                            <span className="font-semibold text-gray-600">Editar Información</span>
-                        </button>
-                    </div>
-                )}
+        {user.role === 'Administrador' && (
+          <div className="sm:col-span-2 flex justify-end mb-2">
+            <button
+              className="flex items-center gap-3 bg-gray-200 text-white hover:bg-gray-300 transition-colors rounded-xl py-2 px-5"
+              size="sm"
+              type="button"
+              onClick={() => setIsOpenEditModal(true)}
+            >
+              <RiEditLine className="h-5 w-5 text-gray-600" />
+              <span className="font-semibold text-gray-600">Editar Información</span>
+            </button>
+          </div>
+        )}
       </form>
+      <ModalForm
+        isOpen={isOpenEditModal}
+        maxWidth='max-w-4xl'
+        setIsOpen={setIsOpenEditModal}
+        title="Editar empleado"
+        icon={<RiEditLine className="w-6 h-6 flex items-center justify-center rounded-full text-blue-500" />}
+      >
+        <EmployeeForm
+          onSubmit={handleEditSubmit}
+          onCancel={() => setIsOpenEditModal(false)}
+          formErrors={formErrors}
+          initialData={{ id }}
+          isEditMode={true}
+        />
+      </ModalForm>
     </div>
   );
 };

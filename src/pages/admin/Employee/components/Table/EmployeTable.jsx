@@ -64,6 +64,7 @@ function EmployeeTable() {
     fetchEmployeesAction();
   }, [fetchEmployeesAction]);
 
+
   return (
     <div className="flex flex-col h-full">
       <div className="sticky top-0 bg-white z-10">

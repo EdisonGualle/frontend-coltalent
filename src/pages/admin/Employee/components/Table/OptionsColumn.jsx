@@ -50,8 +50,8 @@ const OptionsColumn = ({ employee, updateEmployees }) => {
   const handleCancel = () => setIsOpenDialog2(false);
   const handleClick = () => setIsOpenDialog2(true);
   const handleConfirm = async () => {
-      await handleDelete();
-      setIsOpenDialog2(false);
+    await handleDelete();
+    setIsOpenDialog2(false);
   };
 
 
@@ -72,9 +72,9 @@ const OptionsColumn = ({ employee, updateEmployees }) => {
       }
     }
   };
-  
-  
-  
+
+
+
 
   return (
     <>
@@ -101,7 +101,7 @@ const OptionsColumn = ({ employee, updateEmployees }) => {
             </Link>
           </MenuItem>
           <MenuItem className="p-0 hover:bg-transparent">
-           <button
+            <button
               className="w-full rounded-lg transition-colors text-xs hover:bg-teal-50 flex items-center gap-x-2 p-2"
               onClick={() => setIsOpenEditModal(true)}
             >
@@ -116,10 +116,12 @@ const OptionsColumn = ({ employee, updateEmployees }) => {
             </button>
           </MenuItem>
           <MenuItem className="p-0 hover:bg-transparent">
-            <button className="w-full rounded-lg transition-colors text-xs hover:bg-teal-50 flex items-center gap-x-2 p-2">
+            <Link
+              to={`/permisos/${employee.id}/solicitar`}
+              className="w-full rounded-lg transition-colors text-xs hover:bg-teal-50 flex items-center gap-x-2 p-2">
               <RiKeyLine className="text-blue-500" />
               <span className="truncate">Permisos</span>
-            </button>
+            </Link>
           </MenuItem>
         </div>
       </Menu>
@@ -138,9 +140,9 @@ const OptionsColumn = ({ employee, updateEmployees }) => {
           <RiDeleteBin6Line className="w-10 h-10 flex items-center justify-center rounded-full text-red-500" />
         }
       />
-        <ModalForm
+      <ModalForm
         isOpen={isOpenEditModal}
-       maxWidth='max-w-4xl'
+        maxWidth='max-w-4xl'
         setIsOpen={setIsOpenEditModal}
         title="Editar empleado"
         icon={<RiEdit2Line className="w-6 h-6 flex items-center justify-center rounded-full text-blue-500" />} // Icono para el modal de edición
@@ -149,9 +151,9 @@ const OptionsColumn = ({ employee, updateEmployees }) => {
           onSubmit={handleEditSubmit}
           onCancel={() => setIsOpenEditModal(false)}
           formErrors={formErrors}
-          initialData={{ id: employee.id, ...employee }} 
+          initialData={{ id: employee.id, ...employee }}
           isEditMode={true}
-        
+
         />
       </ModalForm>
     </>
