@@ -190,7 +190,7 @@ const Sidebar = () => {
                   <li>
                     <Link
                       to="/unidades"
-                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ml-6  relative hover:text-primary transition-colors"
+                      className="flex items-center gap-2 py-1 text-secondary-100 px-4 ps-7 ml-6  relative hover:text-primary transition-colors"
                     >
                       <RiArrowDropRightLine className="text-primary text-xl group-hover:text-yellow-500 inline-block" />
                       Unidades

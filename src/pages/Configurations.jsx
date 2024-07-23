@@ -53,7 +53,7 @@ const Configurations = () => {
         </div>
       </CardHeader>
       {loading && <p>Loading...</p>}
-      <div className="grid gap-10 md:grid-cols-2">
+      <div className="grid gap-10 md:grid-cols-4 sm:grid-cols-1">
         {configurations.map(config => (
           <CardConfigurable key={config.id} config={config} onSave={handleSave} />
         ))}

@@ -1,150 +1,337 @@
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
+import {
+  RiUserLine,
+  RiBuildingLine,
+  RiGroupLine,
+  RiTeamLine,
+  RiBriefcaseLine,
+  RiFileList3Line,
+  RiFileListLine,    // Total de permisos solicitados
+  RiCheckboxCircleLine,  // Permisos aprobados
+  RiCloseCircleLine  // Permisos rechazados
+} from "react-icons/ri";
+import { Link } from "react-router-dom";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+} from "chart.js";
+
+import { getCompleteDashboardStatistics } from "../../services/dashboardStatisticsService";
+import { useAuth } from "../../hooks/useAuth";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const Home = () => {
+  const [barData, setBarData] = useState(null);
+  const [horizontalBarData, setHorizontalBarData] = useState(null);
+  const [statistics, setStatistics] = useState({});
+  const [loading, setLoading] = useState(true);  // Estado de carga
+  const barRef = useRef(null);
+  const horizontalBarRef = useRef(null);
+
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchStatistics = async () => {
+      try {
+        const stats = await getCompleteDashboardStatistics(user.employee_id);
+        setStatistics(stats);
+
+        const barLabels = stats.aprobacionesPorMes.data.map(item => item.mes);
+        const aprobados = stats.aprobacionesPorMes.data.map(item => item.Aprobados);
+        const rechazados = stats.aprobacionesPorMes.data.map(item => item.Rechazados);
+        const totalPermisos = stats.aprobacionesPorMes.data.map(item => item.Total_Permisos);
+
+        const horizontalBarLabels = stats.aprobacionesPorTipo.data.map(item => item.Tipo);
+        const cantidades = stats.aprobacionesPorTipo.data.map(item => item.Cantidad);
+
+        setBarData({
+          labels: barLabels,
+          datasets: [
+            {
+              label: "Aprobados",
+              backgroundColor: "rgba(75, 192, 192, 0.6)",
+              data: aprobados,
+              stack: 'Stack 0',
+            },
+            {
+              label: "Rechazados",
+              backgroundColor: "rgba(255, 99, 132, 0.6)",
+              data: rechazados,
+              stack: 'Stack 0',
+            },
+            {
+              label: "Total Permisos",
+              backgroundColor: "rgba(54, 162, 235, 0.6)",
+              data: totalPermisos,
+              stack: 'Stack 1',
+            },
+          ],
+        });
+
+        setHorizontalBarData({
+          labels: horizontalBarLabels,
+          datasets: [
+            {
+              label: "Cantidad de permisos",
+              backgroundColor: "rgba(75, 192, 192, 0.6)",
+              data: cantidades,
+            },
+          ],
+        });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);  // Desactivar estado de carga
+      }
+    };
+
+    fetchStatistics();
+  }, [user.employee_id]);
+
+  const barOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      title: {
+        display: true,
+        text: "Cantidad de solicitudes de permisos por Mes",
+      },
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.parsed.y !== null) {
+              label += context.parsed.y;
+            }
+            return label;
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        stacked: true,
+      },
+      y: {
+        stacked: true,
+      },
+    },
+  };
+
+  const horizontalBarOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      title: {
+        display: true,
+        text: "Cantidad de solicitudes de permisos por Tipo",
+      },
+    },
+    indexAxis: 'y', // Configuración para barras horizontales
+  };
+
   return (
-    <div>
-      <div className="mt-12">
-        <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-          <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
-            <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-blue-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-6 h-6 text-white">
-                <path d="M12 7.5a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z"></path>
-                <path fillRule="evenodd" d="M1.5 4.875C1.5 3.839 2.34 3 3.375 3h17.25c1.035 0 1.875.84 1.875 1.875v9.75c0 1.036-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 14.625v-9.75zM8.25 9.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM18.75 9a.75.75 0 00-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 00.75-.75V9.75a.75.75 0 00-.75-.75h-.008zM4.5 9.75A.75.75 0 015.25 9h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75H5.25a.75.75 0 01-.75-.75V9.75z" clipRule="evenodd"></path>
-                <path d="M2.25 18a.75.75 0 000 1.5c5.4 0 10.63.722 15.6 2.075 1.19.324 2.4-.558 2.4-1.82V18.75a.75.75 0 00-.75-.75H2.25z"></path>
-              </svg>
-            </div>
-            <div className="p-4 text-right">
-              <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Total de Direcciones</p>
-              <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">X</h4>
-            </div>
-            <div className="border-t border-blue-gray-50 p-4">
-              <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                <strong className="text-green-500">+Y%</strong>&nbsp;desde la última semana
-              </p>
+    <div className="container mx-auto">
+      <div className="mt-10">
+        {loading ? (
+          <div className="flex items-center justify-center mt-52 ">
+            <div
+              className="w-12 h-12 rounded-full animate-spin border-y-2 border-solid border-violet-200 border-t-transparent shadow-md">
             </div>
           </div>
+        ) : (
+          <>
+            <div className="mb-4 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
 
-          <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
-            <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-pink-600 to-pink-400 text-white shadow-pink-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-6 h-6 text-white">
-                <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd"></path>
-              </svg>
-            </div>
-            <div className="p-4 text-right">
-              <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Total de Unidades</p>
-              <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">X</h4>
-            </div>
-            <div className="border-t border-blue-gray-50 p-4">
-              <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                <strong className="text-green-500">+Y%</strong>&nbsp;desde el último mes
-              </p>
-            </div>
-          </div>
+              {user.role === 'Administrador' && (
+                <>
 
-          <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
-            <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-green-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-6 h-6 text-white">
-                <path d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z"></path>
-              </svg>
-            </div>
-            <div className="p-4 text-right">
-              <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Total de Cargos</p>
-              <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">X</h4>
-            </div>
-            <div className="border-t border-blue-gray-50 p-4">
-              <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                <strong className="text-red-500">-Y%</strong>&nbsp;desde ayer
-              </p>
-            </div>
-          </div>
+                  {/* Usuarios */}
+                  <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                    <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-blue-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                      <RiUserLine className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="pe-2 text-right">
+                      <p className="block antialiased  font-sans text-sm leading-normal font-semibold text-blue-gray-600">Usuarios</p>
+                      <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{statistics.totalUsuarios}</h4>
+                    </div>
+                    <div className="border-t border-blue-gray-50 p-2 flex justify-end items-center">
+                      <Link to="/usuarios" className="text-gray-500 hover:text-gray-700 text-xs">Ver más</Link>
+                    </div>
+                  </div>
 
-          <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
-            <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-orange-600 to-orange-400 text-white shadow-orange-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-6 h-6 text-white">
-                <path d="M18.375 2.25c-1.035 0-1.875.84-1.875 1.875v15.75c0 1.035.84 1.875 1.875 1.875h.75c1.035 0 1.875-.84 1.875-1.875V4.125c0-1.036-.84-1.875-1.875-1.875h-.75zM9.75 8.625c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-.75a1.875 1.875 0 01-1.875-1.875V8.625zM3 13.125c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v6.75c0 1.035-.84 1.875-1.875 1.875h-.75A1.875 1.875 0 013 19.875v-6.75z"></path>
-              </svg>
-            </div>
-            <div className="p-4 text-right">
-              <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Total de Empleados</p>
-              <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">X</h4>
-            </div>
-            <div className="border-t border-blue-gray-50 p-4">
-              <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                <strong className="text-green-500">+5%</strong>&nbsp;desde ayer
-              </p>
-            </div>
-          </div>
-        </div>
+                  {/* Empleados */}
+                  <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                    <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-pink-600 to-pink-400 text-white shadow-pink-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                      <RiGroupLine className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="pe-2 text-right">
+                      <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-600">Empleados</p>
+                      <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{statistics.totalEmpleados}</h4>
+                    </div>
+                    <div className="border-t border-blue-gray-50 p-2 flex justify-end items-center">
+                      <Link to="/empleados" className="text-gray-500 hover:text-gray-700 text-xs">Ver más</Link>
+                    </div>
+                  </div>
 
-        <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
-          <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md overflow-hidden xl:col-span-2">
-            <div className="relative bg-clip-border rounded-xl overflow-hidden bg-transparent text-gray-700 shadow-none m-0 flex items-center justify-between p-6">
-              <div>
-                <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-blue-gray-900 mb-1">Estadísticas de Usuarios</h6>
-                <p className="antialiased font-sans text-sm leading-normal flex items-center gap-1 font-normal text-blue-gray-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" aria-hidden="true" className="h-4 w-4 text-blue-500">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"></path>
-                  </svg>
-                  <strong>X usuarios activos</strong> vs <strong>Y usuarios inactivos</strong>
-                </p>
+                  {/* Direcciones */}
+                  <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                    <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-green-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                      <RiBuildingLine className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="pe-2 text-right">
+                      <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-600">Direcciones</p>
+                      <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{statistics.totalDirecciones}</h4>
+                    </div>
+                    <div className="border-t border-blue-gray-50 p-2 flex justify-end items-center">
+                      <Link to="/direcciones" className="text-gray-500 hover:text-gray-700 text-xs">Ver más</Link>
+                    </div>
+                  </div>
+
+                  {/* Unidades */}
+                  <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                    <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-orange-600 to-orange-400 text-white shadow-orange-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                      <RiTeamLine className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="pe-2 text-right">
+                      <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-600">Unidades</p>
+                      <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{statistics.totalUnidades}</h4>
+                    </div>
+                    <div className="border-t border-blue-gray-50 p-2 flex justify-end items-center">
+                      <Link to="/unidades" className="text-gray-500 hover:text-gray-700 text-xs">Ver más</Link>
+                    </div>
+                  </div>
+
+                  {/* Cargos */}
+                  <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                    <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-purple-600 to-purple-400 text-white shadow-purple-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                      <RiBriefcaseLine className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="pe-2 text-right">
+                      <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-600">Cargos</p>
+                      <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{statistics.totalCargos}</h4>
+                    </div>
+                    <div className="border-t border-blue-gray-50 p-2 flex justify-end items-center">
+                      <Link to="/cargos" className="text-gray-500 hover:text-gray-700 text-xs">Ver más</Link>
+                    </div>
+                  </div>
+
+                  {/* Tipos de Permisos */}
+                  <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                    <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-teal-600 to-teal-400 text-white shadow-teal-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                      <RiFileList3Line className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="pe-2 text-right">
+                      <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-600">Tipos de Permisos</p>
+                      <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{statistics.totalTiposPermisos}</h4>
+                    </div>
+                    <div className="border-t border-blue-gray-50 p-2 flex justify-end items-center">
+                      <Link to="/permisos/tipos" className="text-gray-500 hover:text-gray-700 text-xs">Ver más</Link>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {user.role !== 'Empleado' && (
+                <>
+                  {/* Total de Solicitudes de Permisos */}
+                  <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                    <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-gray-600 to-gray-400 text-white shadow-gray-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                      <RiFileList3Line className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="pe-2 text-right">
+                      <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-600">Solicitudes de Permisos</p>
+                      <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{statistics.totalSolicitudesPermisos}</h4>
+                    </div>
+                    <div className="border-t border-blue-gray-50 p-2 flex justify-end items-center">
+                      <Link to="/permisos/autorizaciones" className="text-gray-500 hover:text-gray-700 text-xs">Ver más</Link>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Permisos solicitados por un empleado */}
+
+              {user.role !== 'Administrador' && (
+                <>
+                  {/* Permisos Solicitados */}
+                  <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                    <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-blue-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                      <RiFileListLine className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="pe-2 text-right">
+                      <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-600">Permisos Solicitados</p>
+                      <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{statistics.solicitudesPermisos.totalSolicitudes}</h4>
+                    </div>
+                    <div className="border-t border-blue-gray-50 p-2 flex justify-end items-center">
+                      <Link to={`/permisos/${user.employee_id}/historial`} className="text-gray-500 hover:text-gray-700 text-xs">Ver más</Link>
+                    </div>
+                  </div>
+
+                  {/* Permisos aprobados*/}
+                  <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                    <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-green-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                      <RiCheckboxCircleLine className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="pe-2 text-right">
+                      <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-600">Permisos Aprobados</p>
+                      <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{statistics.solicitudesPermisos.totalAprobados}</h4>
+                    </div>
+                    <div className="border-t border-blue-gray-50 p-2 flex justify-end items-center">
+                      <Link to={`/permisos/${user.employee_id}/historial`} className="text-gray-500 hover:text-gray-700 text-xs">Ver más</Link>
+                    </div>
+                  </div>
+
+                  {/* Permisos rechazados */}
+                  <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                    <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-red-600 to-red-400 text-white shadow-red-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                      <RiCloseCircleLine className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="pe-2 text-right">
+                      <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-600">Permisos rechazados</p>
+                      <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{statistics.solicitudesPermisos.totalRechazados}</h4>
+                    </div>
+                    <div className="border-t border-blue-gray-50 p-2 flex justify-end items-center">
+                      <Link to={`/permisos/${user.employee_id}/historial`} className="text-gray-500 hover:text-gray-700 text-xs">Ver más</Link>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {user.role !== 'Empleado' && (
+              <div className="grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-2">
+                <div className="bg-white rounded-xl p-4 shadow-md">
+                  {barData && <Bar ref={barRef} data={barData} options={barOptions} />}
+                </div>
+                <div className="bg-white rounded-xl p-4 shadow-md">
+                  {horizontalBarData && <Bar ref={horizontalBarRef} data={horizontalBarData} options={horizontalBarOptions} />}
+                </div>
               </div>
-              <button aria-expanded="false" aria-haspopup="menu" id=":r5:" className="relative middle none font-sans font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none w-8 max-w-[32px] h-8 max-h-[32px] rounded-lg text-xs text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30" type="button">
-                <span className="absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="currenColor" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" aria-hidden="true" className="h-6 w-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"></path>
-                  </svg>
-                </span>
-              </button>
-            </div>
-            <div className="p-6 overflow-x-scroll px-0 pt-0 pb-2">
-              <table className="w-full min-w-[640px] table-auto">
-                <thead>
-                  <tr>
-                    <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
-                      <p className="block antialiased font-sans text-[11px] font-medium uppercase text-blue-gray-400">Indicadores</p>
-                    </th>
-                    <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
-                      <p className="block antialiased font-sans text-[11px] font-medium uppercase text-blue-gray-400">Cantidad</p>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="py-3 px-5 border-b border-blue-gray-50">
-                      <div className="flex items-center gap-4">
-                        <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-bold">Usuarios Activos</p>
-                      </div>
-                    </td>
-                    <td className="py-3 px-5 border-b border-blue-gray-50">
-                      <p className="block antialiased font-sans text-xs font-medium text-blue-gray-600">X</p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 px-5 border-b border-blue-gray-50">
-                      <div className="flex items-center gap-4">
-                        <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-bold">Usuarios Inactivos</p>
-                      </div>
-                    </td>
-                    <td className="py-3 px-5 border-b border-blue-gray-50">
-                      <p className="block antialiased font-sans text-xs font-medium text-blue-gray-600">Y</p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 px-5 border-b border-blue-gray-50">
-                      <div className="flex items-center gap-4">
-                        <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-bold">Total de Empleados</p>
-                      </div>
-                    </td>
-                    <td className="py-3 px-5 border-b border-blue-gray-50">
-                      <p className="block antialiased font-sans text-xs font-medium text-blue-gray-600">Z</p>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
+            )}
+          </>
+        )}
       </div>
     </div>
   );
