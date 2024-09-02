@@ -73,7 +73,7 @@ const PersonalContact = () => {
                     disabled={true}
                 />
                 <SimpleInput
-                    label="Correo Electrónico Personal"
+                    label="Correo Personal"
                     id="personal_email"
                     value={contactData.personal_email}
                     onChange={(e) => setContactData({ ...contactData, personal_email: e.target.value })}

@@ -1,16 +1,15 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { getConfigurations, updateConfiguration } from '../services/configurationService';
 import CardConfigurable from '../components/ui/CardConfigurable';
-import { CardHeader, Typography, Button } from "@material-tailwind/react";
+import { CardHeader, Typography } from "@material-tailwind/react";
 import { AlertContext } from '../contexts/AlertContext';
-
 
 const Configurations = () => {
   const [configurations, setConfigurations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { showAlert } = useContext(AlertContext);
-
+  const [isEditing, setIsEditing] = useState(null); // Nuevo estado para manejar la edición
 
   useEffect(() => {
     const fetchConfigurations = async () => {
@@ -53,11 +52,22 @@ const Configurations = () => {
         </div>
       </CardHeader>
       {loading && <p>Loading...</p>}
-      <div className="grid gap-10 md:grid-cols-4 sm:grid-cols-1">
+      <ul className="divide-y divide-gray-200">
         {configurations.map(config => (
-          <CardConfigurable key={config.id} config={config} onSave={handleSave} />
+          <CardConfigurable 
+            key={config.id} 
+            config={config} 
+            onSave={handleSave} 
+            showAlert={showAlert}
+            isEditing={isEditing} // Pasar el estado de edición actual
+            setIsEditing={setIsEditing} // Pasar la función para actualizar el estado de edición
+            relatedConfigValue={configurations.find(c => 
+              (config.key === 'max_duration_hours_min' && c.key === 'max_duration_hours_max') || 
+              (config.key === 'max_duration_hours_max' && c.key === 'max_duration_hours_min')
+            )?.value}
+          />
         ))}
-      </div>
+      </ul>
     </div>
   );
 };

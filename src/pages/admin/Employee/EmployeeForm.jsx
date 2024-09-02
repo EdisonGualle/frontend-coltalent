@@ -25,6 +25,7 @@ const steps = [
   { number: 2, title: "Información de Contacto", icon: "📞" },
   { number: 3, title: "Información de Residencia", icon: "🏠" },
   { number: 4, title: "Información Laboral", icon: "💼" },
+  { number: 5, title: "Horario de Trabajo", icon: "🕒" }
 ];
 const maritalStatusOptions = {
   hombre: ['Soltero', 'Casado', 'Viudo', 'Divorciado', 'Separado', 'Otro'],
@@ -78,6 +79,17 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
   const [selectedUnit, setSelectedUnit] = useState('');
 
   const [selectedRole, setSelectedRole] = useState(null);
+
+
+  const [workSchedule, setWorkSchedule] = useState({
+    monday: { start_time: '', end_time: '', has_lunch_break: false, lunch_start_time: '', lunch_end_time: '' },
+    tuesday: { start_time: '', end_time: '', has_lunch_break: false, lunch_start_time: '', lunch_end_time: '' },
+    wednesday: { start_time: '', end_time: '', has_lunch_break: false, lunch_start_time: '', lunch_end_time: '' },
+    thursday: { start_time: '', end_time: '', has_lunch_break: false, lunch_start_time: '', lunch_end_time: '' },
+    friday: { start_time: '', end_time: '', has_lunch_break: false, lunch_start_time: '', lunch_end_time: '' },
+    saturday: { start_time: '', end_time: '', has_lunch_break: false, lunch_start_time: '', lunch_end_time: '' },
+    sunday: { start_time: '', end_time: '', has_lunch_break: false, lunch_start_time: '', lunch_end_time: '' },
+  });
 
 
 
@@ -539,6 +551,90 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
     fetchPositions();
   }, [selectedUnit]);
 
+
+  const daysOfWeek = {
+    monday: "Lunes",
+    tuesday: "Martes",
+    wednesday: "Miércoles",
+    thursday: "Jueves",
+    friday: "Viernes",
+    saturday: "Sábado",
+    sunday: "Domingo"
+  };
+  
+  const renderWorkScheduleInputs = () => {
+    return Object.keys(workSchedule).map((day) => (
+      <div key={day} className="mb-4 p-4 bg-white rounded-lg shadow-sm">
+        <label className="block font-medium text-gray-700 capitalize mb-2">{daysOfWeek[day]}:</label>
+        <div className="flex items-center space-x-4">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-600">Hora de inicio:</label>
+            <Input
+              type="time"
+              value={workSchedule[day].start_time}
+              onChange={(e) => handleScheduleChange(day, 'start_time', e.target.value)}
+              
+             
+            />
+          </div>
+          <span className="text-gray-500">-</span>
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-600">Hora de fin:</label>
+            <Input
+              type="time"
+              value={workSchedule[day].end_time}
+              onChange={(e) => handleScheduleChange(day, 'end_time', e.target.value)}
+             
+            />
+          </div>
+        </div>
+        <div className="mt-2">
+          <input
+            type="checkbox"
+            checked={workSchedule[day].has_lunch_break}
+            onChange={(e) => handleScheduleChange(day, 'has_lunch_break', e.target.checked)}
+            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          />
+          <label className="ml-2 text-sm font-medium text-gray-600">Tiene descanso para almuerzo</label>
+        </div>
+        {workSchedule[day].has_lunch_break && (
+          <div className="mt-2 flex items-center space-x-4">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-600">Inicio del almuerzo:</label>
+              <Input
+                type="time"
+                value={workSchedule[day].lunch_start_time}
+                onChange={(e) => handleScheduleChange(day, 'lunch_start_time', e.target.value)}
+               
+              />
+            </div>
+            <span className="text-gray-500">-</span>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-600">Fin del almuerzo:</label>
+              <Input
+                type="time"
+                value={workSchedule[day].lunch_end_time}
+                onChange={(e) => handleScheduleChange(day, 'lunch_end_time', e.target.value)}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    ));
+  };
+
+
+  const handleScheduleChange = (day, field, value) => {
+    setWorkSchedule(prevSchedule => ({
+      ...prevSchedule,
+      [day]: {
+        ...prevSchedule[day],
+        [field]: value,
+      }
+    }));
+  };
+
+  
   return (
     <form onSubmit={handleSubmit}>
       <div className="w-full mx-auto p-4">
@@ -572,7 +668,7 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: currentStep > step.number ? 1 : 0 }}
                   transition={{ duration: 0.5 }}
-                  className="absolute top-8 left-full w-full h-0.5 bg-blue-200 transform origin-left"
+                  className="absolute top-8 left-full w-full  bg-blue-200 transform origin-left"
                 />
               )}
             </div>
@@ -909,6 +1005,13 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
             </div>
           </div>
         )}
+
+        {currentStep === 5 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {renderWorkScheduleInputs()}
+          </div>
+        )}
+
 
 
         <div className="flex justify-between mt-4">

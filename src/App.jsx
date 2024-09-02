@@ -18,6 +18,9 @@ import { AuthProvider } from "./contexts/AuthContext";
 // Proteccion de rutas
 import PrivateRoute from "./components/common/routing/PrivateRoute";
 import PublicRoute from "./components/common/routing/PublicRoute";
+import ProtectedRoute from "./components/common/routing/ProtectedRoute";
+
+
 
 // Employee
 import EmployeeIndex from "./pages/admin/Employee/Index";
@@ -52,58 +55,82 @@ import Configurations from "./pages/Configurations";
 function App() {
   return (
     <Provider store={store}>
-    <BrowserRouter>
+      <BrowserRouter>
         <AuthProvider>
           <AlertProvider>
-          <Routes>
-            {/* Rutas públicas */}
-            <Route element={<PublicRoute />}>
-              <Route path="/login" element={<Login />} />
-              <Route path="/forgot-password" element={<ForgetPassword />} />
-            </Route>
-            {/* Rutas protegidas que requieren autenticación */}
-            <Route element={<PrivateRoute />}>
-              <Route path="/" element={<LayoutAdmin />}>
-                <Route  index element={<Home />} />
-
-                {/* User */}
-                <Route path="/usuarios" element={<UserIndex />} />
-
-                {/* Employee */}
-                <Route path="empleados" element={<EmployeeIndex />} />
-
-                {/* Perfil */}
-                <Route path="/perfil/:id/*" element={<Perfil />} />
-
-                {/* Permisos */}
-                <Route path="/permisos/:id/*" element={<LeaveIndex />} />
-                <Route path="/permisos/motivos-rechazo" element={<RejectionReason />} />
-                <Route path="/permisos/tipos" element={<LeaveType />} />
-                <Route path="/permisos/autorizaciones" element={<AssignedLeaves />} />
-
-                
-                {/* Configuraciones perfil */}
-                <Route path="/perfil/configuracion" element={<Setting />} />
-
-
-                {/* Organization */}
-                <Route path="/direcciones" element={<DepartmentIndex />} />
-                <Route path="/unidades" element={<UnitIndex />} />
-                <Route path="/cargos" element={<PositionIndex />} />
-
-                {/* Configuraciones */}
-                <Route path="/configuraciones" element={<Configurations />} />              
-              
+            <Routes>
+              {/* Rutas públicas */}
+              <Route element={<PublicRoute />}>
+                <Route path="/login" element={<Login />} />
+                <Route path="/forgot-password" element={<ForgetPassword />} />
               </Route>
-            </Route>
-            {/* Ruta para manejar acceso no autorizado */}
-            <Route path="/unauthorized" element={<Unauthorized />} />
-            {/* Ruta para manejar cualquier otra URL */}
-            <Route path="*" element={<Error404 />} />
-          </Routes>
+              {/* Rutas protegidas que requieren autenticación */}
+              <Route path="/" element={<ProtectedRoute allowedRoles={['Administrador', 'Empleado', 'Jefe Dirección', 'Jefe General', 'Jefe Unidad']} />}>
+                <Route path="/" element={<LayoutAdmin />}>
+                  <Route index element={<Home />} />
+
+                  {/* User */}
+                  <Route path="/usuarios" element={<ProtectedRoute allowedRoles={['Administrador']} />}>
+                    <Route path="" element={<UserIndex />} />
+                  </Route>
+
+                  {/* Employee */}
+                  <Route path="/empleados" element={<ProtectedRoute allowedRoles={['Administrador']} />}>
+                    <Route path="" element={<EmployeeIndex />} />
+                  </Route>
+
+
+
+                  {/* Perfil */}
+                  <Route path="/perfil/:id/*" element={<Perfil />} />
+
+                  {/* Permisos */}
+                  <Route path="/permisos/:id/*" element={<LeaveIndex />} />
+
+                  <Route path="/permisos/motivos-rechazo" element={<ProtectedRoute allowedRoles={['Administrador']} />}>
+                    <Route path="" element={<RejectionReason />} />
+                  </Route>
+
+                  <Route path="/permisos/tipos" element={<ProtectedRoute allowedRoles={['Administrador']} />}>
+                    <Route path="" element={<LeaveType />} />
+                  </Route>
+
+                  <Route path="/permisos/autorizaciones" element={<ProtectedRoute allowedRoles={['Administrador', 'Jefe Dirección', 'Jefe General', 'Jefe Unidad']} />}>
+                    <Route path="" element={<AssignedLeaves />} />
+                  </Route>
+
+                  {/* Configuraciones perfil */}
+                  <Route path="/perfil/configuracion" element={<Setting />} />
+
+
+                  {/* Organization */}
+                  <Route path="/direcciones" element={<ProtectedRoute allowedRoles={['Administrador']} />}>
+                    <Route path="" element={<DepartmentIndex />} />
+                  </Route>
+
+                  <Route path="/unidades" element={<ProtectedRoute allowedRoles={['Administrador']} />}>
+                    <Route path="" element={<UnitIndex />} />
+                  </Route>
+
+                  <Route path="/cargos" element={<ProtectedRoute allowedRoles={['Administrador']} />}>
+                    <Route path="" element={<PositionIndex />} />
+                  </Route>
+
+                  {/* Configuraciones */}
+                  <Route path="/configuraciones" element={<ProtectedRoute allowedRoles={['Administrador']} />}>
+                    <Route path="" element={<Configurations />} />
+                  </Route>
+
+                </Route>
+              </Route>
+              {/* Ruta para manejar acceso no autorizado */}
+              <Route path="/unauthorized" element={<Unauthorized />} />
+              {/* Ruta para manejar cualquier otra URL */}
+              <Route path="*" element={<Error404 />} />
+            </Routes>
           </AlertProvider>
         </AuthProvider>
-    </BrowserRouter>
+      </BrowserRouter>
     </Provider>
   );
 }

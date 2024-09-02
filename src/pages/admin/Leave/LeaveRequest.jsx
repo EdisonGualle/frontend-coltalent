@@ -19,6 +19,9 @@ import ConfirmationModal from './Request/ConfirmationModal';
 import { BsCalendarCheck, BsCalendarX } from "react-icons/bs";
 import { BsClock, BsClockHistory } from "react-icons/bs";
 
+import { getEmployeeWorkSchedules } from '../../../services/Employee/Schedules/workScheduleService';
+
+import { getConfigurations } from "../../../services/configurationService";
 
 // Mapping of string names to icon components
 const iconMap = {
@@ -52,6 +55,7 @@ const Request = () => {
 
   const { leaveTypes, status, hasFetchedOnce } = useSelector((state) => state.leaveType);
 
+
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [infoPanelLeave, setInfoPanelLeave] = useState(null); // Nuevo estado para el panel de información
   const [timeUnit, setTimeUnit] = useState('Horas'); // Estado para gestionar el tipo de permiso
@@ -69,8 +73,37 @@ const Request = () => {
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
 
+  const [configurations, setConfigurations] = useState({});
+
+
+
+  const [workSchedules, setWorkSchedules] = useState([]);
+
 
   const panelRef = useRef(null);
+
+  useEffect(() => {
+    const fetchConfigurations = async () => {
+      try {
+        const response = await getConfigurations();
+
+        if (response.status && Array.isArray(response.data)) {
+          const configData = {};
+          response.data.forEach(config => {
+            configData[config.key] = config.value;
+          });
+          setConfigurations(configData);
+        } else {
+          console.error("Error al cargar las configuraciones:", response);
+        }
+      } catch (error) {
+        console.error("Error al cargar las configuraciones:", error);
+      }
+    };
+
+    fetchConfigurations();
+  }, []);
+
 
   useEffect(() => {
     if (!hasFetchedOnce && status !== 'loading') {
@@ -111,10 +144,150 @@ const Request = () => {
 
 
 
+    useEffect(() => {
+      // Función para obtener los horarios de trabajo del empleado
+      const fetchWorkSchedules = async () => {
+        try {
+          const response = await getEmployeeWorkSchedules(employee_id);
+          setWorkSchedules(response.data); // Accede al array `data` dentro de la respuesta
+          console.log(response.data); // Imprimir los horarios en la consola
+        } catch (error) {
+          console.error("Error fetching work schedules:", error);
+        }
+      };
+
+      fetchWorkSchedules();
+
+    }, [employee_id]);
+
+
   const handleStartDateChange = (e) => {
     const value = e.target.value;
     setStartDate(value);
-    validateDates(value, endDate);
+
+    // Obtener la fecha actual y la seleccionada
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Para asegurarnos de comparar solo las fechas, sin las horas
+    const selectedDate = new Date(value);
+    selectedDate.setHours(0, 0, 0, 0); // Para asegurarnos de comparar solo las fechas, sin las horas
+
+    // Calcular la diferencia en días entre hoy y la fecha seleccionada, incluyendo hoy como primer día
+    const diffTime = selectedDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Incluye el día de hoy como primer día
+
+    let newErrors = { ...errors };
+
+    // Validar la anticipación de días
+    if (selectedLeave && selectedLeave.advance_notice_days) {
+      const advanceNoticeDays = selectedLeave.advance_notice_days;
+      if (diffDays < advanceNoticeDays) {
+        newErrors.start_date = `Debe solicitar el permiso con al menos ${advanceNoticeDays} ${advanceNoticeDays === 1 ? 'día' : 'días'} de anticipación.`;
+      } else {
+        delete newErrors.start_date;
+      }
+    }
+
+    // Si pasa la validación de anticipación, continuar con la validación del horario laboral
+    if (!newErrors.start_date) {
+      // Obtener el día de la semana (0 para domingo, 1 para lunes, etc.)
+      let dayOfWeek = selectedDate.getDay(); // getDay() devuelve 0 para domingo, 6 para sábado
+
+      // Ajuste para que lunes sea 1 y domingo sea 7
+      dayOfWeek = dayOfWeek + 1;
+
+      // Imprimir el número del día seleccionado
+      console.log("Día seleccionado:", dayOfWeek);
+
+      // Buscar el horario correspondiente al día de la semana seleccionado
+      const scheduleForDay = workSchedules.find(schedule => schedule.day_of_week === dayOfWeek);
+
+      if (!scheduleForDay) {
+        newErrors.start_date = 'No hay horario configurado para este día.';
+      } else {
+        delete newErrors.start_date;
+      }
+    }
+
+    setErrors(newErrors);
+
+    // Revalidar las horas si ya están seleccionadas
+    if (startTime && endTime) {
+      validateTimes(startTime, endTime);
+    }
+  };
+
+
+  const validateDates = (start, end) => {
+    let newErrors = { ...errors };
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Para comparar solo la fecha sin la hora
+  
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+  
+    // Validación 1: Fecha de inicio no debe ser en el pasado
+    if (startDate < today) {
+      newErrors.start_date = 'La fecha de inicio debe ser una fecha futura.';
+    } else {
+      delete newErrors.start_date;
+    }
+  
+    // Validación 2: Fecha de fin no debe ser en el pasado
+    if (endDate < today) {
+      newErrors.end_date = 'La fecha de fin debe ser una fecha futura.';
+    } else {
+      delete newErrors.end_date;
+    }
+  
+    // Validación 3: Fecha de fin debe ser posterior o igual a la fecha de inicio
+    if (endDate < startDate) {
+      newErrors.end_date = 'La fecha de fin debe ser posterior o igual a la fecha de inicio.';
+    } else {
+      delete newErrors.end_date;
+    }
+  
+    // Validación 4: Duración del permiso no debe exceder el máximo permitido
+    if (selectedLeave && selectedLeave.max_duration) {
+      const maxDuration = selectedLeave.max_duration;
+      const diffTime = endDate - startDate;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 para incluir el día de inicio
+  
+      if (diffDays > maxDuration) {
+        newErrors.end_date = `La duración del permiso no debe exceder los ${maxDuration} días.`;
+      } else if (!newErrors.end_date) {
+        delete newErrors.end_date;
+      }
+    }
+  
+    // Validación 5: El permiso debe solicitarse con días de anticipación
+    if (selectedLeave && selectedLeave.advance_notice_days) {
+      const advanceNoticeDays = selectedLeave.advance_notice_days;
+      const diffTimeAdvance = startDate - today;
+      const diffDaysAdvance = Math.ceil(diffTimeAdvance / (1000 * 60 * 60 * 24));
+  
+      if (diffDaysAdvance < advanceNoticeDays) {
+        newErrors.start_date = `Debe solicitar el permiso con al menos ${advanceNoticeDays} ${advanceNoticeDays === 1 ? 'día' : 'días'} de anticipación.`;
+      } else {
+        delete newErrors.start_date;
+      }
+    }
+  
+    // Validación 6: Fecha de fin debe tener horario configurado
+    if (!newErrors.end_date) { // Realizar esta validación solo si las anteriores pasaron
+      const endDateObj = new Date(end);
+      endDateObj.setHours(0, 0, 0, 0); // Asegurar que solo se comparen fechas sin horas
+  
+      let dayOfWeek = endDateObj.getDay() + 1; // Obtener el día de la semana (lunes es 1, domingo es 7)
+      const scheduleForDay = workSchedules.find(schedule => schedule.day_of_week === dayOfWeek);
+  
+      if (!scheduleForDay) {
+        newErrors.end_date = 'No hay horario configurado para la fecha de fin seleccionada.';
+      } else {
+        delete newErrors.end_date;
+      }
+    }
+  
+    setErrors(newErrors);
   };
 
   const handleEndDateChange = (e) => {
@@ -122,60 +295,6 @@ const Request = () => {
     setEndDate(value);
     validateDates(startDate, value);
   };
-
-  const validateDates = (start, end) => {
-    let newErrors = { ...errors };
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Para comparar solo la fecha sin la hora
-
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-
-    if (startDate < today) {
-      newErrors.start_date = 'La fecha de inicio debe ser una fecha futura.';
-    } else {
-      delete newErrors.start_date;
-    }
-
-    if (endDate < today) {
-      newErrors.end_date = 'La fecha de fin debe ser una fecha futura.';
-    } else {
-      delete newErrors.end_date;
-    }
-
-    if (endDate < startDate) {
-      newErrors.end_date = 'La fecha de fin debe ser posterior o igual a la fecha de inicio.';
-    } else {
-      delete newErrors.end_date;
-    }
-
-    if (selectedLeave && selectedLeave.max_duration) {
-      const maxDuration = selectedLeave.max_duration;
-      const diffTime = endDate - startDate;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include the start day
-
-      if (diffDays > maxDuration) {
-        newErrors.end_date = `La duración del permiso no debe exceder los ${maxDuration} días.`;
-      } else if (!newErrors.end_date) {
-        delete newErrors.end_date;
-      }
-    }
-
-    if (selectedLeave && selectedLeave.advance_notice_days) {
-      const advanceNoticeDays = selectedLeave.advance_notice_days;
-      const diffTimeAdvance = startDate - today;
-      const diffDaysAdvance = Math.ceil(diffTimeAdvance / (1000 * 60 * 60 * 24));
-
-      if (diffDaysAdvance < advanceNoticeDays) {
-        newErrors.start_date = `Debe solicitar el permiso con al menos ${advanceNoticeDays} ${advanceNoticeDays === 1 ? 'día' : 'días'} de anticipación.`;
-      } else {
-        delete newErrors.start_date;
-      }
-    }
-
-    setErrors(newErrors);
-  };
-
 
 
   const handleStartTimeChange = (e) => {
@@ -190,9 +309,14 @@ const Request = () => {
     validateTimes(startTime, value);
   };
 
-
   const validateTimes = (start, end) => {
-    let newErrors = { ...errors };
+    let newErrors = {};  // Inicializamos newErrors como un objeto vacío
+
+    if (!startDate) {
+      newErrors.start_time = 'Primero selecciona una fecha válida.';
+      setErrors(newErrors);
+      return;
+    }
 
     const [startHours, startMinutes] = start.split(':').map(Number);
     const [endHours, endMinutes] = end.split(':').map(Number);
@@ -203,44 +327,105 @@ const Request = () => {
     const endTime = new Date();
     endTime.setHours(endHours, endMinutes, 0, 0);
 
-    if (endTime <= startTime) {
-      // Si la hora de fin es anterior a la hora de inicio, asumir que es al día siguiente
-      endTime.setDate(endTime.getDate() + 1);
-    }
-
-    const duration = (endTime - startTime) / (1000 * 60); // duración en minutos
-
-    if (duration < 30) { // 30 minutos
-      newErrors.end_time = 'La duración mínima del permiso debe ser de 30 minutos.';
+    // Calcular la duración
+    let duration;
+    if (endTime < startTime) {
+      duration = ((endTime.getTime() + (24 * 60 * 60 * 1000)) - startTime.getTime()) / (1000 * 60);
     } else {
-      delete newErrors.end_time;
+      duration = (endTime - startTime) / (1000 * 60);
     }
 
-    if (selectedLeave && selectedLeave.max_duration) {
-      const [maxHours, maxMinutes] = selectedLeave.max_duration.split(':').map(Number);
-      const maxDuration = maxHours * 60 + maxMinutes; // duración máxima en minutos
+    const date = new Date(startDate);
+    const dayOfWeek = date.getDay() + 1;
 
-      if (duration > maxDuration) {
-        newErrors.end_time = `La duración del permiso no debe exceder las ${maxHours} horas y ${maxMinutes} minutos.`;
-      } else if (!newErrors.end_time) {
-        delete newErrors.end_time;
+    const scheduleForDay = workSchedules.find(schedule => schedule.day_of_week === dayOfWeek);
+
+    if (scheduleForDay) {
+      const workStartTime = new Date();
+      const workEndTime = new Date();
+      const lunchStartTime = new Date();
+      const lunchEndTime = new Date();
+
+      workStartTime.setHours(...scheduleForDay.start_time.split(':').map(Number));
+      workEndTime.setHours(...scheduleForDay.end_time.split(':').map(Number));
+      lunchStartTime.setHours(...scheduleForDay.lunch_start_time.split(':').map(Number));
+      lunchEndTime.setHours(...scheduleForDay.lunch_end_time.split(':').map(Number));
+
+      // Truncar a horas y minutos
+      startTime.setSeconds(0, 0);
+      workStartTime.setSeconds(0, 0);
+      workEndTime.setSeconds(0, 0);
+
+      // Validar horario laboral (prioridad alta)
+      let hasWorkScheduleError = false;
+      if (startTime < workStartTime || startTime > workEndTime) {
+        newErrors.start_time = 'La hora de inicio debe estar dentro del horario laboral.';
+        hasWorkScheduleError = true;
       }
-    }
-
-    if (timeUnit === 'Horas' && selectedLeave.time_unit === 'Días') {
-      const maxAllowedDuration = 7.5 * 60; // 7 horas y media en minutos
-      if (duration > maxAllowedDuration) {
-        newErrors.end_time = 'La duración del permiso no debe exceder las 7 horas y 30 minutos.';
-      } else if (!newErrors.end_time) {
-        delete newErrors.end_time;
+      if (endTime < workStartTime || endTime > workEndTime) {
+        newErrors.end_time = 'La hora de fin debe estar dentro del horario laboral.';
+        hasWorkScheduleError = true;
       }
+
+      // Validar almuerzo (prioridad media)
+      if (!hasWorkScheduleError && scheduleForDay.has_lunch_break) {
+        if (startTime >= lunchStartTime && startTime < lunchEndTime) {
+          newErrors.start_time = 'El horario de inicio no puede comenzar durante el horario de almuerzo.';
+        }
+        if (endTime > lunchStartTime && endTime <= lunchEndTime) {
+          newErrors.end_time = 'El horario de fin no puede terminar durante el horario de almuerzo.';
+        }
+      }
+
+      // Validar duración del permiso (prioridad baja)
+      if (!hasWorkScheduleError && selectedLeave) {
+        if (selectedLeave.time_unit === 'Horas') {
+          const [minHours, minMinutes] = configurations.max_duration_hours_min.split(':').map(Number);
+          const minDuration = (minHours * 60) + minMinutes;
+
+          const [maxHours, maxMinutes] = selectedLeave.max_duration.split(':').map(Number);
+          const maxDuration = maxHours * 60 + maxMinutes;
+
+          if (duration < minDuration) {
+            newErrors.end_time = `La duración mínima del permiso debe ser de ${formatDuration(minDuration)}.`;
+          } else if (duration > maxDuration) {
+            newErrors.end_time = `La duración del permiso no debe exceder ${formatDuration(maxDuration)}.`;
+          }
+        } else if (selectedLeave.time_unit === 'Días') {
+          const [minHours, minMinutes] = configurations.max_duration_hours_min.split(':').map(Number);
+          const minDuration = (minHours * 60) + minMinutes;
+
+          const [maxHours, maxMinutes] = configurations.max_duration_hours_max.split(':').map(Number);
+          const maxDuration = maxHours * 60 + maxMinutes;
+
+          if (duration < minDuration) {
+            newErrors.end_time = `La duración mínima del permiso debe ser de ${formatDuration(minDuration)}.`;
+          } else if (duration > maxDuration) {
+            newErrors.end_time = `La duración del permiso no debe exceder ${formatDuration(maxDuration)}.`;
+          }
+        }
+      }
+    } else {
+      newErrors.start_time = 'No hay horario configurado para este día.';
     }
 
-    setErrors(newErrors);
+    setErrors(newErrors);  // Establecemos los nuevos errores (o la ausencia de ellos)
   };
 
-
-  const calculateTotalDuration = () => {
+  // Función auxiliar para formatear la duración
+  const formatDuration = (minutes) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    let message = '';
+    if (hours > 0) {
+      message += `${hours} ${hours > 1 ? 'horas' : 'hora'}`;
+    }
+    if (mins > 0) {
+      if (hours > 0) message += ' y ';
+      message += `${mins} ${mins > 1 ? 'minutos' : 'minuto'}`;
+    }
+    return message;
+  }; const calculateTotalDuration = () => {
     if (timeUnit === 'Días' && startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
@@ -254,13 +439,29 @@ const Request = () => {
       start.setHours(startHours, startMinutes, 0, 0);
       const end = new Date();
       end.setHours(endHours, endMinutes, 0, 0);
-      if (end <= start) {
-        end.setDate(end.getDate() + 1); // consider it as the next day
+
+      if (end < start) {
+        end.setDate(end.getDate() + 1); // Considerar como el siguiente día
+      } else if (end.getTime() === start.getTime()) {
+        // Si las horas de inicio y fin son exactamente iguales
+        return `0 horas y 0 minutos`;
       }
+
       const durationMinutes = (end - start) / (1000 * 60);
       const hours = Math.floor(durationMinutes / 60);
       const minutes = durationMinutes % 60;
-      return `${hours} horas y ${minutes} minutos`;
+
+      // Casos para mostrar diferentes formatos
+      if (hours > 0 && minutes > 0) {
+        return `${hours} horas y ${minutes} minutos`;
+      } else if (hours > 0) {
+        return `${hours} ${hours > 1 ? 'horas' : 'hora'}`;
+      } else if (minutes > 0) {
+        return `${minutes} ${minutes > 1 ? 'minutos' : 'minuto'}`;
+      } else {
+        return `0 horas y 0 minutos`;
+      }
+
     }
     return '';
   };
@@ -292,6 +493,7 @@ const Request = () => {
     }
     setErrors(newErrors);
   };
+
   const handleRemoveAttachment = (e) => {
     e.preventDefault();
     setAttachment(null);
@@ -331,33 +533,33 @@ const Request = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
+
     let newErrors = {};
-  
+
     if (!startDate) {
       newErrors.start_date = 'La fecha de inicio es requerida.';
     }
-  
+
     if (!endDate && timeUnit === 'Días') {
       newErrors.end_date = 'La fecha de fin es requerida.';
     }
-  
+
     if (!startTime && timeUnit === 'Horas') {
       newErrors.start_time = 'La hora de inicio es requerida.';
     }
-  
+
     if (!endTime && timeUnit === 'Horas') {
       newErrors.end_time = 'La hora de fin es requerida.';
     }
-  
+
     if (!reason) {
       newErrors.reason = 'La razón es requerida.';
     }
-  
+
     if (selectedLeave && selectedLeave.requires_document === 'Si' && !attachment) {
       newErrors.attachment = 'El documento es requerido.';
     }
-  
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
     } else {
@@ -377,11 +579,11 @@ const Request = () => {
         if (attachment) {
           formData.append('attachment', attachment);
         }
-  
+
         try {
           const resultAction = await dispatch(createOneLeave({ employeeId: employee_id, leave: formData }));
           unwrapResult(resultAction);
-  
+
           // Resetear campos y errores
           setSelectedLeave(null);
           setTimeUnit('Horas');
@@ -389,11 +591,12 @@ const Request = () => {
           showAlert('Solicitud creada correctamente', 'success', 3000);
         } catch (error) {
           const errorMsg = JSON.parse(error.message);
-  
+
           if (errorMsg.msg) {
             showAlert(errorMsg.msg, 'error', 3000);
+            console.log(errorMsg.msg);
           }
-  
+
           if (errorMsg.errors) {
             const backendErrors = errorMsg.errors;
             let newErrors = {};
@@ -406,7 +609,7 @@ const Request = () => {
       });
     }
   };
-  
+
   // Funciones de confirmación y cancelación
   const handleConfirm = async () => {
     if (confirmAction) {
@@ -414,12 +617,12 @@ const Request = () => {
     }
     setIsConfirmationOpen(false);
   };
-  
+
   const handleCancel = () => {
     setIsConfirmationOpen(false);
     setConfirmAction(null);
   };
-  
+
   return (
     <form className="px-6" onSubmit={handleSubmit}>
       {/* Parte del renderizado de los botones */}

@@ -2,9 +2,13 @@ import React, { useState, useEffect } from "react";
 import Input from "../../../../components/ui/Input";
 import Textarea from "../../../../components/ui/Textarea";
 import { validateDescripcion, validateNames } from "../../../../Utils/validationsV2";
+
 import { FaHouseDamage, FaUmbrellaBeach, FaBriefcaseMedical, FaHome, FaUserMd, FaUniversity, FaPlus, FaPlane, FaHospital, FaChild, FaGraduationCap, FaSuitcase, FaRegClock } from 'react-icons/fa';
 import { FaHandshakeAngle } from "react-icons/fa6";
 import Select from 'react-select';
+import { getConfigurations } from "../../../../services/configurationService";
+
+
 
 // Mapeo de nombres de iconos a componentes de iconos
 const iconOptions = {
@@ -35,14 +39,29 @@ const options = Object.keys(iconOptions).map(key => ({
     icon: React.createElement(iconOptions[key])
 }));
 
+const colorOptions = [
+    { value: '#FF0000', label: 'Rojo', color: '#FF0000' },
+    { value: '#00FF00', label: 'Verde', color: '#00FF00' },
+    { value: '#0000FF', label: 'Azul', color: '#0000FF' },
+    { value: '#FFFF00', label: 'Amarillo', color: '#FFFF00' },
+    { value: '#FFA500', label: 'Naranja', color: '#FFA500' },
+    { value: '#800080', label: 'Púrpura', color: '#800080' },
+    { value: '#FFC0CB', label: 'Rosa', color: '#FFC0CB' },
+    { value: '#A52A2A', label: 'Marrón', color: '#A52A2A' },
+    { value: '#808080', label: 'Gris', color: '#808080' },
+    { value: '#000000', label: 'Negro', color: '#000000' },
+    { value: '#FFFFFF', label: 'Blanco', color: '#FFFFFF' }
+];
+
+
 
 const NAME_REQUIRED = "Por favor, ingrese el nombre del tipo de permiso.";
 const DESCRIPTION_REQUIRED = "Por favor, ingrese la descripción del tipo de permiso.";
 const ADVANCE_NOTICE_DAYS_REQUIRED = "Por favor, ingrese los días de anticipación.";
-const REQUIRES_DOCUMENT_REQUIRED = "Por favor, seleccione si requiere documentación.";
 const TIME_UNIT_REQUIRED = "Por favor, seleccione la unidad de tiempo.";
 const MAX_DURATION_REQUIRED = "Por favor, ingrese la duración máxima.";
 const ICON_REQUIRED = "Por favor, seleccione un icono.";
+const COLOR_REQUIRED = "Por favor, seleccione un color.";
 
 const LeaveTypeForm = ({
     leaveType,
@@ -65,18 +84,21 @@ const LeaveTypeForm = ({
         requires_document: "",
         advance_notice_days: "",
         icon: "",
+        color: "",
     });
     const [errors, setErrors] = useState({
         name: "",
         description: "",
         max_duration: "",
         time_unit: "",
-        requires_document: "",
         advance_notice_days: "",
         icon: "",
+        color: "",
     });
 
-    const { name, description, max_duration, time_unit, requires_document, advance_notice_days, icon } = formData;
+    const [configurations, setConfigurations] = useState({});
+
+    const { name, description, max_duration, time_unit, requires_document, advance_notice_days, icon, color } = formData;
 
     useEffect(() => {
         setErrors(formErrors);
@@ -94,9 +116,9 @@ const LeaveTypeForm = ({
                 description: leaveType.description,
                 max_duration: leaveType.max_duration,
                 time_unit: leaveType.time_unit,
-                requires_document: leaveType.requires_document,
                 advance_notice_days: leaveType.advance_notice_days,
                 icon: leaveType.icon,
+                color: leaveType.color,
             });
 
             setErrors({
@@ -106,10 +128,33 @@ const LeaveTypeForm = ({
                 time_unit: "",
                 requires_document: "",
                 advance_notice_days: "",
-                icon: "", // Inicializar el error de icono en el estado de errores
+                icon: "",
+                color: "",
             });
         }
     }, [isEditing, leaveType]);
+
+    // Cargar configuraciones desde la base de datos
+    useEffect(() => {
+        const fetchConfigurations = async () => {
+            try {
+                const response = await getConfigurations();
+                if (Array.isArray(response)) {
+                    const configData = {};
+                    response.forEach(config => {
+                        configData[config.key] = config.value;
+                    });
+                    setConfigurations(configData);
+                } else {
+                    console.error("La respuesta no es un array:", response);
+                }
+            } catch (error) {
+                console.error("Error al cargar las configuraciones:", error);
+            }
+        };
+
+        fetchConfigurations();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -131,9 +176,6 @@ const LeaveTypeForm = ({
                 case "advance_notice_days":
                     error = ADVANCE_NOTICE_DAYS_REQUIRED;
                     break;
-                case "requires_document":
-                    error = REQUIRES_DOCUMENT_REQUIRED;
-                    break;
                 case "time_unit":
                     error = TIME_UNIT_REQUIRED;
                     break;
@@ -142,6 +184,9 @@ const LeaveTypeForm = ({
                     break;
                 case "icon":
                     error = ICON_REQUIRED;
+                    break;
+                case "color":
+                    error = COLOR_REQUIRED;
                     break;
                 default:
                     break;
@@ -153,12 +198,19 @@ const LeaveTypeForm = ({
             if (name === "description") {
                 error = validateDescripcion(value);
             }
-            if (name === "max_duration" && time_unit === "Días" && (value < 1 || value > 30)) {
-                error = "La duración máxima en días debe estar entre 1 y 30.";
-            } else if (name === "max_duration" && time_unit === "Horas" && (value < "00:30" || value > "07:30")) {
-                error = "La duración máxima en horas debe estar entre 00:30 y 07:30.";
-            } else if (name === "advance_notice_days" && (value < 1 || value > 10)) {
-                error = "Los días de anticipación deben estar entre 1 y 10.";
+            if (name === "max_duration" && time_unit === "Días" && (value < 1 || value > parseInt(configurations.max_duration_days))) {
+                error = `La duración máxima en días debe estar entre 1 y ${configurations.max_duration_days}.`;
+            } else if (name === "max_duration" && time_unit === "Horas") {
+                const [hours, minutes] = value.split(":").map(Number);
+                const totalMinutes = hours * 60 + minutes;
+                const minDuration = parseInt(configurations.max_duration_hours_min.split(":").map(Number)[0] * 60 + configurations.max_duration_hours_min.split(":").map(Number)[1]);
+                const maxDuration = parseInt(configurations.max_duration_hours_max.split(":").map(Number)[0] * 60 + configurations.max_duration_hours_max.split(":").map(Number)[1]);
+
+                if (totalMinutes < minDuration || totalMinutes > maxDuration) {
+                    error = `La duración máxima en horas debe estar entre ${configurations.max_duration_hours_min} y ${configurations.max_duration_hours_max}.`;
+                }
+            } else if (name === "advance_notice_days" && (value < 1 || value > parseInt(configurations.advance_notice_days))) {
+                error = `Los días de anticipación deben estar entre 1 y ${configurations.advance_notice_days}.`;
             }
         }
 
@@ -175,9 +227,28 @@ const LeaveTypeForm = ({
         });
         setErrors({
             ...errors,
-            icon: selectedOption ? "" : ICON_REQUIRED, // Añadir validación de error para icono
+            icon: selectedOption ? "" : ICON_REQUIRED,
         });
     };
+
+    const formatColorOptionLabel = ({ value, label, color }) => (
+        <div className="flex items-center">
+            <span className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: color }}></span>
+            {label}
+        </div>
+    );
+
+    const handleColorChange = (selectedOption) => {
+        setFormData({
+            ...formData,
+            color: selectedOption ? selectedOption.value : "",
+        });
+        setErrors({
+            ...errors,
+            color: selectedOption ? "" : COLOR_REQUIRED,
+        });
+    };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -193,20 +264,23 @@ const LeaveTypeForm = ({
             return;
         }
 
-        if (!name || !description || !advance_notice_days || !requires_document || !time_unit || !max_duration || !icon) {
+        // Asignar un valor predeterminado para requires_document si está vacío
+        const requiresDocument = requires_document || "No";
+
+        if (!name || !description || !advance_notice_days || !time_unit || !max_duration || !icon || !color) {
             setErrors({
                 name: !name ? NAME_REQUIRED : "",
                 description: !description ? DESCRIPTION_REQUIRED : "",
                 advance_notice_days: !advance_notice_days ? ADVANCE_NOTICE_DAYS_REQUIRED : "",
-                requires_document: !requires_document ? REQUIRES_DOCUMENT_REQUIRED : "",
                 time_unit: !time_unit ? TIME_UNIT_REQUIRED : "",
                 max_duration: !max_duration ? MAX_DURATION_REQUIRED : "",
-                icon: !icon ? ICON_REQUIRED : "", // Añadir error de icono
+                icon: !icon ? ICON_REQUIRED : "",
+                color: !color ? COLOR_REQUIRED : "",
             });
             return;
         }
 
-        onSubmit(formData);
+        onSubmit({ ...formData, requires_document: requiresDocument });
     };
 
     return (
@@ -280,8 +354,6 @@ const LeaveTypeForm = ({
                             value={max_duration}
                             onChange={handleChange}
                             error={errors.max_duration}
-                            min="00:30"
-                            max="07:30"
                         />
                     )}
                 </div>
@@ -328,46 +400,84 @@ const LeaveTypeForm = ({
                         max="10"
                     />
                 </div>
-                <div className="flex flex-col">
-                    <label className="mb-1 text-gray-800 font-semibold">Icono</label>
-                    <Select
-                        options={options}
-                        value={options.find(option => option.value === icon)}
-                        onChange={handleIconChange}
-                        className="border border-gray-300 rounded-lg p-2 w-full"
-                        placeholder="Seleccione un icono"
-                        menuPortalTarget={document.body}
-                        styles={{
-                            menuPortal: base => ({ ...base, zIndex: 9999 }),
-                            menu: base => ({ ...base, zIndex: 9999 }),
-                            menuList: base => ({
-                                ...base,
-                                maxHeight: 160,
-                                overflowY: 'auto',
-                            }),
-                            control: base => ({
-                                ...base,
-                                overflow: 'visible'
-                            }),
-                            container: base => ({
-                                ...base,
-                                position: 'relative',
-                                zIndex: 9999,
-                            }),
-                            dropdownIndicator: base => ({
-                                ...base,
-                                zIndex: 9999,
-                            }),
-                        }}
-                        menuPlacement="auto"
-                        menuPosition="fixed"
-                    />
-
-
-
-                    {errors.icon && (
-                        <span className="text-red-500 text-xs">{errors.icon}</span>
-                    )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                    <div className="flex flex-col">
+                        <label className="mb-1 text-gray-800 font-semibold">Icono</label>
+                        <Select
+                            options={options}
+                            value={options.find(option => option.value === icon)}
+                            onChange={handleIconChange}
+                            className="border border-gray-300 rounded-lg p-2 w-full"
+                            placeholder="Seleccione un icono"
+                            menuPortalTarget={document.body}
+                            styles={{
+                                menuPortal: base => ({ ...base, zIndex: 9999 }),
+                                menu: base => ({ ...base, zIndex: 9999 }),
+                                menuList: base => ({
+                                    ...base,
+                                    maxHeight: 160,
+                                    overflowY: 'auto',
+                                }),
+                                control: base => ({
+                                    ...base,
+                                    overflow: 'visible'
+                                }),
+                                container: base => ({
+                                    ...base,
+                                    position: 'relative',
+                                    zIndex: 9999,
+                                }),
+                                dropdownIndicator: base => ({
+                                    ...base,
+                                    zIndex: 9999,
+                                }),
+                            }}
+                            menuPlacement="auto"
+                            menuPosition="fixed"
+                        />
+                        {errors.icon && (
+                            <span className="text-red-500 text-xs">{errors.icon}</span>
+                        )}
+                    </div>
+                    <div className="flex flex-col">
+                        <label className="mb-1 text-gray-800 font-semibold">Color reporte</label>
+                        <Select
+                            options={colorOptions}
+                            value={colorOptions.find(option => option.value === color)}
+                            onChange={handleColorChange}
+                            formatOptionLabel={formatColorOptionLabel}
+                            className="border border-gray-300 rounded-lg p-2 w-full"
+                            placeholder="Seleccione un color"
+                            menuPortalTarget={document.body}
+                            styles={{
+                                menuPortal: base => ({ ...base, zIndex: 9999 }),
+                                menu: base => ({ ...base, zIndex: 9999 }),
+                                menuList: base => ({
+                                    ...base,
+                                    maxHeight: 160,
+                                    overflowY: 'auto',
+                                }),
+                                control: base => ({
+                                    ...base,
+                                    overflow: 'visible'
+                                }),
+                                container: base => ({
+                                    ...base,
+                                    position: 'relative',
+                                    zIndex: 9999,
+                                }),
+                                dropdownIndicator: base => ({
+                                    ...base,
+                                    zIndex: 9999,
+                                }),
+                            }}
+                            menuPlacement="auto"
+                            menuPosition="fixed"
+                        />
+                        {errors.color && (
+                            <span className="text-red-500 text-xs">{errors.color}</span>
+                        )}
+                    </div>
                 </div>
             </div>
             <div className="flex items-center gap-x-2 mt-4">

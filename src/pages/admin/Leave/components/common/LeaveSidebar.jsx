@@ -49,7 +49,7 @@ const LeaveSidebar = () => {
   };
 
 
-  const isActive = (path) => location.pathname.includes(`/perfil/${id}${path}`);
+  const isActive = (path) => location.pathname.includes(`/permisos/${id}${path}`);
   return (
     <div className="bg-slate-200 rounded-lg pt-6 px-6 w-64">
       <h5 className="text-gray-900 text-lg text-center font-bold mb-4 uppercase">Gestión de Permisos</h5>
@@ -73,6 +73,12 @@ const LeaveSidebar = () => {
             className={`flex items-center text-gray-700 text-sm px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-300 ${isActive('/historial') ? 'bg-slate-300' : ''}`}
           >
             <FaFolderOpen className="mr-2" /> Mis Permisos
+          </Link>
+          <Link
+              to={`/permisos/${id}/horario/`}
+            className={`flex items-center text-gray-700 text-sm px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-300 ${isActive('/horario') ? 'bg-slate-300' : ''}`}
+          >
+            <FaFolderOpen className="mr-2" /> Horario
           </Link>
           {/* <Link
             to="/permisos/reporte-mensual"

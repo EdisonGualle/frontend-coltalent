@@ -109,12 +109,12 @@ const OptionsColumn = ({ employee, updateEmployees }) => {
               <span className="truncate">Editar</span>
             </button>
           </MenuItem>
-          <MenuItem className="p-0 hover:bg-transparent" onClick={handleClick}>
+          {/* <MenuItem className="p-0 hover:bg-transparent" onClick={handleClick}>
             <button className="w-full rounded-lg transition-colors text-xs hover:bg-teal-50 flex items-center gap-x-2 p-2">
               <RiDeleteBin6Line className="text-red-500" />
               <span className="truncate">Eliminar</span>
             </button>
-          </MenuItem>
+          </MenuItem> */}
           <MenuItem className="p-0 hover:bg-transparent">
             <Link
               to={`/permisos/${employee.id}/solicitar`}

@@ -169,7 +169,7 @@ const Sidebar = () => {
                 >
                   <span className="flex items-center gap-4">
                     <HiOutlineOfficeBuilding className="text-primary text-xl group-hover:text-yellow-500" />{" "}
-                    Empresa
+                    Organización
                   </span>
                   <RiArrowRightSLine
                     className={`mt-1 ${activeSubmenu === 1 && "rotate-90"} transition-all`}
