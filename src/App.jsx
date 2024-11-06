@@ -51,6 +51,9 @@ import AssignedLeaves from "./pages/admin/Leave/Authorization/AssignedLeaves";
 
 //Configuracion
 import Configurations from "./pages/Configurations";
+import AnotherComponent from "./pages/admin/Employee/AnotherComponent";
+
+
 
 function App() {
   return (
@@ -120,6 +123,12 @@ function App() {
                   <Route path="/configuraciones" element={<ProtectedRoute allowedRoles={['Administrador']} />}>
                     <Route path="" element={<Configurations />} />
                   </Route>
+
+                  {/* Otro componente  */}
+                  <Route path="/prueba-calendario" element={<AnotherComponent />} />
+
+                  {/* Asistencia */}
+
 
                 </Route>
               </Route>

@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { RiMailLine } from "react-icons/ri";
 import ResetPasswordService from "../../services/Auth/ResetPasswordService";
+import { AlertContext } from '../../contexts/AlertContext';
 
 const ForgetPassword = () => {
+  const { showAlert } = useContext(AlertContext);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -18,7 +19,7 @@ const ForgetPassword = () => {
     try {
       const response = await ResetPasswordService.changePassword(email);
       if (response.success) {
-        setSuccessMessage(response.msg);
+        showAlert('Por favor revisa tu correo para restablecer tu contraseña.', 'success', 3000);
       } else {
         setError(response.msg);
       }
@@ -37,7 +38,7 @@ const ForgetPassword = () => {
         </h1>
         <div className="mb-2">
         {successMessage && <p className={`text-${successMessage ? 'green' : 'red'}-500`}>{successMessage}</p>}
-        {error && <p className="text-red-500">{error}</p>}
+        {error && <p className="text-red-300">{error}</p>}
         </div>
         <form className="mb-8" onSubmit={handleSubmit}>
           <div className="relative mb-5">
@@ -53,7 +54,7 @@ const ForgetPassword = () => {
           <div>
             <button
               type="submit"
-              className="bg-primary text-black uppercase font-bold text-sm w-full py-3 px-4 rounded-lg hover:bg-yellow-400"
+              className={`bg-primary text-black uppercase font-bold text-sm w-full mt-5 py-3 px-4 rounded-lg ${loading ? " opacity-95" : "hover:bg-yellow-400"}`} 
               disabled={loading}
             >
               {loading ? "Enviando..." : "Enviar instrucciones"}

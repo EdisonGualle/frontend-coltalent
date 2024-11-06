@@ -15,9 +15,9 @@ import {
   BsSignpost, BsHouseDoor, BsSignpostSplit, BsCompass
 } from "react-icons/bs";
 
-
 import { fetchRoles } from '../../../redux/User/rolSlice.js';
 import CustomSelect from '../../../components/ui/Select.jsx';
+import WorkScheduleForm from './WorkScheduleForm.jsx';
 
 
 const steps = [
@@ -80,6 +80,7 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
 
   const [selectedRole, setSelectedRole] = useState(null);
 
+  const [scheduleErrors, setScheduleErrors] = useState({});
 
   const [workSchedule, setWorkSchedule] = useState({
     monday: { start_time: '', end_time: '', has_lunch_break: false, lunch_start_time: '', lunch_end_time: '' },
@@ -372,6 +373,12 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
         };
 
 
+        if (Object.values(scheduleErrors).every((error) => !error)) {
+          // Proceso de envío de datos
+        } else {
+          console.log('Errores en el horario:', scheduleErrors);
+        }
+
         onSubmit(submissionData);
       }
     } else {
@@ -551,90 +558,6 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
     fetchPositions();
   }, [selectedUnit]);
 
-
-  const daysOfWeek = {
-    monday: "Lunes",
-    tuesday: "Martes",
-    wednesday: "Miércoles",
-    thursday: "Jueves",
-    friday: "Viernes",
-    saturday: "Sábado",
-    sunday: "Domingo"
-  };
-  
-  const renderWorkScheduleInputs = () => {
-    return Object.keys(workSchedule).map((day) => (
-      <div key={day} className="mb-4 p-4 bg-white rounded-lg shadow-sm">
-        <label className="block font-medium text-gray-700 capitalize mb-2">{daysOfWeek[day]}:</label>
-        <div className="flex items-center space-x-4">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-600">Hora de inicio:</label>
-            <Input
-              type="time"
-              value={workSchedule[day].start_time}
-              onChange={(e) => handleScheduleChange(day, 'start_time', e.target.value)}
-              
-             
-            />
-          </div>
-          <span className="text-gray-500">-</span>
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-600">Hora de fin:</label>
-            <Input
-              type="time"
-              value={workSchedule[day].end_time}
-              onChange={(e) => handleScheduleChange(day, 'end_time', e.target.value)}
-             
-            />
-          </div>
-        </div>
-        <div className="mt-2">
-          <input
-            type="checkbox"
-            checked={workSchedule[day].has_lunch_break}
-            onChange={(e) => handleScheduleChange(day, 'has_lunch_break', e.target.checked)}
-            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-          />
-          <label className="ml-2 text-sm font-medium text-gray-600">Tiene descanso para almuerzo</label>
-        </div>
-        {workSchedule[day].has_lunch_break && (
-          <div className="mt-2 flex items-center space-x-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-600">Inicio del almuerzo:</label>
-              <Input
-                type="time"
-                value={workSchedule[day].lunch_start_time}
-                onChange={(e) => handleScheduleChange(day, 'lunch_start_time', e.target.value)}
-               
-              />
-            </div>
-            <span className="text-gray-500">-</span>
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-600">Fin del almuerzo:</label>
-              <Input
-                type="time"
-                value={workSchedule[day].lunch_end_time}
-                onChange={(e) => handleScheduleChange(day, 'lunch_end_time', e.target.value)}
-              />
-            </div>
-          </div>
-        )}
-      </div>
-    ));
-  };
-
-
-  const handleScheduleChange = (day, field, value) => {
-    setWorkSchedule(prevSchedule => ({
-      ...prevSchedule,
-      [day]: {
-        ...prevSchedule[day],
-        [field]: value,
-      }
-    }));
-  };
-
-  
   return (
     <form onSubmit={handleSubmit}>
       <div className="w-full mx-auto p-4">
@@ -1007,12 +930,12 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
         )}
 
         {currentStep === 5 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {renderWorkScheduleInputs()}
-          </div>
+          <WorkScheduleForm
+            workSchedule={workSchedule}
+            setWorkSchedule={setWorkSchedule}
+            setScheduleErrors={setScheduleErrors} // Pasar la función de manejo de errores
+          />
         )}
-
-
 
         <div className="flex justify-between mt-4">
           <motion.button

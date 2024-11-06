@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FaCog } from 'react-icons/fa';
+import { RiCheckboxCircleLine, RiCloseCircleLine } from 'react-icons/ri';
 
-const CardConfigurable = ({ config, onSave, relatedConfigValue, showAlert, isEditing, setIsEditing }) => {
+const CardConfigurable = ({ config, onSave, relatedConfigValue, translatedKey, showAlert, isEditing, setIsEditing }) => {
   const [value, setValue] = useState(config.value);
   const [originalValue, setOriginalValue] = useState(config.value);
   const [minError, setMinError] = useState('');
@@ -46,9 +46,14 @@ const CardConfigurable = ({ config, onSave, relatedConfigValue, showAlert, isEdi
           const maxTotalMinutes = maxHours * 60 + maxMinutes;
 
           if (minTotalMinutes >= maxTotalMinutes) {
-            validationMinError = 'La duración mínima debe ser menor que la duración máxima.';
-            validationMaxError = 'La duración máxima debe ser mayor que la duración mínima.';
+            if (config.key.includes('min')) {
+              validationMinError = 'La duración mínima debe ser menor que la duración máxima.';
+            }
+            if (config.key.includes('max')) {
+              validationMaxError = 'La duración máxima debe ser mayor que la duración mínima.';
+            }
           }
+
         }
       } else {
         const numericValue = parseInt(value, 10);
@@ -88,38 +93,38 @@ const CardConfigurable = ({ config, onSave, relatedConfigValue, showAlert, isEdi
   const inputType = timeFields.includes(config.key) || config.key.includes('hours') ? 'text' : 'number';
 
   return (
-    <li className="flex flex-col p-4 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200 ease-in-out">
+    <li className="flex flex-col py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200 ease-in-out">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <FaCog className="text-gray-500" />
+        
           <div>
-            <h3 className="text-lg font-semibold text-gray-800">{config.key}</h3>
+            <h3 className=" text-base  font-semibold text-gray-800">{translatedKey}</h3>
             <p className="text-gray-600 text-sm">{config.description}</p>
           </div>
         </div>
-        <div className="flex flex-col">
-          <div className="flex items-center space-x-4">
+        <div className="flex flex-col ms-1">
+          <div className="flex items-center space-x-1">
             <input
-              type={inputType} // Ajusta el tipo de input
+              type={inputType} 
               min="1"
-              className={`p-2 border ${(minError || maxError) ? 'border-red-400' : 'border-gray-300'} rounded w-24 focus:outline-none focus:ring-1 focus:ring-blue-400`}
+              className={`p-2 border ${(minError || maxError) ? 'border-red-400' : 'border-gray-300'} rounded w-14 focus:outline-none focus:ring-1 focus:ring-blue-400`}
               value={value}
               onChange={handleChange}
               disabled={isEditing !== null && isEditing !== config.id} // Deshabilita si se está editando otro campo
             />
             <button
-              className={`px-4 py-2 rounded-lg text-white ${(minError || maxError || value === originalValue || isEditing !== config.id) ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-400 hover:bg-blue-500'}`}
+              className={`px-4 py-2 rounded-lg bg-blue-100 text-blue-600 ${(minError || maxError || value === originalValue || isEditing !== config.id) ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-100 hover:bg-blue-200'}`}
               onClick={handleSave}
               disabled={!!(minError || maxError || value === originalValue || isEditing !== config.id)}
             >
-              Guardar
+              <RiCheckboxCircleLine size={24} />
             </button>
             {isEditing === config.id && (
               <button
-                className="px-4 py-2 rounded-lg text-white bg-red-400 hover:bg-red-500"
+                className="px-4 py-2 rounded-lg text-red-600 bg-red-100 hover:bg-red-200"
                 onClick={handleCancel}
               >
-                Cancelar
+              <RiCloseCircleLine size={24} />
               </button>
             )}
           </div>
