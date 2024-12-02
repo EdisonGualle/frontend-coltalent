@@ -20,6 +20,7 @@ const getAllPositionsIncludingDeleted = async () => {
 
 const createPosition = async (newPosition) => {
   try {
+    console.log("Datos enviados al backend:", newPosition);
     const response = await AxiosInstance.post("/positions", newPosition);
     return response.data;
   } catch (error) {

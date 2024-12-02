@@ -6,6 +6,7 @@ import CustomSelect from "../../../../components/ui/Select";
 import { fetchUnits } from "../../../../redux/Organization/UnitSlince";
 import { validateName } from "../../../../Utils/validationsV2";
 import { fetchDepartments } from "../../../../redux/Organization/DepartamentSlice";
+import ResponsibilitiesModal from "./ResponsibilitiesModal";
 
 const NAME_REQUIRED = "Se requiere el nombre del cargo.";
 const FUNCTION_REQUIRED = "Indica la función que desempeña el cargo.";
@@ -32,6 +33,10 @@ const PositionForm = ({
     const departments = departmentsState ? departmentsState.departments : [];
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
     const [selectedOption, setSelectedOption] = useState(null);
+
+    const [isResponsibilitiesModalOpen, setIsResponsibilitiesModalOpen] = useState(false);
+    const [responsibilities, setResponsibilities] = useState([]);
+
 
     const [formData, setFormData] = useState({
         name: "",
@@ -78,6 +83,7 @@ const PositionForm = ({
                 isManager: position.is_manager === 1,
             });
             setSelectedOption(belongsToValue);
+            setResponsibilities(position.responsibilities || []);
             setErrors({
                 name: nameError,
                 function: functionError,
@@ -202,7 +208,11 @@ const PositionForm = ({
                 unit_id: unitId,
                 direction_id: directionId,
                 is_manager: isManager,
+                responsibilities,
             };
+
+            // Aquí agrega el console.log
+        console.log("Datos enviados:", updatePositionData);
 
             onSubmit(updatePositionData);
         }
@@ -309,6 +319,28 @@ const PositionForm = ({
                     </div>
                 )}
             </div>
+
+            <button
+                type="button"
+                className="bg-gray-200 text-gray-700 px-4 py-2 mt-4  rounded-lg w-full hover:bg-gray-300 transition-colors"
+                onClick={() => setIsResponsibilitiesModalOpen(true)}
+            >
+                Gestionar responsabilidades
+            </button>
+
+
+            {isResponsibilitiesModalOpen && (
+                <ResponsibilitiesModal
+                    responsibilities={responsibilities}
+                    onSave={(updatedResponsibilities) => {
+                        console.log("Responsabilidades actualizadas:", updatedResponsibilities);
+                        setResponsibilities(updatedResponsibilities); // Actualizar responsabilidades
+                        setIsResponsibilitiesModalOpen(false); // Cerrar modal
+                    }}
+                    onClose={() => setIsResponsibilitiesModalOpen(false)} // Solo cerrar modal
+                />
+            )}
+
             <div className="flex justify-end gap-4 mt-6">
                 <button
                     type="submit"
@@ -329,6 +361,7 @@ const PositionForm = ({
                 </button>
             </div>
         </form>
+
     );
 }
 
