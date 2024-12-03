@@ -18,6 +18,7 @@ const notificationTypeColors = {
     'Solicitud rechazada': 'text-red-600',
     'Solicitud para corrección': 'text-yellow-600',
     'Solicitud pendiente': 'text-amber-600',
+    'Subrogación asignada': 'text-purple-600',
 };
 
 const notificationTypeLabels = {
@@ -26,6 +27,7 @@ const notificationTypeLabels = {
     'Rechazado': 'Solicitud rechazada',
     'Corregir': 'Solicitud para corrección',
     'Solicitud pendiente': 'Solicitud pendiente',
+    'Subrogación asignada': 'Nueva delegación',
 };
 
 const Notifications = () => {
@@ -103,8 +105,8 @@ const Notifications = () => {
     return (
         <Menu
             menuButton={
-                <MenuButton className="relative p-2 rounded-lg transition-colors group hover:bg-secondary-50">
-                    <RiNotification3Line className="text-secondary-100 group-hover:text-black" />
+                <MenuButton className="relative p-2 rounded-lg transition-colors group hover:bg-gray-200">
+                    <RiNotification3Line className="text-gray-900 group-hover:text-black" />
                     {unreadCount > 0 && (
                         <span className="absolute -top-0.5 right-0 bg-primary py-0.5 px-[5px] box-content text-black rounded-full text-[8px] font-bold">
                             {unreadCount}
@@ -123,7 +125,7 @@ const Notifications = () => {
                 Notificaciones ({notifications.length})
             </h1>
             <hr className="my-4 border-gray-500" />
-            <div className="max-h-[calc(3*100px)] overflow-y-auto custom-scrollbar-notification">
+            <div className="max-h-[calc(3*100px)] overflow-y-auto custom-scrollbar-notification ">
                 {notifications.length === 0 ? (
                     <p className="text-center text-gray-500">¡Estás al día!</p>
                 ) : (
@@ -133,9 +135,9 @@ const Notifications = () => {
                                 // to={`/details/${notification.data.leave_id}`}
                                 className="text-gray-300 flex flex-1 items-center gap-4 py-2 px-4 hover:bg-secondary-50 transition-colors rounded-lg"
                             >
-                                {notification.data.approver_photo || notification.data.applicant_photo ? (
+                                {notification.data.assigner_photo || notification.data.approver_photo || notification.data.applicant_photo ? (
                                     <img
-                                        src={`${import.meta.env.VITE_STORAGE_URL}/${notification.data.approver_photo || notification.data.applicant_photo}`}
+                                        src={`${import.meta.env.VITE_STORAGE_URL}/${notification.data.assigner_photo || notification.data.approver_photo || notification.data.applicant_photo}`}
                                         className="w-8 h-8 object-cover rounded-full border border-slate-500"
                                         alt="Avatar"
                                     />

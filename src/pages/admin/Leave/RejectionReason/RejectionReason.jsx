@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { CardHeader, Typography } from "@material-tailwind/react";
-import { RiEdit2Line, RiCheckboxCircleLine,  RiCloseCircleLine  } from 'react-icons/ri';
+import { RiEdit2Line, RiCheckboxCircleLine, RiCloseCircleLine } from 'react-icons/ri';
 import LeaveTable from '../components/Table/LeaveTable';
 import rejectionReasonColumns from './Table/rejectionReasonColumns';
 import Dialog2 from '../../../../components/ui/Dialog2';
@@ -16,7 +16,7 @@ import SkeletonTable from '../components/Table/SkeletonTable';
 import ModalForm from '../../../../components/ui/ModalForm';
 import { TbMessageX } from "react-icons/tb";
 import RejectionReasonForm from './RejectionReasonForm';
-import { getCellStyle} from './Table/getCellStyle';
+import { getCellStyle } from './Table/getCellStyle';
 const RejectionReason = () => {
   const dispatch = useDispatch();
   const { showAlert } = useContext(AlertContext);
@@ -139,7 +139,7 @@ const RejectionReason = () => {
   // };
 
   const handleEdit = (row) => {
-    const rejectionReason =  allRejectionReasons.find(reason => reason.id === row.id);
+    const rejectionReason = allRejectionReasons.find(reason => reason.id === row.id);
     if (rejectionReason) {
       handleOpenEditModalForm(rejectionReason);
     }
@@ -200,11 +200,11 @@ const RejectionReason = () => {
       className: row.status === 'Activo' ? 'bg-yellow-100 hover:bg-yellow-200 cursor-pointer' : 'bg-green-100 hover:bg-green-200 cursor-pointer',
     }
   ];
-  
+
 
   return (
     <div>
-      <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0">
+      <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0 bg-gray-100">
         <div className="mb-2 flex items-center justify-between gap-8">
           <div>
             <Typography variant="h5" color="blue-gray" className="font-semibold">
@@ -255,7 +255,7 @@ const RejectionReason = () => {
           cancelButtonColor="border-gray-400"
         /> */}
 
-<Dialog2
+        <Dialog2
           isOpen={isOpenToggleDialog}
           setIsOpen={setIsOpenToggleDialog}
           title={getToggleMessage(selectedReason?.status).title}

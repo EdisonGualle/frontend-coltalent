@@ -1,23 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CardHeader, Typography } from "@material-tailwind/react";
-import { RiCheckLine, RiCloseLine, RiIndeterminateCircleLine } from 'react-icons/ri';
+import { RiCheckLine, RiCloseLine, RiEyeLine } from 'react-icons/ri';
 import LeaveTable from '../components/Table/LeaveTable';
 import { getColumns } from './Table/getColumns';
 import { useAuth } from '../../../../hooks/useAuth';
 import { fetchAssignedLeaves, setAssignedLeaveFilter, updateCache, clearCache } from '../../../../redux/Leave/assignedLeavesSlice';
 import { getAuthorizationCellStyle } from './Table/authorizationColumnsStyles';
 import ActionModal from './Table/ActionModal';
+import PermissionDetailModal from './PermissionDetails/PermissionDetailModal';
 
 const AssignedLeaves = () => {
   const dispatch = useDispatch();
   const { user } = useAuth();
   const { leaves, filter, loading, error, cache } = useSelector((state) => state.assignedLeaves);
+
   const [currentFilter, setCurrentFilter] = useState('pendientes');
   const [columns, setColumns] = useState(getColumns(user.role, 'pendientes'));
-  const [modalData, setModalData] = useState(null);  // Estado para los datos del modal
-  const [modalAction, setModalAction] = useState('');  // Estado para la acción del modal
-  const [isModalOpen, setIsModalOpen] = useState(false);  // Estado para controlar la visibilidad del modal
+
+  // Estado para acciones del modal
+  const [actionModalData, setActionModalData] = useState(null); // Datos del modal de acciones
+  const [actionModalAction, setActionModalAction] = useState(''); // Acción (Aprobar/Rechazar)
+  const [isActionModalOpen, setIsActionModalOpen] = useState(false); // Control de visibilidad del modal de acciones
+
+  // Estado para el modal de detalles (Ver más)
+  const [detailModalData, setDetailModalData] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   useEffect(() => {
     if (!cache[currentFilter]) {
@@ -32,16 +40,21 @@ const AssignedLeaves = () => {
   }, [currentFilter, user.role]);
 
   const handleActionClick = (leave, action) => {
-    setModalData(leave);
-    setModalAction(action);
-    setIsModalOpen(true);
+    setActionModalData(leave);
+    setActionModalAction(action);
+    setIsActionModalOpen(true);
+  };
+
+  const handleViewDetails = (leave) => {
+    setDetailModalData(leave);
+    setIsDetailModalOpen(true);
   };
 
   const handleSuccess = () => {
     // Limpia el caché y vuelve a obtener los datos actualizados
     dispatch(clearCache());
-    ['pendientes', 'aprobados', 'rechazados', 'historial'].forEach(filter => {
-      dispatch(fetchAssignedLeaves({ employeeId: user.employee_id, filter })).then(response => {
+    ['pendientes', 'aprobados', 'rechazados', 'historial'].forEach((filter) => {
+      dispatch(fetchAssignedLeaves({ employeeId: user.employee_id, filter })).then((response) => {
         dispatch(updateCache({ filter, data: response.payload.data }));
       });
     });
@@ -49,24 +62,29 @@ const AssignedLeaves = () => {
 
   const actions = [
     {
-      label: 'Aprobar',
-      icon: <RiCheckLine className="text-green-600 h-4 w-4" />,
-      onClick: (leave) => handleActionClick(leave, 'Aprobar'),
-      className: 'bg-green-100 hover:bg-green-200 cursor-pointer',
+      label: 'Ver más',
+      icon: <RiEyeLine className="text-gray-600 h-4 w-4" />,
+      onClick: handleViewDetails,
+      className: 'bg-gray-100 hover:bg-gray-200 cursor-pointer',
     },
-    {
-      label: 'Rechazar',
-      icon: <RiCloseLine className="text-red-600 h-4 w-4" />,
-      onClick: (leave) => handleActionClick(leave, 'Rechazar'),
-      className: 'bg-red-100 hover:bg-red-200 cursor-pointer',
-    },
-    // {
-    //   label: 'Corregir',
-    //   icon: <RiIndeterminateCircleLine className="text-orange-600 h-4 w-4" />,
-    //   onClick: (leave) => handleActionClick(leave, 'Corregir'),
-    //   className: 'bg-orange-100 hover:bg-orange-200 cursor-pointer',
-    // }
+    ...(currentFilter === 'pendientes'
+      ? [
+        {
+          label: 'Aprobar',
+          icon: <RiCheckLine className="text-green-600 h-4 w-4" />,
+          onClick: (leave) => handleActionClick(leave, 'Aprobar'),
+          className: 'bg-green-100 hover:bg-green-200 cursor-pointer',
+        },
+        {
+          label: 'Rechazar',
+          icon: <RiCloseLine className="text-red-600 h-4 w-4" />,
+          onClick: (leave) => handleActionClick(leave, 'Rechazar'),
+          className: 'bg-red-100 hover:bg-red-200 cursor-pointer',
+        },
+      ]
+      : []),
   ];
+
 
   const handleFilterChange = (filter) => {
     setCurrentFilter(filter);
@@ -78,15 +96,20 @@ const AssignedLeaves = () => {
     }
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setModalData(null);
-    setModalAction('');
+  const closeActionModal = () => {
+    setIsActionModalOpen(false);
+    setActionModalData(null);
+    setActionModalAction('');
+  };
+
+  const closeDetailModal = () => {
+    setIsDetailModalOpen(false);
+    setDetailModalData(null);
   };
 
   return (
     <div>
-      <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0">
+      <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0 bg-gray-100 mb-2">
         <div className="mb-2 flex items-center justify-between gap-8">
           <div>
             <Typography variant="h5" color="blue-gray" className="font-semibold">
@@ -102,14 +125,10 @@ const AssignedLeaves = () => {
             <button
               key={filter}
               onClick={() => handleFilterChange(filter)}
-              className={`
-                px-4 py-2 rounded-lg font-semibold text-sm sm:text-base transition-all duration-300 ease-in-out
-                ${currentFilter === filter
+              className={`px-4 py-2 rounded-lg font-semibold text-sm sm:text-base transition-all duration-300 ease-in-out ${currentFilter === filter
                   ? 'bg-secondary-600 text-white shadow-lg transform scale-105'
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:shadow-md'
-                }
-                focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50
-              `}
+                  : 'bg-gray-200 text-gray-800 hover:bg-gray-200 hover:shadow-md'
+                } focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50`}
             >
               {(() => {
                 switch (filter) {
@@ -135,12 +154,12 @@ const AssignedLeaves = () => {
         <div>Error: {error}</div>
       ) : (
         <LeaveTable
-          key={currentFilter} // Asegura que el componente se re-monte cuando el filtro cambie
+          key={currentFilter}
           columns={columns}
           getCellStyle={getAuthorizationCellStyle}
           data={leaves}
-          actions={currentFilter === 'pendientes' ? actions : []}
-          showActions={currentFilter === 'pendientes'}
+          actions={actions}
+          showActions={true}
           showFilters={false}
           showExport={false}
           showAddNew={false}
@@ -148,12 +167,18 @@ const AssignedLeaves = () => {
           onDelete={null}
         />
       )}
-      {isModalOpen && (
+      {isActionModalOpen && (
         <ActionModal
-          action={modalAction}
-          data={modalData}
-          onClose={closeModal}
+          action={actionModalAction}
+          data={actionModalData}
+          onClose={closeActionModal}
           onSuccess={handleSuccess}
+        />
+      )}
+      {isDetailModalOpen && (
+        <PermissionDetailModal
+          data={detailModalData}
+          onClose={closeDetailModal}
         />
       )}
     </div>

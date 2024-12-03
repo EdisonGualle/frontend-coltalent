@@ -5,11 +5,11 @@ export const getColumns = (role, filter) => {
     case "Administrador":
       return adminColumns[filter] ||  adminColumns.pendientes;
     case "Jefe Dirección":
-      return jefeDireccionColumns[filter] || jefeDireccionColumns.pendientes;
+      return adminColumns[filter] ||  adminColumns.pendientes;
     case "Jefe Unidad":
-      return jefeDireccionColumns[filter] || jefeDireccionColumns.pendientes;
+      return adminColumns[filter] ||  adminColumns.pendientes;
     case "Jefe General":
-      return jefeDireccionColumns[filter] || jefeDireccionColumns.pendientes;
+      return adminColumns[filter] ||  adminColumns.pendientes;
     default:
       return [];
   }

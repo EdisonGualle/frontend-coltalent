@@ -10,7 +10,7 @@ const Pagination = ({ currentPage, rowsPerPage, totalRows, onPageChange, onRowsP
   };
 
   return (
-    <div className="flex justify-between items-center py-2">
+    <div className="flex justify-between items-center p-2">
       <div className="flex items-center space-x-2">
         <span>Filas por página:</span>
         <select

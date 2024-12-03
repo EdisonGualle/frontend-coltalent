@@ -58,14 +58,37 @@ const LeaveTable = ({
     }
   }, [data]);
 
-  const displayedData = Array.isArray(filteredData) ? filteredData.filter(row => {
-    const matchesSearchTerm = visibleColumns.some(column =>
-      (getNestedValue(row, column.id) !== undefined && getNestedValue(row, column.id) !== null) && getNestedValue(row, column.id).toString().toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    const matchesFromDate = fromDate ? new Date(row.date) >= new Date(fromDate) : true;
-    const matchesToDate = toDate ? new Date(row.date) <= new Date(toDate) : true;
-    return matchesSearchTerm && matchesFromDate && matchesToDate;
-  }) : [];
+  const displayedData = Array.isArray(filteredData)
+    ? filteredData.filter((row) => {
+      const matchesSearchTerm = visibleColumns.some((column) => {
+        let value;
+
+        // Si la columna tiene una función de renderizado, úsala para obtener el texto limpio
+        if (column.render) {
+          value = column.render(row, true); // `true` genera texto plano para la búsqueda
+        } else {
+          value = getNestedValue(row, column.id);
+        }
+
+        return (
+          value !== undefined &&
+          value !== null &&
+          value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      });
+
+      const matchesFromDate = fromDate
+        ? new Date(row.date) >= new Date(fromDate)
+        : true;
+      const matchesToDate = toDate
+        ? new Date(row.date) <= new Date(toDate)
+        : true;
+
+      return matchesSearchTerm && matchesFromDate && matchesToDate;
+    })
+    : [];
+
+
 
   const paginatedData = displayedData.slice(
     (currentPage - 1) * rowsPerPage,
@@ -169,9 +192,9 @@ const LeaveTable = ({
   const isExpanded = actions.length > 2;
 
   return (
-    <div className="table-container">
-      <div className="table-header sticky top-0 bg-white z-10 py-2">
-        <div className="flex justify-between items-center py-2">
+    <div className="table-container bg-white shadow-sm mb-4 rounded-lg py-2">
+      <div className="mb-2 pt-1">
+        <div className="flex justify-between items-center py-2 px-2">
           <div className="flex items-center space-x-2">
             <div className="relative flex items-center justify-center max-w-md mx-auto h-6 group">
               <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 opacity-50 blur-lg group-hover:opacity-75 transition-all duration-300"></div>
@@ -260,10 +283,10 @@ const LeaveTable = ({
           </div>
         </div>
       </div>
-      <div className="table-content overflow-y-auto custom-scrollbar">
+      <div className="table-content">
         <table className="min-w-full leading-normal">
           <thead className="sticky top-0 bg-gray-100  z-0">
-            <tr className="bg-gray-100 text-gray-600 uppercase text-xs leading-normal">
+            <tr className=" text-gray-600 uppercase text-xs leading-normal">
               {showActions && onDelete && (
                 <th className="py-4 px-6 text-left relative" style={{ minHeight: '50px' }}>
                   <button
@@ -328,14 +351,16 @@ const LeaveTable = ({
                 </th>
               )}
               {visibleColumns.map((column) => (
-                <th key={column.id} className="py-4 px-6 text-left text-xs sticky top-0 bg-gray-100 z-10" style={{ minHeight: '50px' }}>
+                <th key={column.id} className="py-4 px-6 text-left text-xs sticky top-0  z-10" style={{ minHeight: '50px' }}>
                   {column.label}
                 </th>
               ))}
               {showActions && (
-                <th className="py-4 px-6 text-left text-xs right-0 bg-gray-100 z-10"
-                  style={{ minWidth: '50px', maxWidth: '150px', width: 'auto' }}>
-                  {isExpanded && <span style={{ visibility: 'hidden' }}>Acciones</span>}
+                <th
+                  className="py-4 px-6 text-center text-xs  z-10"
+                  style={{ minWidth: '100px', maxWidth: '150px', width: 'auto' }}
+                >
+                  Acciones
                 </th>
               )}
             </tr>
@@ -345,7 +370,7 @@ const LeaveTable = ({
               paginatedData.map((row) => (
                 <tr
                   key={row.id}
-                  className="border-b border-gray-200 hover:bg-gray-100 group"
+                  className=" hover:bg-gray-100 group"
                   style={{ minHeight: '50px' }}
                 >
                   {onDelete && (
@@ -363,42 +388,48 @@ const LeaveTable = ({
                       className={`py-3 px-6 text-left text-xs group-hover:bg-gray-100 ${column.autoWidth ? 'whitespace-nowrap auto-width' : ''}`}
                       style={{ minHeight: '50px' }}
                     >
-                      {column.showIcon ? (
-                        column.id === 'attachment' ? (
-                          <div className="flex justify-center items-center h-full">
-                            <FileViewer filename={getNestedValue(row, column.id)} />
-                          </div>
+                      {column.render ? (
+                        <span className={`rounded-full px-2 py-1 inline-block ${getCellStyle(column.id, getNestedValue(row, column.id) || '')}`}>
+                          {column.render(row)}
+                        </span>
+                      )
+                        : column.showIcon ? (
+                          column.id === 'attachment' ? (
+                            <div className="flex justify-center items-center h-full">
+                              <FileViewer filename={getNestedValue(row, column.id)} />
+                            </div>
+                          ) : (
+                            <FaEye className="cursor-pointer mx-auto text-base text-gray-500 hover:text-gray-700" onClick={() => openModal(row, column.modalConfig, column.modalTitle)} />
+                          )
                         ) : (
-                          <FaEye className="cursor-pointer mx-auto text-base text-gray-500 hover:text-gray-700" onClick={() => openModal(row, column.modalConfig, column.modalTitle)} />
-                        )
-                      ) : (
-                        column.id === 'combined_evaluators' ? (
-                          <span className="whitespace-pre-line">
-                            {formatCombinedEvaluators(row, column.combineFields)}
-                          </span>
-                        ) : (
-                          <span className={`rounded-full px-2 py-1 inline-block ${getCellStyle(column.id, getNestedValue(row, column.id) || '')}`}>
-                            {(getNestedValue(row, column.id) !== undefined && getNestedValue(row, column.id) !== null) ? formatCellContent(getNestedValue(row, column.id)) : ''}
-                          </span>
-                        )
-                      )}
+                          column.id === 'combined_evaluators' ? (
+                            <span className="whitespace-pre-line">
+                              {formatCombinedEvaluators(row, column.combineFields)}
+                            </span>
+                          ) : (
+                            <span className={`rounded-full px-2 py-1 inline-block ${getCellStyle(column.id, getNestedValue(row, column.id) || '')}`}>
+                              {(getNestedValue(row, column.id) !== undefined && getNestedValue(row, column.id) !== null) ? formatCellContent(getNestedValue(row, column.id)) : ''}
+                            </span>
+                          )
+                        )}
                     </td>
                   ))}
+
                   {showActions && (
-                   <td className="py-3 px-4 text-center text-xs bg-white z-10 group-hover:bg-gray-100" style={{ minWidth: '50px', maxWidth: '300px', width: 'auto' }}>
-                   {(typeof actions === 'function' ? actions(row) : actions).map(action => (
-                     <button
-                       key={action.label}
-                       className={`m-1 p-1 rounded ${action.className}`}
-                       onClick={() => action.onClick(row)}
-                       aria-label={action.label}
-                       title={action.label}
-                     >
-                       {action.icon}
-                     </button>
-                   ))}
-                 </td>
-                 
+                    <td className="py-3 px-4 text-center text-xs bg-white z-10 group-hover:bg-gray-100" style={{ minWidth: '50px', maxWidth: '300px', width: 'auto' }}>
+                      {(typeof actions === 'function' ? actions(row) : actions).map(action => (
+                        <button
+                          key={action.label}
+                          className={`m-1 p-1 rounded ${action.className}`}
+                          onClick={() => action.onClick(row)}
+                          aria-label={action.label}
+                          title={action.label}
+                        >
+                          {action.icon}
+                        </button>
+                      ))}
+                    </td>
+
                   )}
                 </tr>
               ))

@@ -100,18 +100,18 @@ const Breadcrumbs = () => {
   });
 
   return (
-    <nav aria-label="Breadcrumb" className="mt-2 border-b-2 bg-gray-300 border-gray-600 shadow-lg rounded-lg px-2 py-1">
+    <nav aria-label="Breadcrumb" className="mt-2   rounded-lg px-2 py-1">
       <ol className="flex items-center gap-1 text-sm text-gray-600">
         {breadcrumbItems.map((item, index) => (
           <React.Fragment key={index}>
             <li>
               {item.isClickable ? (
-                <Link to={item.path} className=" transition hover:text-gray-700 flex items-center">
+                <Link to={item.path} className=" transition hover:text-black flex items-center">
                   {item.icon && <span className="mr-1">{item.icon}</span>}
                   <span>{item.label}</span>
                 </Link>
               ) : (
-                <span className=" transition text-gray-700 flex items-center cursor-default">
+                <span className=" transition text-gray-900 flex items-center cursor-default">
                   {item.icon && <span className="mr-1">{item.icon}</span>}
                   <span>{item.label}</span>
                 </span>

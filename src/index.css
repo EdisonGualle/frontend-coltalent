@@ -48,22 +48,18 @@
 .table-container {
   display: flex;
   flex-direction: column;
-
 }
 
-.table-header, .pagination-container {
+.pagination-container {
   background-color: white;
   position: sticky;
   z-index: 10;
 }
 
-.table-header {
-  top: 0;
-}
+
 
 .pagination-container {
   bottom: 0;
-  border-top: 1px solid #e2e8f0;
   width: 100%;
 }
 

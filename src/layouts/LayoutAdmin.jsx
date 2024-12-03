@@ -5,20 +5,22 @@ import Header from "../components/common/layout/Header";
 import AppWrapper from "../components/common/layout/AppWrapper";
 import Breadcrumbs from "../components/common/layout/Breadcrumbs";
 
-
 const LayoutAdmin = () => {
   return (
     <AppWrapper>
       <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
         <Sidebar />
-        <div className="xl:col-span-5 flex flex-col">
-          <Header />
-          <div className="px-4">
-            <Breadcrumbs />
+        <div className="xl:col-span-5 flex flex-col h-screen">
+          {/* Header fijo */}
+          <div className="sticky top-0 z-10">
+            <Header />
           </div>
-          <div className="flex-1 overflow-auto px-4">
-            {/* poner shadow-lg si es necesario luego */}
-            <div className="mt-3 pt-2 border-t-2 border-gray-300 rounded-lg px-2 h-[83vh] pb-2">
+          {/* Contenedor desplazable: incluye Breadcrumbs y Outlet */}
+          <div className="flex-1 overflow-y-auto px-4 pt-[10vh] bg-gray-100">
+            <div className="">
+              <Breadcrumbs />
+            </div>
+            <div className="mt-2 border-t-2 border-gray-100 rounded-lg px-2 pb-2 bg-gray-100">
               <Outlet />
             </div>
           </div>
