@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
-import { useAuth } from "../../../hooks/useAuth";
 import {
   RiLogoutCircleRLine,
   RiArrowRightSLine,
@@ -11,54 +10,47 @@ import {
   RiDashboardLine,
   RiUserStarLine,
   RiSettings3Line,
-  RiClipboardLine,
-  RiArrowDropRightLine,
-  RiShieldUserLine // Nuevo ícono para Permisos
+  RiProfileLine,
+  RiShieldUserLine,
+  RiFileTextLine
 } from "react-icons/ri";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
+import { useAuth } from "../../../hooks/useAuth";
 
 const Sidebar = () => {
   const [showMenu, setShowMenu] = useState(false);
-
   const [activeSubmenu, setActiveSubmenu] = useState(null);
 
   const { logout, userRole, user } = useAuth();
-
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Verificar si un submenú está activo
+  const isSubmenuActive = (paths) => paths.includes(location.pathname);
 
   const toggleSubMenu = (index) => {
-    if (activeSubmenu === index) {
-      setActiveSubmenu(null);
-    } else {
-      setActiveSubmenu(index);
-    }
+    setActiveSubmenu(activeSubmenu === index ? null : index);
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleNavigate = (path) => {
+    navigate(path);
   };
 
-  const handleProfileClick = () => {
-    navigate(`/perfil/${user.employee_id}/datos-personales`);
-  };
-
-  const handlePermisosClick = () => {
-    navigate(`/permisos/${user.employee_id}/solicitar`);
-  };
+  const handleLogout = () => logout();
 
   return (
     <>
       <div
-        className={`xl:h-[100vh] absolute overflow-y-scroll xl:static w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto h-full top-0 bg-gray-300  flex flex-col justify-between z-50  ${showMenu ? "left-0" : "-left-full"
+        className={`xl:h-[100vh] absolute overflow-y-scroll xl:static w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto h-full top-0 bg-gray-300 flex flex-col justify-between z-50 ${showMenu ? "left-0" : "-left-full"
           } transition-all`}
       >
         <div>
-          <div className="px-6 py-4 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-br-3xl shadow-md sticky top-0 z-10">
+          <div className="px-6 py-4 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-br-3xl shadow sticky top-0 z-10">
             <h1 className="text-2xl font-bold">COLTALENT</h1>
             <p className="text-sm opacity-75">Gestión Eficiente de RRHH</p>
           </div>
 
-          {/* Menu */}
+          {/* Menú principal */}
           <ul className="flex-1 space-y-2 px-4 py-8">
 
             {/* Separador */}
@@ -68,32 +60,53 @@ const Sidebar = () => {
             <li className="group">
               <Link
                 to="/"
-                className="w-full flex text-gray-800 items-center gap-4 py-2 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-600 hover:shadow-sm  transition-colors"
+                className={`w-full flex items-center gap-4 py-2 px-4 rounded-lg ${location.pathname === "/"
+                  ? "bg-gray-100 text-blue-700 shadow "
+                  : "hover:bg-blue-50 hover:text-blue-700 "
+                  }`}
               >
-                <RiDashboardLine className="text-gray-800 text-xl group-hover:text-blue-700" />
+                <RiDashboardLine
+                  className={`text-xl ${location.pathname === "/"
+                    ? "text-blue-700"
+                    : "text-gray-800 group-hover:text-blue-700"}`}
+                />
                 <span className="font-medium">Tablero</span>
               </Link>
             </li>
 
-            {/* Mi Perfil - Acceso Todos*/}
-            <li className="group">
-              <button
-                onClick={handleProfileClick}
-                className="w-full flex text-gray-800 items-center gap-4 py-2 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-700 hover:shadow-sm  transition-colors"
-              >
-                <RiUser3Line className="text-gray-800 text-xl group-hover:text-blue-700" />
-                <span className="font-medium">Mi Perfil</span>
-              </button>
-            </li>
+            {/* Perfil - Acceso Administrador*/}
+            {(userRole === 'Administrador') && (
+              <li className="group">
+                <button
+                  onClick={() => handleNavigate(`/perfil/${user.employee_id}/datos-personales`)}
+                  className={`w-full flex items-center gap-4 py-2 px-4 rounded-lg ${location.pathname === `/perfil/${user.employee_id}/datos-personales`
+                    ? "bg-gray-100 text-blue-700 shadow"
+                    : "hover:bg-blue-50 hover:text-blue-700"
+                    }`}
+                >
+                  <RiProfileLine className={`text-xl ${location.pathname === `/perfil/${user.employee_id}/datos-personales`
+                    ? "text-blue-700"
+                    : "text-gray-800 group-hover:text-blue-700"
+                    }`} />
+                  <span className="font-medium">Perfil</span>
+                </button>
+              </li>
+            )}
 
             {/* Empleados - Acceso Administrador*/}
             {(userRole === 'Administrador') && (
               <li className="group">
                 <Link
                   to="/empleados"
-                  className="w-full flex text-gray-800 items-center gap-4 py-2 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-700 hover:shadow-sm  transition-colors"
+                  className={`w-full flex items-center gap-4 py-2 px-4 rounded-lg ${location.pathname === `/empleados`
+                    ? "bg-gray-100 text-blue-700 shadow"
+                    : "hover:bg-blue-50 hover:text-blue-700 "
+                    }`}
                 >
-                  <RiUserStarLine className="text-gray-800 text-xl group-hover:text-blue-700" />
+                  <RiUserStarLine className={`text-xl ${location.pathname === `/empleados`
+                    ? "text-blue-700"
+                    : "text-gray-800 group-hover:text-blue-700"
+                    }`} />
                   <span className="font-medium">Empleados</span>
                 </Link>
               </li>
@@ -104,38 +117,46 @@ const Sidebar = () => {
               <li className="group">
                 <Link
                   to="/usuarios"
-                  className="w-full flex text-gray-800 items-center gap-4 py-2 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-700 hover:shadow-sm  transition-colors"
+                  className={`w-full flex items-center gap-4 py-2 px-4 rounded-lg ${location.pathname === `/usuarios`
+                    ? "bg-gray-100 text-blue-700 shadow"
+                    : "hover:bg-blue-50 hover:text-blue-700 "
+                    }`}
                 >
-                  <RiUser3Line className="text-gray-800 text-xl group-hover:text-blue-700" />
+                  <RiUser3Line className={`text-xl ${location.pathname === `/usuarios`
+                    ? "text-blue-700"
+                    : "text-gray-800 group-hover:text-blue-700"
+                    }`} />
                   <span className="font-medium">Usuarios</span>
                 </Link>
               </li>
             )}
 
             {/* Permisos */}
-            <li >
+            <li>
               <button
                 onClick={() => toggleSubMenu(3)}
-                className="group w-full flex text-gray-800 items-center justify-between py-2 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-700 hover:shadow-sm transition-colors"
+                className="group w-full flex items-center justify-between py-2 px-4 rounded-lg hover:bg-blue-50 hover:text-blue-700"
               >
                 <span className="flex items-center gap-4">
-                  <RiShieldUserLine className="text-gray-800 text-xl group-hover:text-blue-700" />{" "}
+                  <RiFileTextLine className="text-xl text-gray-800 group-hover:text-blue-700" />
                   <span className="font-medium">Permisos</span>
                 </span>
                 <RiArrowRightSLine
-                  className={`mt-1 ${activeSubmenu === 3 && "rotate-90"} transition-all`}
+                  className={`${activeSubmenu === 3 ? "rotate-90 text-blue-700" : "text-gray-800 "
+                    } transition-transform`}
                 />
               </button>
-
-              {/* Solicitudes - Acceso Todos */}
               <ul
                 className={`mt-2 space-y-1 pl-8 overflow-hidden transition-all ${activeSubmenu === 3 ? "h-auto" : "h-0"
                   }`}
               >
                 <li>
                   <button
-                    onClick={handlePermisosClick}
-                    className="w-full flex items-start  py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 hover:shadow-md hover:text-blue-700 rounded-lg transition-all"
+                    onClick={() => handleNavigate(`/permisos/${user.employee_id}/solicitar`)}
+                    className={`w-full flex items-start py-2 px-4 text-sm rounded-lg ${location.pathname === `/permisos/${user.employee_id}/solicitar`
+                      ? "bg-gray-100 text-blue-700 shadow"
+                      : "hover:bg-blue-50 "
+                      }`}
                   >
                     Solicitudes
                   </button>
@@ -146,7 +167,10 @@ const Sidebar = () => {
                   <li>
                     <Link
                       to="/permisos/autorizaciones"
-                      className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 hover:shadow-md hover:text-blue-700 rounded-lg transition-all"
+                      className={`block py-2 px-4 text-sm rounded-lg ${location.pathname === "/permisos/autorizaciones"
+                        ? "bg-gray-100 text-blue-700 shadow"
+                        : "hover:bg-blue-50 hover:text-blue-700"
+                        }`}
                     >
                       Autorizaciones
                     </Link>
@@ -156,9 +180,13 @@ const Sidebar = () => {
                 {/* Tipos de Permisos - Acceso Administrador */}
                 {(userRole === 'Administrador') && (
                   <li>
+
                     <Link
                       to="/permisos/tipos"
-                      className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 hover:shadow-md hover:text-blue-700 rounded-lg transition-all"
+                      className={`block py-2 px-4 text-sm rounded-lg ${location.pathname === "/permisos/tipos"
+                        ? "bg-gray-100 text-blue-700 shadow"
+                        : "hover:bg-blue-50 hover:text-blue-700"
+                        }`}
                     >
                       Tipos de Permisos
                     </Link>
@@ -170,7 +198,10 @@ const Sidebar = () => {
                   <li>
                     <Link
                       to="/permisos/motivos-rechazo"
-                      className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 hover:shadow-md hover:text-blue-700 rounded-lg transition-all"
+                      className={`block py-2 px-4 text-sm rounded-lg ${location.pathname === "/permisos/motivos-rechazo"
+                        ? "bg-gray-100 text-blue-700 shadow"
+                        : "hover:bg-blue-50 hover:text-blue-700"
+                        }`}
                     >
                       Motivos de Rechazo
                     </Link>
@@ -179,51 +210,56 @@ const Sidebar = () => {
               </ul>
             </li>
 
-            {/* Organización - Acceso Administrador*/}
-            {(userRole === 'Administrador') && (
+            {/* Organización */}
+            {userRole === "Administrador" && (
               <li>
                 <button
-                  onClick={() => toggleSubMenu(1)}
-                  className="group w-full flex text-gray-800 items-center justify-between py-2 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-700 hover:shadow-sm transition-colors"
+                  onClick={() => toggleSubMenu(4)}
+                  className="group w-full flex items-center justify-between py-2 px-4 rounded-lg hover:bg-blue-50 hover:text-blue-700"
                 >
                   <span className="flex items-center gap-4">
-                    <HiOutlineOfficeBuilding className="text-gray-800 text-xl group-hover:text-blue-700" />{" "}
+                    <HiOutlineOfficeBuilding className="text-xl text-gray-800" />
                     <span className="font-medium">Organización</span>
                   </span>
                   <RiArrowRightSLine
-                    className={`mt-2 ${activeSubmenu === 1 && "rotate-90"} transition-all`}
+                    className={`${activeSubmenu === 4 ? "rotate-90 text-blue-700" : "text-gray-800 group-hover:text-blue-700"
+                      } transition-transform`}
                   />
                 </button>
                 <ul
-                  className={`mt-2 space-y-1 pl-8 overflow-hidden transition-all ${activeSubmenu === 1 ? "h-auto" : "h-0"
+                  className={`mt-2 space-y-1 pl-8 overflow-hidden transition-all ${activeSubmenu === 4 ? "h-auto" : "h-0"
                     }`}
                 >
-
-                  {/* Direcciones - Acceso Administrador */}
                   <li>
                     <Link
                       to="/direcciones"
-                      className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 hover:shadow-md hover:text-blue-700 rounded-lg transition-all"
+                      className={`block py-2 px-4 text-sm rounded-lg ${location.pathname === "/direcciones"
+                        ? "bg-gray-100 text-blue-700 shadow"
+                        : "hover:bg-blue-50 hover:text-blue-700"
+                        }`}
                     >
                       Direcciones
                     </Link>
                   </li>
-
-                  {/* Unidades - Acceso Administrador */}
                   <li>
                     <Link
                       to="/unidades"
-                      className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 hover:shadow-md hover:text-blue-700 rounded-lg transition-all"
+                      className={`block py-2 px-4 text-sm rounded-lg ${location.pathname === "/unidades"
+                        ? "bg-gray-100 text-blue-700 shadow"
+                        : "hover:bg-blue-50 hover:text-blue-700"
+                        }`}
                     >
                       Unidades
                     </Link>
                   </li>
 
-                  {/* Cargos - Acceso Administrador */}
                   <li>
                     <Link
                       to="/cargos"
-                      className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 hover:shadow-md hover:text-blue-700 rounded-lg transition-all"
+                      className={`block py-2 px-4 text-sm rounded-lg ${location.pathname === "/cargos"
+                        ? "bg-gray-100 text-blue-700 shadow"
+                        : "hover:bg-blue-50 hover:text-blue-700"
+                        }`}
                     >
                       Cargos
                     </Link>
@@ -232,32 +268,45 @@ const Sidebar = () => {
               </li>
             )}
 
-            {/* Configuraciones - Acceso Administrador */}
+            {/* Usuarios - Acceso Administrador*/}
             {(userRole === 'Administrador') && (
               <li className="group">
                 <Link
                   to="/configuraciones"
-                  className="w-full flex text-gray-800 items-center gap-4 py-2 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-700 hover:shadow-sm  transition-colors"
+                  className={`w-full flex items-center gap-4 py-2 px-4 rounded-lg ${location.pathname === `/configuraciones`
+                    ? "bg-gray-100 text-blue-700 shadow"
+                    : "hover:bg-blue-50 hover:text-blue-700"
+                    }`}
                 >
-                  <RiSettings3Line className="text-gray-800 text-xl group-hover:text-blue-700" />
+                  <RiSettings3Line className={`text-xl ${location.pathname === `/configuraciones`
+                    ? "text-blue-700"
+                    : "text-gray-800 group-hover:text-blue-700"
+                    }`} />
                   <span className="font-medium">Configuraciones</span>
                 </Link>
               </li>
             )}
+
           </ul>
         </div>
 
+        {/* Cerrar sesión */}
         <nav className="p-4">
           <hr className="mb-4" />
-          <button onClick={handleLogout} className="group w-full flex text-gray-800 items-center gap-4 py-2 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-700 hover:shadow-sm  transition-colors">
+          <button
+            onClick={handleLogout}
+            className="group w-full flex items-center gap-4 py-2 px-4 rounded-lg hover:bg-blue-50 hover:text-blue-700"
+          >
             <RiLogoutCircleRLine className="text-gray-800 text-xl group-hover:text-blue-700" />
-            <span className="font-medium">Cerrar sesión</span >
+            <span className="font-medium">Cerrar sesión</span>
           </button>
         </nav>
       </div>
+
+      {/* Botón para mostrar/ocultar el menú */}
       <button
         onClick={() => setShowMenu(!showMenu)}
-        className="xl:hidden fixed bottom-4 right-4 bg-primary text-black p-3 rounded-full z-50"
+        className="xl:hidden fixed bottom-4 right-4 bg-gray-800 text-white p-3 rounded-full z-50"
       >
         {showMenu ? <RiCloseLine /> : <RiMenu3Line />}
       </button>
