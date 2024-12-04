@@ -9,6 +9,7 @@ import { fetchAssignedLeaves, setAssignedLeaveFilter, updateCache, clearCache } 
 import { getAuthorizationCellStyle } from './Table/authorizationColumnsStyles';
 import ActionModal from './Table/ActionModal';
 import PermissionDetailModal from './PermissionDetails/PermissionDetailModal';
+import LoadingIndicator from '../../../../components/ui/LoadingIndicator';
 
 const AssignedLeaves = () => {
   const dispatch = useDispatch();
@@ -63,7 +64,7 @@ const AssignedLeaves = () => {
   const actions = [
     {
       label: 'Ver más',
-      icon: <RiEyeLine className="text-gray-600 h-4 w-4" />,
+      icon: <RiEyeLine className="text-gray-700 h-4 w-4" />,
       onClick: handleViewDetails,
       className: 'bg-gray-100 hover:bg-gray-200 cursor-pointer',
     },
@@ -149,7 +150,7 @@ const AssignedLeaves = () => {
         </div>
       </CardHeader>
       {loading ? (
-        <div>Cargando...</div>
+        <LoadingIndicator />
       ) : error ? (
         <div>Error: {error}</div>
       ) : (

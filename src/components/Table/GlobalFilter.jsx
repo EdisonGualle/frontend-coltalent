@@ -10,7 +10,6 @@ const GlobalFilter = ({ preGlobalFilteredRows, globalFilter, setGlobalFilter }) 
   }, 200);
 
   return (
-    <div className="table-header sticky top-0 bg-white z-10 py-2">
       <div className="flex justify-between items-center py-2">
         <div className="flex items-center space-x-2">
           <div className="relative flex items-center justify-center max-w-md mx-auto h-6 group">
@@ -32,8 +31,7 @@ const GlobalFilter = ({ preGlobalFilteredRows, globalFilter, setGlobalFilter }) 
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </div>  
   );
 };
 

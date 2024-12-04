@@ -13,16 +13,16 @@ export const getHistoryCellStyle = (columnId, value) => {
   
     if (columnId === 'state.name') {
       if (value === 'Pendiente') {
-        return 'bg-yellow-100 text-yellow-600';
+        return 'bg-yellow-100 text-yellow-600 shadow-sm';
       }
       if (value === 'Aprobado') {
-        return 'bg-green-100 text-green-600';
+        return 'bg-green-100 text-green-600 shadow-sm';
       }
       if (value === 'Rechazado') {
-        return 'bg-red-100 text-red-600';
+        return 'bg-red-100 text-red-600 shadow-sm';
       }
       if (value === 'Corregir') {
-        return 'bg-orange-100 text-orange-600';
+        return 'bg-orange-100 text-orange-600 shadow-sm';
       }
     }
     return '';

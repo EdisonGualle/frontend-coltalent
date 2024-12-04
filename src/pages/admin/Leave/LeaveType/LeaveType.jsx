@@ -18,6 +18,7 @@ import ModalForm from '../../../../components/ui/ModalForm';
 import { FaClipboardList } from "react-icons/fa";
 import { getLeaveTypeCellStyle } from './Table/leaveTypeColumnStyles';
 
+import LoadingIndicator from '../../../../components/ui/LoadingIndicator';
 
 const LeaveType = () => {
   const dispatch = useDispatch();
@@ -193,13 +194,13 @@ const LeaveType = () => {
   const renderActions = (row) => [
     {
       label: 'Editar',
-      icon: <RiEdit2Line className="text-green-600 h-4 w-4" />,
+      icon: <RiEdit2Line className="text-green-700 h-4 w-4" />,
       onClick: () => handleEdit(row),
       className: 'bg-green-100 hover:bg-green-200 cursor-pointer',
     },
     {
       label: row.status === 'Activo' ? 'Desactivar' : 'Activar',
-      icon: row.status === 'Activo' ? <RiCloseCircleLine className="text-yellow-600 h-4 w-4" /> : <RiCheckboxCircleLine className="text-green-600 h-4 w-4" />,
+      icon: row.status === 'Activo' ? <RiCloseCircleLine className="text-yellow-700 h-4 w-4" /> : <RiCheckboxCircleLine className="text-green-700 h-4 w-4" />,
       onClick: () => handleToggleClick(row),
       className: row.status === 'Activo' ? 'bg-yellow-100 hover:bg-yellow-200 cursor-pointer' : 'bg-green-100 hover:bg-green-200 cursor-pointer',
     }
@@ -224,14 +225,7 @@ const LeaveType = () => {
 
       <div className=''>
         {isLoadingInitial && !allLeaveTypes.length ? (
-          <SkeletonTable
-            columns={leaveTypeColumns}
-            showFilters={false}
-            showExport={false}
-            showAddNew={true}
-            showColumnOptions={false}
-            actions={renderActions}
-          />
+          <LoadingIndicator/>
         ) : (
           <LeaveTable
             columns={leaveTypeColumns}

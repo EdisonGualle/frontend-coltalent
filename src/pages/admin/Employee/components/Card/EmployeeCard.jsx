@@ -9,7 +9,7 @@ const EmployeeCard = memo(({ employee, updateEmployees }) => {
 
 
   return (
-    <Card className="bg-gray-100 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg  hover:shadow-secondary-100 relative group  border-b-4 border-b-gradient-to-r hover:border-blue-200">
+    <Card className="rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-lg  hover:shadow-secondary-100 relative group  border-b-4 border-b-gradient-to-r hover:border-blue-200">
       <CardBody className="flex flex-col items-center gap-2 p-4">
         <div className="relative">
           {photoUrl ? (

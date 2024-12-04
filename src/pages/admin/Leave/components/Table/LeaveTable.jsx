@@ -291,7 +291,7 @@ const LeaveTable = ({
                 <th className="py-4 px-6 text-left relative" style={{ minHeight: '50px' }}>
                   <button
                     ref={buttonRef}
-                    className={`focus:outline-none ${someSelected || allSelected ? 'text-blue-500' : 'text-gray-500'} hover:text-blue-500`}
+                    className={`focus:outline-none ${someSelected || allSelected ? 'text-blue-600' : 'text-gray-600'} hover:text-blue-600`}
                     title='Acciones'
                     onClick={handleMenuToggle}
                   >
@@ -365,16 +365,16 @@ const LeaveTable = ({
               )}
             </tr>
           </thead>
-          <tbody className="text-gray-700 text-xs bg-white">
+          <tbody className="text-gray-700 text-sm bg-white">
             {paginatedData.length > 0 ? (
               paginatedData.map((row) => (
                 <tr
                   key={row.id}
-                  className=" hover:bg-gray-100 group"
+                  className=" hover:bg-gray-100 group  transition duration-200 ease-in-out"
                   style={{ minHeight: '50px' }}
                 >
                   {onDelete && (
-                    <td className="py-3 px-6 text-left whitespace-nowrap group-hover:bg-gray-100" style={{ minHeight: '50px' }}>
+                    <td className="py-3 px-6 text-left whitespace-nowrap group-hover:bg-gray-100  transition duration-200 ease-in-out" style={{ minHeight: '50px' }}>
                       <input
                         type="checkbox"
                         checked={!!selectedRows[row.id]}
@@ -385,13 +385,13 @@ const LeaveTable = ({
                   {visibleColumns.map((column) => (
                     <td
                       key={column.id}
-                      className={`py-3 px-6 text-left text-xs group-hover:bg-gray-100 ${column.autoWidth ? 'whitespace-nowrap auto-width' : ''}`}
+                      className={`py-3 px-6 text-left text-sm group-hover:bg-gray-100  transition duration-200 ease-in-out ${column.autoWidth ? 'whitespace-nowrap auto-width' : ''}`}
                       style={{ minHeight: '50px' }}
                     >
                       {column.render ? (
-                        <span className={`rounded-full px-2 py-1 inline-block ${getCellStyle(column.id, getNestedValue(row, column.id) || '')}`}>
-                          {column.render(row)}
-                        </span>
+                          <span className={`rounded-full px-2 py-1 inline-block ${getCellStyle(column.id, getNestedValue(row, column.id) || '')}`}>
+                            {column.render(row)}
+                          </span>
                       )
                         : column.showIcon ? (
                           column.id === 'attachment' ? (
@@ -407,7 +407,7 @@ const LeaveTable = ({
                               {formatCombinedEvaluators(row, column.combineFields)}
                             </span>
                           ) : (
-                            <span className={`rounded-full px-2 py-1 inline-block ${getCellStyle(column.id, getNestedValue(row, column.id) || '')}`}>
+                            <span className={`rounded-lg  px-2 py-1 inline-block ${getCellStyle(column.id, getNestedValue(row, column.id) || '')}`}>
                               {(getNestedValue(row, column.id) !== undefined && getNestedValue(row, column.id) !== null) ? formatCellContent(getNestedValue(row, column.id)) : ''}
                             </span>
                           )
@@ -416,7 +416,7 @@ const LeaveTable = ({
                   ))}
 
                   {showActions && (
-                    <td className="py-3 px-4 text-center text-xs bg-white z-10 group-hover:bg-gray-100" style={{ minWidth: '50px', maxWidth: '300px', width: 'auto' }}>
+                    <td className="py-3 px-4 text-center text-sm bg-white z-10 group-hover:bg-gray-100  transition duration-200 ease-in-out" style={{ minWidth: '50px', maxWidth: '300px', width: 'auto' }}>
                       {(typeof actions === 'function' ? actions(row) : actions).map(action => (
                         <button
                           key={action.label}
@@ -435,7 +435,7 @@ const LeaveTable = ({
               ))
             ) : (
               <tr>
-                <td colSpan={visibleColumns.length + (showActions && onDelete ? 2 : 1)} className="py-4 px-6 text-center text-xs text-gray-500">
+                <td colSpan={visibleColumns.length + (showActions && onDelete ? 2 : 1)} className="py-4 px-6 text-center text-sm text-gray-500">
                   No hay coincidencias que mostrar
                 </td>
               </tr>
@@ -443,7 +443,7 @@ const LeaveTable = ({
           </tbody>
         </table>
       </div>
-      <div className="pagination-container">
+      <div className="pagination-container px-2">
         <Pagination
           currentPage={currentPage}
           rowsPerPage={rowsPerPage}

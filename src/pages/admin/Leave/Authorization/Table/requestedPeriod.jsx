@@ -18,17 +18,17 @@ export const renderRequestedPeriod = (row, asText = false) => {
             <div>
                 {period.start === period.end ? (
                     // Color para fechas iguales
-                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded-lg">
+                    <span className="text-xs font-semibold  bg-green-100 text-green-600 px-2 py-1 rounded-lg shadow-sm">
                         {period.start}
                     </span>
                 ) : (
                     // Color para rango de fechas
                     <div>
-                        <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-lg">
+                        <span className="text-xs font-semibold bg-yellow-100 text-yellow-600 px-2 py-1 rounded-lg shadow-sm">
                             {period.start}
                         </span>
-                        <span className="text-gray-500 mx-1">-</span>
-                        <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-lg">
+                        <span className="text-xs  text-gray-500 mx-1">-</span>
+                        <span className="text-xs font-semibold bg-yellow-100 text-yellow-600 px-2 py-1 rounded-lg shadow-sm">
                             {period.end}
                         </span>
                     </div>
@@ -50,10 +50,10 @@ export const renderRequestedPeriod = (row, asText = false) => {
         // Color para una fecha única
         return (
             <div>
-                <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg">
+                <span className="text-xs font-semibold bg-blue-100 text-blue-600 px-2 py-1 rounded-lg shadow-sm">
                     {period.date}
                 </span>
-                {timeRange && <span className="ml-2 text-gray-500">{timeRange}</span>}
+                {timeRange && <span className="text-xs ml-2 text-gray-500">{timeRange}</span>}
             </div>
         );
     }

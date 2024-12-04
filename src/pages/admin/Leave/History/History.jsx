@@ -8,6 +8,7 @@ import { fetchLeaveHistory, setLeaveHistoryFilter, updateCache, clearCache } fro
 import { getHistoryCellStyle } from './historyComumnStyles';
 import { RiEyeLine } from 'react-icons/ri';
 import PermissionDetailModal from '../Authorization/PermissionDetails/PermissionDetailModal';
+import LoadingIndicator from '../../../../components/ui/LoadingIndicator';
 
 const History = () => {
   const { id: employeeId } = useParams(); // Obtener employeeId desde la ruta
@@ -114,7 +115,7 @@ const History = () => {
         </div>
       </CardHeader>
       {loading ? (
-        <div>Cargando...</div>
+        <LoadingIndicator />
       ) : error ? (
         <div>Error: {error}</div>
       ) : (

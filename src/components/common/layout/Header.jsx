@@ -19,7 +19,7 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full h-[7vh] md:h-[10vh] p-8 flex items-center justify-end bg-gray-200 bg-opacity-30 backdrop-blur-lg z-50">
+    <header className="fixed top-0 left-0 w-full h-[7vh] md:h-[10vh] p-8 flex items-center justify-end bg-gray-100 bg-opacity-30 backdrop-blur-lg z-50">
       <nav className="flex items-center gap-2">
         <Notifications />
         <Menu
@@ -27,7 +27,7 @@ const Header = () => {
             <MenuButton className="flex items-center gap-x-2 p-2 rounded-lg transition-colors hover:bg-gray-200 group">
               <img
                 src={`${import.meta.env.VITE_STORAGE_URL}/${user.photo}`}
-                className="w-6 h-6 object-cover rounded-full"
+                className="w-8 h-8 object-cover rounded-full"
               />
               {user && user.employee_name ? (
                 <span className="text-gray-900 group-hover:text-black">

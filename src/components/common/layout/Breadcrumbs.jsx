@@ -100,7 +100,7 @@ const Breadcrumbs = () => {
   });
 
   return (
-    <nav aria-label="Breadcrumb" className="mt-2   rounded-lg px-2 py-1">
+    <nav aria-label="Breadcrumb" className="rounded-lg px-2 py-1">
       <ol className="flex items-center gap-1 text-sm text-gray-600">
         {breadcrumbItems.map((item, index) => (
           <React.Fragment key={index}>

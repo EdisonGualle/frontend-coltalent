@@ -7,22 +7,22 @@ export const getAuthorizationCellStyle = (columnId, value) => {
       return 'bg-purple-100 text-purple-600';
     }
     if (value.includes('Minutos') || value.includes('Minuto')) {
-      return 'bg-indigo-100 text-indigo-600';
+      return 'bg-indigo-100 text-indigo-600 ';
     }
   }
 
   if (columnId === 'state.name') {
     if (value === 'Pendiente') {
-      return 'bg-yellow-100 text-yellow-600';
+      return 'text-xs font-semibold  bg-yellow-100 text-yellow-600 shadow-sm';
     }
     if (value === 'Aprobado') {
-      return 'bg-green-100 text-green-600';
+      return 'text-xs font-semibold  bg-green-100 text-green-600 shadow-sm';
     }
     if (value === 'Rechazado') {
-      return 'bg-red-100 text-red-600';
+      return 'text-xs font-semibold  bg-red-100 text-red-600 shadow-sm';
     }
     if (value === 'Corregir') {
-      return 'bg-orange-100 text-orange-600';
+      return 'text-xs font-semibold  bg-orange-100 text-orange-600 shadow-sm';
     }
   }
 

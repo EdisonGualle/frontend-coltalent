@@ -1,28 +1,28 @@
 export const getLeaveTypeCellStyle = (columnId, value) => {
     if (columnId === 'time_unit') {
       if (value === 'Días') {
-        return 'bg-blue-100 text-blue-600'; 
+        return 'text-xs font-semibold  bg-blue-100 text-blue-600 shadow-sm'; 
       }
       if (value === 'Horas') {
-        return 'bg-purple-100 text-purple-600'; 
+        return 'text-xs font-semibold  bg-purple-100 text-purple-600 shadow-sm'; 
       }
     }
   
     if (columnId === 'requires_document') {
       if (value === 'Si') {
-        return 'bg-teal-100 text-teal-600'; 
+        return 'text-xs font-semibold  bg-teal-100 text-teal-600 shadow-sm'; 
       }
       if (value === 'No') {
-        return 'bg-pink-100 text-pink-600'; 
+        return 'text-xs font-semibold  bg-pink-100 text-pink-600 shadow-sm'; 
       }
     }
 
     if (columnId === 'status') {
       if (value === 'Activo') {
-        return 'bg-green-100 text-green-700';
+        return 'text-xs font-semibold  bg-green-100 text-green-600  shadow-sm';
       }
       if (value === 'Inactivo') {
-        return 'bg-yellow-100 text-yellow-700';
+        return 'text-xs font-semibold  bg-yellow-100 text-yellow-600 shadow-sm';
       }
       
     }

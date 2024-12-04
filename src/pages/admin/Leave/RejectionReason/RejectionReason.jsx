@@ -17,6 +17,9 @@ import ModalForm from '../../../../components/ui/ModalForm';
 import { TbMessageX } from "react-icons/tb";
 import RejectionReasonForm from './RejectionReasonForm';
 import { getCellStyle } from './Table/getCellStyle';
+import LoadingIndicator from '../../../../components/ui/LoadingIndicator';
+
+
 const RejectionReason = () => {
   const dispatch = useDispatch();
   const { showAlert } = useContext(AlertContext);
@@ -189,13 +192,13 @@ const RejectionReason = () => {
   const renderActions = (row) => [
     {
       label: 'Editar',
-      icon: <RiEdit2Line className="text-green-600 h-4 w-4" />,
+      icon: <RiEdit2Line className="text-green-700 h-4 w-4 " />,
       onClick: () => handleEdit(row),
       className: 'bg-green-100 hover:bg-green-200 cursor-pointer',
     },
     {
       label: row.status === 'Activo' ? 'Desactivar' : 'Activar',
-      icon: row.status === 'Activo' ? <RiCloseCircleLine className="text-yellow-600 h-4 w-4" /> : <RiCheckboxCircleLine className="text-green-600 h-4 w-4" />,
+      icon: row.status === 'Activo' ? <RiCloseCircleLine className="text-yellow-700 h-4 w-4 " /> : <RiCheckboxCircleLine className="text-green-700 h-4 w-4" />,
       onClick: () => handleToggleClick(row),
       className: row.status === 'Activo' ? 'bg-yellow-100 hover:bg-yellow-200 cursor-pointer' : 'bg-green-100 hover:bg-green-200 cursor-pointer',
     }
@@ -204,7 +207,7 @@ const RejectionReason = () => {
 
   return (
     <div>
-      <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0 bg-gray-100">
+      <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0 bg-gray-100 " >
         <div className="mb-2 flex items-center justify-between gap-8">
           <div>
             <Typography variant="h5" color="blue-gray" className="font-semibold">
@@ -219,14 +222,7 @@ const RejectionReason = () => {
 
       <div className=''>
         {isLoadingInitial && !allRejectionReasons.length ? (
-          <SkeletonTable
-            columns={rejectionReasonColumns}
-            showFilters={false}
-            showExport={false}
-            showAddNew={true}
-            showColumnOptions={false}
-            actions={renderActions}
-          />
+          <LoadingIndicator />
         ) : (
           <LeaveTable
             columns={rejectionReasonColumns}
