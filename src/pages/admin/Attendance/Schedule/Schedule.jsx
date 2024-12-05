@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import WeeklySchedule from './WeeklySchedule';
 import { getEmployeeWorkSchedules } from '../../../../services/Employee/Schedules/workScheduleService.js';
+import LoadingSpinner from '../../../../components/ui/LoadingIndicator.jsx';
 
 const Schedule = () => {
   const { id: employee_id } = useParams();
@@ -68,14 +69,12 @@ const Schedule = () => {
     console.log('Editar horario');
   };
 
-    // Mostrar el indicador de carga si `loading` es verdadero
-    if (loading) {
-      return (
-        <div className="">
-          Cargando...
-        </div>
-      );
-    }
+  // Mostrar el indicador de carga si `loading` es verdadero
+  if (loading) {
+    return (
+      <LoadingSpinner />
+    );
+  }
 
   return <WeeklySchedule schedule={schedule} onEdit={handleEdit} />;
 };

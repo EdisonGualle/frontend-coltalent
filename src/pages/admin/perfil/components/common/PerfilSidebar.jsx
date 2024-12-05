@@ -63,7 +63,7 @@ const PerfilSidebar = () => {
   };
 
   return (
-    <div className="bg-slate-200 shadow-lg rounded-lg p-4 w-64">
+    <div className="bg-gray-200  rounded-lg p-4 w-64  mb-1">
       <h5 className="text-gray-900 text-lg text-center font-bold mb-4">PERFIL EMPLEADO</h5>
       <div className="flex flex-col items-center mb-6 text-gray-700 hover:text-blue-500">
         {renderAvatar()}

@@ -624,7 +624,7 @@ const Request = () => {
   };
 
   return (
-    <form className="px-6" onSubmit={handleSubmit}>
+    <form className="px-4" onSubmit={handleSubmit}>
       {/* Parte del renderizado de los botones */}
       {leaveChunks.map((chunk, index) => {
         return (

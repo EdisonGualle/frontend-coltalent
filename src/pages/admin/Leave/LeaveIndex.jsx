@@ -46,13 +46,13 @@ const LeaveIndex = () => {
   }
 
   return (
-    <div className="flex h-[80vh] w-full">
-      <div className="bg-slate-200 overflow-auto custom-scrollbar rounded-lg mt-1">
+    <div className="flex h-[80vh]">
+      <div className=" overflow-auto  shadow-lg rounded-lg mt-1 bg-gray-200">
         <LeaveSidebar />
       </div>
-      <div className="flex flex-col w-4/5 mt-1 ms-2 relative z-0">
+      <div className="flex flex-col w-3/4 mt-1 ms-2">
         <LeaveHeader />
-        <div className="flex-1 shadow-lg overflow-auto custom-scrollbar relative z-10">
+        <div className="flex-1  overflow-auto custom-scrollbar">
           <Routes>
             <Route path="solicitar" element={<LeaveRequest />} />
             <Route path="historial" element={<History />} />

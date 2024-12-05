@@ -75,7 +75,6 @@ const Sidebar = () => {
             </li>
 
             {/* Perfil - Acceso Administrador*/}
-            {(userRole === 'Administrador') && (
               <li className="group">
                 <button
                   onClick={() => handleNavigate(`/perfil/${user.employee_id}/datos-personales`)}
@@ -91,7 +90,6 @@ const Sidebar = () => {
                   <span className="font-medium">Perfil</span>
                 </button>
               </li>
-            )}
 
             {/* Empleados - Acceso Administrador*/}
             {(userRole === 'Administrador') && (

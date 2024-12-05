@@ -9,7 +9,7 @@ const WeeklySchedule = ({ schedule, onEdit }) => {
 
     return (
         <div className="container mx-auto p-4">
-            <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0">
+            <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0 bg-gray-100">
                 <div className="mb-2 flex items-center justify-between gap-8">
                     <div>
                         <Typography variant="h5" color="blue-gray" className="font-semibold">

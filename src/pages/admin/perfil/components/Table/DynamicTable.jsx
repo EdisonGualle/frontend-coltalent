@@ -74,7 +74,7 @@ const DynamicTable = ({ title, columns, data, onAddNew, onGenerateReport, onEdit
   const someSelected = selectedCount > 0 && !allSelected;
 
   return (
-    <div className=" flex-1 shadow-md rounded-lg bg-gray-50 relative px-3 pb-3">
+    <div className=" flex-1 shadow-md rounded-b-lg bg-gray-50 relative px-3 pb-3">
       <div className="flex justify-between items-center py-4">
         <h2 className="text-sm font-semibold text-gray-800">{title}</h2>
         <div className="flex items-center space-x-4">

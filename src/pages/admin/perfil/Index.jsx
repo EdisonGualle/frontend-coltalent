@@ -57,8 +57,8 @@ const Perfil = () => {
   }
 
   return (
-    <div className="flex h-[80vh] w-full">
-      <div className="bg-slate-200 overflow-auto custom-scrollbar rounded-lg mt-1">
+    <div className="flex h-[80vh] ">
+      <div className=" overflow-y-auto shadow-lg rounded-lg mt-1 bg-gray-200">
         <PerfilSidebar />
       </div>
       <div className="flex flex-col w-3/4 mt-1 ms-2">

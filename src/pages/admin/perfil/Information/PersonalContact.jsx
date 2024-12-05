@@ -62,7 +62,7 @@ const PersonalContact = () => {
     };
 
     return (
-        <div className="bg-white p-4 shadow-md rounded-lg">
+        <div className="bg-white p-4 shadow-md rounded-b-lg">
             <form className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <SimpleInput
                     label="Teléfono Personal"
