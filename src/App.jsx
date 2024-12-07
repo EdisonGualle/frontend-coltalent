@@ -53,7 +53,8 @@ import AssignedLeaves from "./pages/admin/Leave/Authorization/AssignedLeaves";
 import Configurations from "./pages/Configurations";
 import AnotherComponent from "./pages/admin/Employee/AnotherComponent";
 
-
+// Prueba subrogaciones
+import Delegations from "./pages/admin/Subrogations/Delegations";
 
 function App() {
   return (
@@ -82,7 +83,8 @@ function App() {
                     <Route path="" element={<EmployeeIndex />} />
                   </Route>
 
-
+                  {/* Subrogaciones */}
+                    <Route path="/delegaciones" element={<Delegations />} />
 
                   {/* Perfil */}
                   <Route path="/perfil/:id/*" element={<Perfil />} />

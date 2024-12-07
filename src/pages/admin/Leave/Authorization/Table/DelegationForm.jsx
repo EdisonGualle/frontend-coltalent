@@ -23,8 +23,6 @@ const DelegationForm = ({
         name: candidate.full_name,
     }));
 
-    console.log(selectedResponsibilities);
-
     return (
         <div>
             <div>
@@ -57,7 +55,6 @@ const DelegationForm = ({
                 )}
             </div>
 
-           
             <div className='mb-4 mt-2'>
                 <Textarea
                     value={reason}

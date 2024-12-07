@@ -12,7 +12,9 @@ import {
   RiSettings3Line,
   RiProfileLine,
   RiShieldUserLine,
-  RiFileTextLine
+  RiFileUserLine,
+  RiFileTextLine,
+  RiAccountCircleLine
 } from "react-icons/ri";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { useAuth } from "../../../hooks/useAuth";
@@ -75,21 +77,21 @@ const Sidebar = () => {
             </li>
 
             {/* Perfil - Acceso Administrador*/}
-              <li className="group">
-                <button
-                  onClick={() => handleNavigate(`/perfil/${user.employee_id}/datos-personales`)}
-                  className={`w-full flex items-center gap-4 py-2 px-4 rounded-lg ${location.pathname === `/perfil/${user.employee_id}/datos-personales`
-                    ? "bg-gray-100 text-blue-700 shadow"
-                    : "hover:bg-blue-50 hover:text-blue-700"
-                    }`}
-                >
-                  <RiProfileLine className={`text-xl ${location.pathname === `/perfil/${user.employee_id}/datos-personales`
-                    ? "text-blue-700"
-                    : "text-gray-800 group-hover:text-blue-700"
-                    }`} />
-                  <span className="font-medium">Perfil</span>
-                </button>
-              </li>
+            <li className="group">
+              <button
+                onClick={() => handleNavigate(`/perfil/${user.employee_id}/datos-personales`)}
+                className={`w-full flex items-center gap-4 py-2 px-4 rounded-lg ${location.pathname === `/perfil/${user.employee_id}/datos-personales`
+                  ? "bg-gray-100 text-blue-700 shadow"
+                  : "hover:bg-blue-50 hover:text-blue-700"
+                  }`}
+              >
+                <RiShieldUserLine className={`text-xl ${location.pathname === `/perfil/${user.employee_id}/datos-personales`
+                  ? "text-blue-700"
+                  : "text-gray-800 group-hover:text-blue-700"
+                  }`} />
+                <span className="font-medium">Perfil</span>
+              </button>
+            </li>
 
             {/* Empleados - Acceso Administrador*/}
             {(userRole === 'Administrador') && (
@@ -175,6 +177,7 @@ const Sidebar = () => {
                   </li>
                 )}
 
+
                 {/* Tipos de Permisos - Acceso Administrador */}
                 {(userRole === 'Administrador') && (
                   <li>
@@ -207,6 +210,24 @@ const Sidebar = () => {
                 )}
               </ul>
             </li>
+
+            {/* Delegaciones */}
+            <li className="group">
+              <Link
+                to="/delegaciones"
+                className={`w-full flex items-center gap-4 py-2 px-4 mb-4 rounded-lg ${location.pathname === `/delegaciones`
+                  ? "bg-gray-100 text-blue-700 shadow"
+                  : "hover:bg-blue-50 hover:text-blue-700"
+                  }`}
+              >
+                <RiFileUserLine className={`text-xl ${location.pathname === `/delegaciones`
+                  ? "text-blue-700"
+                  : "text-gray-800 group-hover:text-blue-700"
+                  }`} />
+                <span className="font-medium">Delegaciones</span>
+              </Link>
+            </li>
+
 
             {/* Organización */}
             {userRole === "Administrador" && (

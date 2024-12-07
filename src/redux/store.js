@@ -21,8 +21,8 @@ import leaveTypeReducer from './Leave/leaveTypeSlince';
 import leaveReducer from './Leave/leaveSince';
 import assignedLeavesReducer from './Leave/assignedLeavesSlice';
 import leaveCommentReducer from './Leave/leaveCommentSlince';
-import leaveHistoryReducer from './Leave/LeaveHistorySlince';
-
+import leaveHistoryReducer from './Leave/leaveHistorySlince';
+import delegationsReducer from './Delegations/delegationsSlice';
 export default configureStore({
   reducer: {
     employee: employeReducer,
@@ -48,5 +48,6 @@ export default configureStore({
     assignedLeaves: assignedLeavesReducer,
     leaveComment: leaveCommentReducer,
     leaveHistory: leaveHistoryReducer,
+    delegations: delegationsReducer,
   },
 });
