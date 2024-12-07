@@ -5,6 +5,8 @@ import { fetchAssignedDelegations } from "../../../../redux/Delegations/delegati
 import LoadingIndicator from "../../../../components/ui/LoadingIndicator";
 import SubrogationsTable from "../Table/SubrogationsTable";
 import { exportToExcel } from "../Table/exportToExcel";
+import { exportToPdf } from "../Table/exportToPdf";
+
 import {
   assignedFixedColumns,
   assignedGeneralColumns,
@@ -26,18 +28,30 @@ const AssignedDelegations = () => {
   }, [dispatch, user?.employee_id, hasFetchedAssigned]);
 
   const handleExport = (data, columns, options = {}) => {
-    const { filename = 'archivo_exportado.xlsx', sheetName = 'Hoja1' } = options;
-  
-    // Generar un identificador único más corto
-    const uniqueId = new Date().getTime(); 
-    const baseFilename = filename.replace('.xlsx', ''); 
-    const uniqueFilename = `${baseFilename}_${uniqueId}.xlsx`; 
-  
+    const { filename = "archivo_exportado", sheetName = "Hoja1", format = "excel" } = options;
+
+    // Generar un identificador único basado en la fecha y hora actual
+    const uniqueId = new Date().toISOString().replace(/[-T:.Z]/g, "");
+    const baseFilename = filename.replace(/\.(xlsx|pdf)$/, ""); // Eliminar extensión si existe
+    const uniqueFilename = `${baseFilename}_${uniqueId}`;
+
+    // Combinar columnas fijas y columnas visibles
     const exportColumns = [...new Set([...assignedFixedColumns, ...columns])];
-    exportToExcel(data, exportColumns, { filename: uniqueFilename, sheetName });
+
+    // Manejar exportación según el formato
+    if (format === "excel") {
+      exportToExcel(data, exportColumns, {
+        filename: `${uniqueFilename}.xlsx`,
+        sheetName,
+      });
+    } else if (format === "pdf") {
+      console.log("Exportando a PDF...");
+      exportToPdf(data, exportColumns, {
+        filename: `${uniqueFilename}.pdf`,
+        title: sheetName,
+      });
+    }
   };
-  
-  
 
   return (
     <div className="">
@@ -57,10 +71,11 @@ const AssignedDelegations = () => {
             showActions={false}
             showAddNew={false}
             showExport={true} 
-            exportFunction={(data, columns) =>
+            exportFunction={(data, columns, format) =>
               handleExport(data, columns, {
-                filename: 'delegaciones_asignadas.xlsx', 
-                sheetName: 'Delegaciones',
+                filename: "delegaciones_asignadas",
+                sheetName: "Delegaciones",
+                format, // "excel" o "pdf"
               })
             }
           />

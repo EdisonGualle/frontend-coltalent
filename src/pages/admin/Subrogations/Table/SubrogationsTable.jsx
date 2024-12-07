@@ -63,20 +63,25 @@ const SubrogationsTable = ({
   }, [data]);
 
   const parseDate = (dateString) => {
-    // Intenta convertir al formato estándar
-    const isoDate = new Date(dateString);
-    if (!isNaN(isoDate)) {
-      return isoDate; // Formato válido como "2024-12-12"
+    // Si el valor ya es una instancia de Date, devolverlo directamente
+    if (dateString instanceof Date) {
+      return dateString;
     }
 
-    // Manejar formato "16-12-2024"
-    const [day, month, year] = dateString.split("-");
+    // Si no es un string, emitir advertencia y devolver null
+    if (typeof dateString !== "string") {
+      return null;
+    }
+
+    // Manejar formato "día/mes/año" (dd/MM/yyyy)
+    const [day, month, year] = dateString.split("/");
     if (day && month && year) {
       return new Date(`${year}-${month}-${day}`);
     }
-
-    return null; // Fecha no válida
+    return null;
   };
+
+
 
   const displayedData = Array.isArray(filteredData)
     ? filteredData.filter((row) => {
@@ -164,21 +169,20 @@ const SubrogationsTable = ({
     });
   };
 
-  const handleExport = (exportAll) => {
+  const handleExport = (exportAll, exportFormat) => {
     if (exportFunction) {
-      // Define los datos a exportar (todas las filas o solo visibles)
       const exportData = exportAll ? data : displayedData;
-  
-      // Combina las columnas fijas con las columnas pasadas al componente
       const exportColumns = exportAll
         ? [...allColumns, ...columns.filter(col => !allColumns.some(c => c.id === col.id))]
         : columns;
-  
-      // Llamar a la función de exportación
-      exportFunction(exportData, exportColumns);
+
+      // Llamar al método de exportación con el formato adecuado
+      exportFunction(exportData, exportColumns, { format: exportFormat });
     }
   };
-  
+
+
+
 
   const openModal = (data, config, title) => {
     setModalContent({ data, config, title });
@@ -300,11 +304,11 @@ const SubrogationsTable = ({
 
                 {showExportOptions && (
                   <ExportOptions
-                    onExport={(exportAll) => {
+                    onExport={(exportAll, exportFormat) => {
                       // Define los datos y columnas a exportar según la opción seleccionada
                       const exportData = exportAll ? data : displayedData;
                       const exportColumns = exportAll ? allColumns : visibleColumns;
-                      exportFunction(exportData, exportColumns);
+                      exportFunction(exportData, exportColumns, exportFormat);
                     }}
                     onClose={() => setShowExportOptions(false)}
                   />

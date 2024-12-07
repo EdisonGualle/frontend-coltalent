@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const DateRangeFilter = ({ onDateRangeChange }) => {
     const [dateRange, setDateRange] = useState([null, null]);
@@ -24,6 +25,7 @@ const DateRangeFilter = ({ onDateRangeChange }) => {
             placeholderText="Filtrar rango de fechas"
             className="min-w-[230px] max-w-[400px] pl-4 pr-6 py-2 text-base text-gray-800 bg-transparent placeholder-gray-500 focus:outline-none focus:ring-0"
             calendarClassName="rounded-lg shadow-lg border border-gray-200" 
+            dateFormat="dd/MM/yyyy"
             popperClassName="z-50" 
             portalId="root"
             popperContainer={({ children }) => <div className="z-50">{children}</div>}
