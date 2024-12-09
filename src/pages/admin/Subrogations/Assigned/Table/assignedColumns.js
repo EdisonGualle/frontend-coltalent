@@ -1,39 +1,55 @@
+import { renderDelegationPeriod } from "./renderDelegationPeriod";
+import { renderDecisionDate } from "./renderDecisionDate.jsx";
+
 // Columnas que siempre estarán visibles y no se pueden ocultar
 export const assignedFixedColumns = [
   {
-    id: "reason",
-    label: "Razón",
+    id: "delegated_by.full_name",
+    label: "Asignado Por",
+    autoWidth: true,
+    order: 1,
+    exportable: true,
+  },
+  {
+    id: "delegated_by.decision_date",
+    label: "Fecha de Decisión",
+    render: renderDecisionDate,
+    autoWidth: true,
+    order: 4,
+    exportable: true,
+  },
+  {
+    id: "delegation_period",
+    label: "Periodo de Subrogación",
+    render: renderDelegationPeriod,
+    filterType: "combinedDateRange",
+    order: 5,
+    exportable: true,
   },
   {
     id: "status",
     label: "Estado",
+    order: 7,
+    exportable: true,
+    autoWidth: true,
   },
 ];
 
 // Columnas visibles al inicio (modificables por el usuario)
 export const assignedVisibleColumns = [
   {
-    id: "delegated_by.full_name",
-    label: "Delegado Por",
-  },
-  {
-    id: "delegated_by.decision_date",
-    label: "Fecha Decisión",
-    autoWidth: true,
-  },
-  {
-    id: "original_leave.start_date",
-    label: "Inicio Permiso",
-    filterType: "dateRange",
-  },
-  {
-    id: "original_leave.end_date",
-    label: "Fin Permiso",
-    filterType: "dateRange",
-  },
-  {
-    id: "original_leave.requested_by.full_name",
-    label: "Solicitado Por",
+    id: "responsibilities",
+    label: "Responsabilidades Asignadas",
+    showIcon: true,
+    modalTitle: "Responsabilidades",
+    modalConfig: [
+      {
+        key: "responsibilities",
+        label: "Lista de responsabilidades asignadas",
+      },
+    ],
+    order: 3,
+    exportable: false,
   },
 ];
 
@@ -41,37 +57,21 @@ export const assignedVisibleColumns = [
 export const assignedGeneralColumns = [
   ...assignedVisibleColumns,
   {
-    id: "original_leave.requested_by.id",
-    label: "id",
+    id: "original_leave.requested_by.full_name",
+    label: "Titular del Puesto:",
+    autoWidth: true,
+    order: 6,
+    exportable: true,
   },
-];
 
-// Filtros manuales: configurados explícitamente con opciones predeterminadas
-export const manualFiltersConfig = [
   {
-    column: "status",
-    label: "Estado",
-    options: [
-      { value: "Aprobado", label: "Aprobado" },
-      { value: "Pendiente", label: "Pendiente" },
-      { value: "Rechazado", label: "Rechazado" },
-    ],
+    id: "reason",
+    label: "Motivo de Subrogación",
+    autoWidth: true,
+    order: 2,
+    exportable: false,
   },
 ];
 
 // Columnas para filtros dinámicos: el sistema generará las opciones automáticamente
-export const dynamicFilterColumns = [
-  { column: "status", label: "Estado" },
-];
-
-// Mixto
-
-
-// export const dynamicFilterColumns = [
-//   "status", 
-//   { column: "priority", label: "Prioridad" },
-// ];
-
-// Normal
-
-// export const dynamicFilterColumns = ["status", "priority"];
+export const dynamicFilterColumns = [{ column: "status", label: "Estado" }];

@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { FaEllipsisV, FaEye } from 'react-icons/fa';
+import { FaEllipsisV, FaEye, FaInfoCircle } from 'react-icons/fa';
 import { MdSearch, MdFilterList, MdOutlineFileDownload } from 'react-icons/md';
 import { HiOutlinePlus } from 'react-icons/hi';
 import Pagination from './Pagination';
@@ -49,6 +48,7 @@ const SubrogationsTable = ({
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filteredData, setFilteredData] = useState([]);
   const [modalContent, setModalContent] = useState('');
+  const [modalTitle, setModalTitle] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const menuRef = useRef(null);
@@ -81,6 +81,21 @@ const SubrogationsTable = ({
     return null;
   };
 
+  const parseDateRange = (dateRangeString) => {
+    if (typeof dateRangeString !== "string") {
+      return { start: null, end: null };
+    }
+
+    // Separar las fechas por el guion
+    const [start, end] = dateRangeString.split(" - ").map((date) => {
+      const [day, month, year] = date.split("/");
+      return new Date(`${year}-${month}-${day}`);
+    });
+
+    return { start: start || null, end: end || null };
+  };
+
+
 
 
   const displayedData = Array.isArray(filteredData)
@@ -104,20 +119,40 @@ const SubrogationsTable = ({
 
       const matchesDateRange = visibleColumns.every((column) => {
         if (column.filterType === "dateRange") {
+          // Filtro para columnas separadas
           const columnValue = getNestedValue(row, column.id);
           const columnDate = columnValue ? parseDate(columnValue) : null;
+
           return (
             (!fromDate || (columnDate && columnDate >= parseDate(fromDate))) &&
             (!toDate || (columnDate && columnDate <= parseDate(toDate)))
           );
+        } else if (column.filterType === "combinedDateRange") {
+          // Filtro para columna combinada
+          const start = parseDate(row.original_leave?.start_date);
+          const end = parseDate(row.original_leave?.end_date);
+
+          // Nueva lógica para manejar casos donde solo hay una fecha seleccionada (fromDate === toDate)
+          if (fromDate && toDate && parseDate(fromDate).getTime() === parseDate(toDate).getTime()) {
+            const singleDate = parseDate(fromDate);
+            return (
+              (start && singleDate >= start && (!end || singleDate <= end)) || // Fecha está dentro del rango
+              (start && singleDate === start) || // Coincide con fecha de inicio
+              (end && singleDate === end) // Coincide con fecha de fin
+            );
+          }
+
+          return (
+            (!fromDate || (start && start >= parseDate(fromDate))) &&
+            (!toDate || (end && end <= parseDate(toDate)))
+          );
         }
-        return true; // Si no es de tipo "dateRange", pasa sin filtro
+        return true; // Si no es de tipo rango, no se filtra
       });
 
       return matchesSearchTerm && matchesDateRange;
     })
     : [];
-
 
 
   const paginatedData = displayedData.slice(
@@ -180,9 +215,6 @@ const SubrogationsTable = ({
       exportFunction(exportData, exportColumns, { format: exportFormat });
     }
   };
-
-
-
 
   const openModal = (data, config, title) => {
     setModalContent({ data, config, title });
@@ -375,7 +407,7 @@ const SubrogationsTable = ({
 
 
       </div>
-      <div className="table-content">
+      <div className="table-content custom-scrollbar">
         <table className="min-w-full leading-normal">
           <thead className="sticky top-0 bg-gray-100  z-0">
             <tr className=" text-gray-600 uppercase text-xs leading-normal">
@@ -491,7 +523,15 @@ const SubrogationsTable = ({
                               <FileViewer filename={getNestedValue(row, column.id)} />
                             </div>
                           ) : (
-                            <FaEye className="cursor-pointer mx-auto text-base text-gray-500 hover:text-gray-700" onClick={() => openModal(row, column.modalConfig, column.modalTitle)} />
+                            <div className='flex items-center justify-center'>
+                              <button
+                                className="flex items-center justify-center text-sm text-gray-600 hover:text-gray-700"
+                                onClick={() => openModal(row, column.modalConfig, column.modalTitle)}
+                              >
+                                <FaInfoCircle className="mr-1" /> Detalles
+                              </button>
+                            </div>
+
                           )
                         ) : (
                           column.id === 'combined_evaluators' ? (

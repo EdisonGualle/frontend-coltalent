@@ -6,14 +6,13 @@ import LoadingIndicator from "../../../../components/ui/LoadingIndicator";
 import SubrogationsTable from "../Table/SubrogationsTable";
 import { exportToExcel } from "../Table/exportToExcel";
 import { exportToPdf } from "../Table/exportToPdf";
-
 import {
   assignedFixedColumns,
   assignedGeneralColumns,
   assignedVisibleColumns,
   dynamicFilterColumns,
-  manualFiltersConfig,
 } from "./Table/assignedColumns";
+import { getAssignedCellStyle } from "./Table/assignedColumnsStyles";
 
 
 const AssignedDelegations = () => {
@@ -45,10 +44,10 @@ const AssignedDelegations = () => {
         sheetName,
       });
     } else if (format === "pdf") {
-      console.log("Exportando a PDF...");
       exportToPdf(data, exportColumns, {
         filename: `${uniqueFilename}.pdf`,
         title: sheetName,
+        subtitle: "Detalles de los periodos de subrogación",
       });
     }
   };
@@ -68,14 +67,16 @@ const AssignedDelegations = () => {
             // manualFiltersConfig={manualFiltersConfig}
             data={assignedDelegations}
             dynamicFilterColumns={dynamicFilterColumns}
+            getCellStyle={getAssignedCellStyle}
             showActions={false}
             showAddNew={false}
             showExport={true} 
             exportFunction={(data, columns, format) =>
               handleExport(data, columns, {
                 filename: "delegaciones_asignadas",
-                sheetName: "Delegaciones",
-                format, // "excel" o "pdf"
+                sheetName: "Delegaciones asignadas",
+                
+                format,
               })
             }
           />
