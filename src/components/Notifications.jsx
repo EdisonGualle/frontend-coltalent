@@ -8,10 +8,8 @@ import { RiNotification3Line, RiUser3Fill } from "react-icons/ri";
 import echo from "../config/echo";
 import { useAuth } from "../hooks/useAuth";
 import { getUnreadNotifications, markNotificationsAsRead } from "../services/NotificationService";
-import { useDispatch } from 'react-redux';
-import { fetchAssignedLeaves, updateCache, clearCache } from '../redux/Leave/assignedLeavesSlice';
-import { fetchLeaveHistory, updateCache as updateHistoryCache, clearCache as clearHistoryCache } from '../redux/Leave/leaveHistorySlince';
-import { IoNotifications } from "react-icons/io5";
+import { useDispatch } from 'react-redux'; // Import useDispatch
+import { fetchAssignedLeaves, updateCache, clearCache } from '../redux/Leave/assignedLeavesSlice'; // Import actions
 
 const notificationTypeColors = {
     'Primera aprobación': 'text-blue-600',
@@ -19,7 +17,6 @@ const notificationTypeColors = {
     'Solicitud rechazada': 'text-red-600',
     'Solicitud para corrección': 'text-yellow-600',
     'Solicitud pendiente': 'text-amber-600',
-    'Subrogación asignada': 'text-purple-600',
 };
 
 const notificationTypeLabels = {
@@ -28,23 +25,18 @@ const notificationTypeLabels = {
     'Rechazado': 'Solicitud rechazada',
     'Corregir': 'Solicitud para corrección',
     'Solicitud pendiente': 'Solicitud pendiente',
-    'Subrogación asignada': 'Nueva delegación',
 };
 
 const Notifications = () => {
     const { user } = useAuth();
-    const dispatch = useDispatch();
+    const dispatch = useDispatch(); // Initialize useDispatch
     const [notifications, setNotifications] = useState([]);
-    const [unreadCount, setUnreadCount] = useState(0);
 
     useEffect(() => {
         if (user) {
             // Obtener notificaciones no leídas
             getUnreadNotifications()
-                .then(data => {
-                    setNotifications(data);
-                    setUnreadCount(data.filter(notification => !notification.read_at).length);
-                })
+                .then(data => setNotifications(data))
                 .catch(error => console.error("Error al obtener notificaciones:", error));
 
             // Configurar canal de Echo para recibir nuevas notificaciones en tiempo real
@@ -52,25 +44,14 @@ const Notifications = () => {
 
             channel.listen('NotificationEvent', (event) => {
                 setNotifications((prev) => [event.notification, ...prev]);
-                setUnreadCount(prev => prev + 1);
 
-                // Actualizar solicitudes asignadas
+                // Dispatch action to update the assigned leaves
                 dispatch(clearCache());
                 ['pendientes', 'aprobados', 'rechazados'].forEach(filter => {
                     dispatch(fetchAssignedLeaves({ employeeId: user.employee_id, filter })).then(response => {
                         dispatch(updateCache({ filter, data: response.payload.data }));
                     });
                 });
-
-                // Actualizar historial de solicitudes para notificaciones específicas
-                if (['Primera aprobación', 'Aprobación final', 'Rechazado', 'Solicitud para corrección', 'Solicitud pendiente'].includes(event.notification.type)) {
-                    dispatch(clearHistoryCache());
-                    ['pendientes', 'aprobados', 'rechazados', 'Corregir', 'todas'].forEach(filter => {
-                        dispatch(fetchLeaveHistory({ employeeId: user.employee_id, filter })).then(response => {
-                            dispatch(updateHistoryCache({ filter, data: response.payload.data }));
-                        });
-                    });
-                }
             });
 
             return () => {
@@ -89,15 +70,12 @@ const Notifications = () => {
             markNotificationsAsRead(notificationIds)
                 .then(() => {
                     // Actualizar estado local para marcar las notificaciones como leídas
-                    setUnreadCount(0); // Reiniciar contador de notificaciones no leídas
-                    setNotifications(prevNotifications =>
-                        prevNotifications.map(notification => {
-                            if (notificationIds.includes(notification.id)) {
-                                return { ...notification, read_at: new Date().toISOString() };
-                            }
-                            return notification;
-                        })
-                    );
+                    setNotifications(notifications.map(notification => {
+                        if (notificationIds.includes(notification.id)) {
+                            return { ...notification, read_at: new Date().toISOString() };
+                        }
+                        return notification;
+                    }));
                 })
                 .catch(error => console.error("Error al marcar notificaciones como leídas:", error));
         }
@@ -125,9 +103,9 @@ const Notifications = () => {
                             d="M12.75 6a.75.75 0 0 0-1.5 0v4a.75.75 0 0 0 1.5 0zM7.243 18.545a5.002 5.002 0 0 0 9.513 0c-3.145.59-6.367.59-9.513 0"
                         ></path>
                     </svg>
-                    {unreadCount > 0 && (
+                    {notifications.filter(notification => !notification.read_at).length > 0 && (
                         <span className="absolute -top-0.5 right-0 bg-primary py-0.5 px-[5px] box-content text-black rounded-full text-[8px] font-bold">
-                            {unreadCount}
+                            {notifications.filter(notification => !notification.read_at).length}
                         </span>
                     )}
                 </MenuButton>
@@ -143,7 +121,7 @@ const Notifications = () => {
                 Notificaciones ({notifications.length})
             </h1>
             <hr className="my-4 border-gray-500" />
-            <div className="max-h-[calc(3*100px)] overflow-y-auto custom-scrollbar-notification ">
+            <div className="max-h-[calc(3*100px)] overflow-y-auto custom-scrollbar-notification">
                 {notifications.length === 0 ? (
                     <p className="text-center text-gray-500">¡Estás al día!</p>
                 ) : (
@@ -153,9 +131,9 @@ const Notifications = () => {
                                 // to={`/details/${notification.data.leave_id}`}
                                 className="text-gray-300 flex flex-1 items-center gap-4 py-2 px-4 hover:bg-secondary-50 transition-colors rounded-lg"
                             >
-                                {notification.data.assigner_photo || notification.data.approver_photo || notification.data.applicant_photo ? (
+                                {notification.data.approver_photo || notification.data.applicant_photo ? (
                                     <img
-                                        src={`${import.meta.env.VITE_STORAGE_URL}/${notification.data.assigner_photo || notification.data.approver_photo || notification.data.applicant_photo}`}
+                                        src={`${import.meta.env.VITE_STORAGE_URL}/${notification.data.approver_photo || notification.data.applicant_photo}`}
                                         className="w-8 h-8 object-cover rounded-full border border-slate-500"
                                         alt="Avatar"
                                     />

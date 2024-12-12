@@ -107,24 +107,24 @@ const CardConfigurable = ({ config, onSave, relatedConfigValue, translatedKey, s
             <input
               type={inputType} 
               min="1"
-              className={`p-2 border ${(minError || maxError) ? 'border-red-400' : 'border-gray-300'} rounded w-14 focus:outline-none focus:ring-1 focus:ring-blue-400`}
+              className={` text-sm  text-center p-1 border ${(minError || maxError) ? 'border-red-400' : 'border-gray-300'} rounded w-14 focus:outline-none focus:ring-1 focus:ring-blue-400`}
               value={value}
               onChange={handleChange}
               disabled={isEditing !== null && isEditing !== config.id} // Deshabilita si se está editando otro campo
             />
             <button
-              className={`px-4 py-2 rounded-lg bg-blue-100 text-blue-600 ${(minError || maxError || value === originalValue || isEditing !== config.id) ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-100 hover:bg-blue-200'}`}
+              className={`px-2 py-1 rounded-lg bg-blue-100 text-blue-600 ${(minError || maxError || value === originalValue || isEditing !== config.id) ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-100 hover:bg-blue-200'}`}
               onClick={handleSave}
               disabled={!!(minError || maxError || value === originalValue || isEditing !== config.id)}
             >
-              <RiCheckboxCircleLine size={24} />
+              <RiCheckboxCircleLine size={20} />
             </button>
             {isEditing === config.id && (
               <button
-                className="px-4 py-2 rounded-lg text-red-600 bg-red-100 hover:bg-red-200"
+                className="px-2 py-1 rounded-lg text-red-600 bg-red-100 hover:bg-red-200"
                 onClick={handleCancel}
               >
-              <RiCloseCircleLine size={24} />
+              <RiCloseCircleLine size={20} />
               </button>
             )}
           </div>

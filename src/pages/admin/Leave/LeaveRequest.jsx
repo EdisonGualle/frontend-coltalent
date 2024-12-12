@@ -150,7 +150,6 @@ const Request = () => {
         try {
           const response = await getEmployeeWorkSchedules(employee_id);
           setWorkSchedules(response.data); // Accede al array `data` dentro de la respuesta
-          console.log(response.data); // Imprimir los horarios en la consola
         } catch (error) {
           console.error("Error fetching work schedules:", error);
         }
@@ -194,9 +193,6 @@ const Request = () => {
 
       // Ajuste para que lunes sea 1 y domingo sea 7
       dayOfWeek = dayOfWeek + 1;
-
-      // Imprimir el número del día seleccionado
-      console.log("Día seleccionado:", dayOfWeek);
 
       // Buscar el horario correspondiente al día de la semana seleccionado
       const scheduleForDay = workSchedules.find(schedule => schedule.day_of_week === dayOfWeek);
@@ -594,7 +590,6 @@ const Request = () => {
 
           if (errorMsg.msg) {
             showAlert(errorMsg.msg, 'error', 3000);
-            console.log(errorMsg.msg);
           }
 
           if (errorMsg.errors) {

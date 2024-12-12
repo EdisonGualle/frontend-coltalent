@@ -8,8 +8,10 @@ import {
   allGeneralColumns,
   allVisibleColumns,
   dynamicFilterColumns,
-  manualFiltersConfig,
 } from "./Table/allColumns";
+import { getAllCellStyle } from "./Table/allColumnsStyles";
+import { exportToExcel } from "../Table/exportToExcel";
+import { exportToPdf } from "../Table/exportToPdf";
 
 const AllDelegations = () => {
   const dispatch = useDispatch();
@@ -21,7 +23,31 @@ const AllDelegations = () => {
     }
   }, [dispatch, hasFetchedAll]);
 
-  console.log(allDelegations)
+  const handleExport = (data, columns, options = {}) => {
+    const { filename = "archivo_exportado", sheetName = "Hoja1", format = "excel" } = options;
+
+    // Generar un identificador único basado en la fecha y hora actual
+    const uniqueId = new Date().toISOString().replace(/[-T:.Z]/g, "");
+    const baseFilename = filename.replace(/\.(xlsx|pdf)$/, ""); // Eliminar extensión si existe
+    const uniqueFilename = `${baseFilename}_${uniqueId}`;
+
+    // Combinar columnas fijas y columnas visibles
+    const exportColumns = [...new Set([...allFixedColumns, ...columns])];
+
+    // Manejar exportación según el formato
+    if (format === "excel") {
+      exportToExcel(data, exportColumns, {
+        filename: `${uniqueFilename}.xlsx`,
+        sheetName,
+      });
+    } else if (format === "pdf") {
+      exportToPdf(data, exportColumns, {
+        filename: `${uniqueFilename}.pdf`,
+        title: sheetName,
+        subtitle: "Detalles del historial de subrogación",
+      });
+    }
+  };
 
   return (
     <div className="">
@@ -35,18 +61,27 @@ const AllDelegations = () => {
           allColumns={allGeneralColumns}
           columns={[...allFixedColumns, ...allVisibleColumns]}
           fixedColumns={allFixedColumns}
-          manualFiltersConfig={manualFiltersConfig}
+          showDateRangeFilter={true}
+          getCellStyle={getAllCellStyle}
           data={allDelegations}
           dynamicFilterColumns={dynamicFilterColumns}
           showActions={false}
           showAddNew={false}
+          showExport={true} 
+          exportFunction={(data, columns, format) =>
+            handleExport(data, columns, {
+              filename: "historial_subrogaciones",
+              sheetName: "Historial subrogaciones",
+              format,
+            })
+          }
         />
       </div>
     )}
 
     {/* Si no hay datos disponibles, mostramos un mensaje */}
-    {assignedDelegations.length === 0 && status !== "loading" && (
-      <p>No hay delegaciones asignadas para mostrar.</p>
+    {allDelegations.length === 0 && status !== "loading" && (
+      <p>No hay historial de subrogaciones para mostrar.</p>
     )}
   </div>
   );

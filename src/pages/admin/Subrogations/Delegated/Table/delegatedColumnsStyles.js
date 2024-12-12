@@ -1,4 +1,4 @@
-export const getAssignedCellStyle = (columnId, value) => {
+export const getDelegatedCellStyle = (columnId, value) => {
   if (columnId === 'status') {
     if (value === 'En espera') {
       return 'text-xs font-semibold bg-blue-100 text-blue-600 shadow-sm'; 

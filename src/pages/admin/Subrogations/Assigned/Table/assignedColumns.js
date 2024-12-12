@@ -15,7 +15,7 @@ export const assignedFixedColumns = [
     label: "Fecha de Decisión",
     render: renderDecisionDate,
     autoWidth: true,
-    order: 4,
+    order: 6,
     exportable: true,
   },
   {
@@ -23,13 +23,13 @@ export const assignedFixedColumns = [
     label: "Periodo de Subrogación",
     render: renderDelegationPeriod,
     filterType: "combinedDateRange",
-    order: 5,
+    order: 7,
     exportable: true,
   },
   {
     id: "status",
     label: "Estado",
-    order: 7,
+    order: 8,
     exportable: true,
     autoWidth: true,
   },
@@ -48,7 +48,7 @@ export const assignedVisibleColumns = [
         label: "Lista de responsabilidades asignadas",
       },
     ],
-    order: 3,
+    order: 5,
     exportable: false,
   },
 ];
@@ -57,19 +57,25 @@ export const assignedVisibleColumns = [
 export const assignedGeneralColumns = [
   ...assignedVisibleColumns,
   {
-    id: "original_leave.requested_by.full_name",
-    label: "Titular del Puesto:",
-    autoWidth: true,
-    order: 6,
-    exportable: true,
-  },
-
-  {
     id: "reason",
     label: "Motivo de Subrogación",
     autoWidth: true,
     order: 2,
     exportable: false,
+  },
+  {
+    id: "original_leave.requested_by.full_name",
+    label: "Titular a Subrogar",
+    autoWidth: true,
+    order: 3,
+    exportable: true,
+  },
+  {
+    id: "original_leave.requested_by.position", 
+    label: "Cargo del titular",
+    autoWidth: true,
+    order: 4,
+    exportable: true,
   },
 ];
 

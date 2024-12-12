@@ -24,7 +24,7 @@ import {
 
 import { getCompleteDashboardStatistics } from "../../services/dashboardStatisticsService";
 import { useAuth } from "../../hooks/useAuth";
-
+import LoadingIndicator from '../../components/ui/LoadingIndicator'
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -152,17 +152,13 @@ const Home = () => {
   };
 
   return (
-    <div className="container mx-auto">
-      <div className="mt-10">
+    <div className="mx-auto">
+      <div className="mt-6">
         {loading ? (
-          <div className="flex items-center justify-center mt-52 ">
-            <div
-              className="w-12 h-12 rounded-full animate-spin border-y-2 border-solid border-violet-200 border-t-transparent shadow-md">
-            </div>
-          </div>
+         <LoadingIndicator />
         ) : (
           <>
-            <div className="mb-4 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
+            <div className="mb-6 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
 
               {user.role === 'Administrador' && (
                 <>

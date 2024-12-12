@@ -14,6 +14,7 @@ const getAssignedDelegations = async (employeeId) => {
 const getDelegatedByEmployee = async (employeeId) => {
   try {
     const response = await AxiosInstance.get(`/subrogations/assigned-by/${employeeId}`);
+    console.log("response delegate", response);
     return response.data;
   } catch (error) {
     throw error;

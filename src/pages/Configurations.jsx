@@ -3,7 +3,7 @@ import { getConfigurations, updateConfiguration } from '../services/configuratio
 import CardConfigurable from '../components/ui/CardConfigurable';
 import { CardHeader, Typography } from "@material-tailwind/react";
 import { AlertContext } from '../contexts/AlertContext';
-
+import LoadingIndicator from '../components/ui/LoadingIndicator'
 // Mapeo de claves en inglés a su equivalente en español en formato snake_case
 const keyTranslations = {
   'max_intentos': 'máximo_intentos',
@@ -16,6 +16,7 @@ const keyTranslations = {
   'min_weekly_hours': 'horas_semanales_minimas',
   'max_daily_hours': 'horas_diarias_maximas',
   'min_daily_hours': 'horas_diarias_minimas',
+  'min_days_for_subrogation': 'dias_subrogacion',
   // Puedes agregar más claves aquí si es necesario
 };
 
@@ -86,11 +87,11 @@ const Configurations = () => {
           </div>
         </div>
       </CardHeader>
-      {loading && <p>Loading...</p>}
+      {loading && <LoadingIndicator />}
       <div className="divide-y divide-gray-200 grid grid-cols-3 gap-4">
         {/* Iteramos sobre cada categoría y mostramos una card por cada una */}
         {Object.keys(groupedConfigurations).map((category) => (
-          <div key={category} className="bg-white shadow-lg rounded-lg p-6 ">
+          <div key={category} className="bg-white shadow-sm rounded-lg p-6 ">
             <h2 className="text-xl font-semibold">{category}</h2>
             <ul>
               {groupedConfigurations[category].map(config => (
@@ -112,7 +113,6 @@ const Configurations = () => {
           </div>
         ))}
       </div>
-
     </div>
   );
 };

@@ -2,7 +2,9 @@ import * as XLSX from 'xlsx';
 
 // Función para obtener valores de objetos con soporte para claves anidadas
 const getNestedValue = (obj, path) => {
-  return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : ''), obj);
+  return path
+    .split('.')
+    .reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : ''), obj);
 };
 
 // Eliminar caracteres no permitidos y limitar a 31 caracteres
@@ -28,8 +30,10 @@ export const exportToExcel = (data, columns, options = {}) => {
     filename = `${filename}.xlsx`;
   }
 
-  // Filtrar columnas exportables
-  const exportableColumns = columns.filter((col) => col.exportable);
+  // Filtrar columnas exportables y ordenarlas por `order`
+  const exportableColumns = columns
+    .filter((col) => col.exportable)
+    .sort((a, b) => a.order - b.order); // Ordenar por `order`
 
   // Añadir encabezados personalizados para columnas exportables
   const headers = exportableColumns.map((col) => col.label);
@@ -42,15 +46,18 @@ export const exportToExcel = (data, columns, options = {}) => {
     exportableColumns.map((col) => {
       if (col.render) {
         // Evaluar el renderizador con `asText = true` para obtener texto plano
-        return col.render(row, true) || "";
+        return col.render(row, true) || '';
       } else {
         const value = getNestedValue(row, col.id);
-        return value !== undefined && value !== null ? value : "";
+        return value !== undefined && value !== null ? value : '';
       }
     })
   );
 
-  XLSX.utils.sheet_add_json(worksheet, processedData, { skipHeader: true, origin: 'A2' });
+  XLSX.utils.sheet_add_json(worksheet, processedData, {
+    skipHeader: true,
+    origin: 'A2',
+  });
 
   // Ajustar el ancho de las columnas
   const columnWidths = exportableColumns.map((col) => ({
@@ -59,7 +66,7 @@ export const exportToExcel = (data, columns, options = {}) => {
       ...data.map((row) => {
         if (col.render) {
           // Obtener longitud del texto plano generado por el renderizador
-          const text = col.render(row, true) || "";
+          const text = col.render(row, true) || '';
           return text.length;
         }
         const value = getNestedValue(row, col.id);

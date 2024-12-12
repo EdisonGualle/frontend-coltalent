@@ -523,9 +523,9 @@ const SubrogationsTable = ({
                               <FileViewer filename={getNestedValue(row, column.id)} />
                             </div>
                           ) : (
-                            <div className='flex items-center justify-center'>
+                            <div className='flex items-center justify-start'>
                               <button
-                                className="flex items-center justify-center text-sm text-gray-600 hover:text-gray-700"
+                                className="flex ps-3 items-center justify-center text-sm text-gray-600 hover:text-gray-700"
                                 onClick={() => openModal(row, column.modalConfig, column.modalTitle)}
                               >
                                 <FaInfoCircle className="mr-1" /> Detalles

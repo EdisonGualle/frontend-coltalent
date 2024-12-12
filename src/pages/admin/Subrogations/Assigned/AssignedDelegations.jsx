@@ -75,7 +75,6 @@ const AssignedDelegations = () => {
               handleExport(data, columns, {
                 filename: "delegaciones_asignadas",
                 sheetName: "Delegaciones asignadas",
-                
                 format,
               })
             }

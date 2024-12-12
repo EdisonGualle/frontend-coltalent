@@ -3,11 +3,14 @@ import { CardHeader, Typography } from "@material-tailwind/react";
 import { FaTasks, FaUserTie, FaHistory } from "react-icons/fa";
 import AssignedDelegations from "./Assigned/AssignedDelegations";
 import DelegatedDelegations from "./Delegated/DelegatedDelegations";
-import AllDelegations from "./All/AllDelegations"
+import AllDelegations from "./All/AllDelegations";
+import { useAuth } from "../../../hooks/useAuth";
+
 const Delegations = () => {
+    const { user } = useAuth();
     const [activeTab, setActiveTab] = useState(0);
 
-    const tabs = [
+    const allTabs = [
         {
             label: "Asignadas",
             icon: <FaTasks />,
@@ -25,6 +28,16 @@ const Delegations = () => {
         },
     ];
 
+    // Filtrar pestañas basado en el rol del usuario
+    let filteredTabs = [];
+    if (user.role === "Empleado") {
+        filteredTabs = allTabs.filter((tab) => tab.label === "Asignadas");
+    } else if (user.role !== "Administrador" && user.role !== "Empleado") {
+        filteredTabs = allTabs.filter((tab) => tab.label !== "Todas");
+    } else {
+        filteredTabs = allTabs; // Mostrar todas las pestañas para roles no restringidos
+    }
+
     return (
         <div className="bg-gray-100">
             {/* Card Header */}
@@ -41,14 +54,15 @@ const Delegations = () => {
 
             {/* Tabs */}
             <div className="flex border-b mt-4">
-                {tabs.map((tab, index) => (
+                {filteredTabs.map((tab, index) => (
                     <button
                         key={index}
                         onClick={() => setActiveTab(index)}
-                        className={`flex items-center py-3 px-5 text-sm font-medium rounded-t-md ${activeTab === index
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-100 text-gray-700 hover:bg-blue-100"
-                            }`}
+                        className={`flex items-center py-3 px-5 text-sm font-medium rounded-t-md ${
+                            activeTab === index
+                                ? "bg-blue-500 text-white"
+                                : "bg-gray-100 text-gray-700 hover:bg-blue-100"
+                        }`}
                     >
                         <span className="mr-2 text-lg">{tab.icon}</span>
                         {tab.label}
@@ -58,7 +72,7 @@ const Delegations = () => {
 
             {/* Content */}
             <div className="">
-                    {tabs[activeTab].component}
+                {filteredTabs[activeTab]?.component}
             </div>
         </div>
     );

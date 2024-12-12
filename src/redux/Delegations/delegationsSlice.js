@@ -27,11 +27,14 @@ export const fetchAllDelegations = createAsyncThunk(
     return response.data;
   }
 );
+
+
 const delegationsSlice = createSlice({
   name: "delegations",
   initialState: {
     assignedDelegations: [],
     delegatedBy: [],
+    allDelegations: [],
     status: "idle", 
     error: null,
     hasFetchedAssigned: false,
