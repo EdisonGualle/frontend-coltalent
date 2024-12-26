@@ -7,7 +7,7 @@ import ModalForm from '../../../../components/ui/ModalForm';
 import { AlertContext } from '../../../../contexts/AlertContext';
 import UnitForm from './UnitForm';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { createNewUnit,  fetchAllUnitsIncludingDeleted } from '../../../../redux/Organization/UnitSlince';
+import { createNewUnit, fetchAllUnitsIncludingDeleted } from '../../../../redux/Organization/UnitSlince';
 import { PiOfficeChairLight } from "react-icons/pi";
 
 const UnitIndex = () => {
@@ -52,7 +52,7 @@ const UnitIndex = () => {
   };
 
   return (
-    <div className='flex flex-col h-full overflow-auto'>
+    <div>
       <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0  bg-gray-100">
         <div className="mb-2 flex items-center justify-between gap-8">
           <div>
@@ -73,10 +73,10 @@ const UnitIndex = () => {
         </div>
       </CardHeader>
 
-      <div className='flex-1 overflow-y-auto'>
-        <UnitTable />
-      </div>
+      {/* Tabla */}
+      <UnitTable />
 
+      {/* Modal para crear una nueva unidad */}
       <ModalForm
         isOpen={isOpen}
         setIsOpen={setIsOpen}

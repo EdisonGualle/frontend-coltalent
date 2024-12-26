@@ -3,15 +3,16 @@ import { FaPlus, FaTrashAlt } from "react-icons/fa";
 
 const ResponsibilitiesModal = ({ responsibilities = [], onSave, onClose }) => {
     const [newResponsibility, setNewResponsibility] = useState("");
-    const [responsibilitiesList, setResponsibilitiesList] = useState(responsibilities);
+    const [responsibilitiesList, setResponsibilitiesList] = useState([]);
 
     useEffect(() => {
-        setResponsibilitiesList(responsibilities || []);
+        // Asegurar que todos los elementos sean cadenas
+        setResponsibilitiesList(responsibilities.map(resp => (typeof resp === "string" ? resp : resp.name)) || []);
     }, [responsibilities]);
 
     const handleAddResponsibility = () => {
         if (newResponsibility.trim()) {
-            setResponsibilitiesList([newResponsibility, ...responsibilitiesList]);
+            setResponsibilitiesList([newResponsibility.trim(), ...responsibilitiesList]);
             setNewResponsibility("");
         }
     };
@@ -22,6 +23,7 @@ const ResponsibilitiesModal = ({ responsibilities = [], onSave, onClose }) => {
     };
 
     const handleSave = () => {
+        // Pasar las responsabilidades como un array de cadenas
         onSave(responsibilitiesList);
         onClose();
     };
@@ -34,12 +36,10 @@ const ResponsibilitiesModal = ({ responsibilities = [], onSave, onClose }) => {
     };
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-gray-300 bg-opacity-50" // Mantener el fondo translúcido gris
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-300 bg-opacity-50">
             <div
                 className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-md border border-gray-200"
-                onClick={(e) => e.stopPropagation()} // Prevenir cierre al hacer clic fuera
+                onClick={(e) => e.stopPropagation()}
             >
                 <h2 className="text-lg font-bold mb-6 text-center text-gray-800">Gestionar responsabilidades</h2>
 
@@ -50,7 +50,7 @@ const ResponsibilitiesModal = ({ responsibilities = [], onSave, onClose }) => {
                         placeholder="Nueva responsabilidad"
                         value={newResponsibility}
                         onChange={(e) => setNewResponsibility(e.target.value)}
-                        onKeyDown={handleKeyDown} // Detectar tecla Enter
+                        onKeyDown={handleKeyDown}
                     />
                     <button
                         type="button"

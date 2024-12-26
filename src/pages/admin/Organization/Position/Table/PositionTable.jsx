@@ -159,8 +159,7 @@ function PositionTable({ }) {
         </div>
       </div>
       {/* Pagination */}
-      <div className=" bg-white p-2 pt-2 flex flex-col sm:flex-row items-center justify-between rounded-b-lg
-">
+      <div className=" bg-white p-2 pt-2 flex flex-col sm:flex-row items-center justify-between rounded-b-lg">
         <div className="flex-1 flex justify-between sm:hidden mb-4 sm:mb-0">
           <Button onClick={() => previousPage()} disabled={!canPreviousPage} className="px-3 py-1 text-xs">
             Anterior

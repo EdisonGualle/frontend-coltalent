@@ -84,7 +84,7 @@ function App() {
                   </Route>
 
                   {/* Subrogaciones */}
-                    <Route path="/delegaciones" element={<Delegations />} />
+                    <Route path="/subrogaciones" element={<Delegations />} />
 
                   {/* Perfil */}
                   <Route path="/perfil/:id/*" element={<Perfil />} />

@@ -57,6 +57,8 @@ const PositionForm = ({
 
     const { name, functionDescription, selectedUnit, selectedDirection, isManager } = formData;
 
+
+
     useEffect(() => {
         setErrors(formErrors);
     }, [formErrors]);
@@ -211,9 +213,6 @@ const PositionForm = ({
                 responsibilities,
             };
 
-            // Aquí agrega el console.log
-        console.log("Datos enviados:", updatePositionData);
-
             onSubmit(updatePositionData);
         }
     };
@@ -333,11 +332,10 @@ const PositionForm = ({
                 <ResponsibilitiesModal
                     responsibilities={responsibilities}
                     onSave={(updatedResponsibilities) => {
-                        console.log("Responsabilidades actualizadas:", updatedResponsibilities);
-                        setResponsibilities(updatedResponsibilities); // Actualizar responsabilidades
-                        setIsResponsibilitiesModalOpen(false); // Cerrar modal
+                        setResponsibilities(updatedResponsibilities); 
+                        setIsResponsibilitiesModalOpen(false);
                     }}
-                    onClose={() => setIsResponsibilitiesModalOpen(false)} // Solo cerrar modal
+                    onClose={() => setIsResponsibilitiesModalOpen(false)} 
                 />
             )}
 

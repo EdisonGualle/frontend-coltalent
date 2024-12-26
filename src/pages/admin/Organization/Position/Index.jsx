@@ -77,6 +77,7 @@ const PositionIndex = () => {
 
       {/* Tabla */}
         <PositionTable />
+        
       {/* Modal para crear un nuevo cargo */}
       <ModalForm
         isOpen={isOpen}

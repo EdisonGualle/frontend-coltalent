@@ -72,98 +72,97 @@ function UnitTable({ }) {
   }
 
   return (
-    <div className='flex flex-col h-full'>
-     <div className='sticky top-0 bg-white z-10'>
-     <div className="flex flex-wrap items-center space-x-4">
-        <GlobalFilter
-          preGlobalFilteredRows={preGlobalFilteredRows}
-          globalFilter={state.globalFilter}
-          setGlobalFilter={setGlobalFilter}
-        />
-        {headerGroups.map((headerGroup) =>
-          headerGroup.headers.map((column) =>
-            column.Filter ? (
-              <div className="mt-2 sm:mt-0" key={column.id}>
-                {column.render("Filter")}
-              </div>
-            ) : null
-          )
-        )}
+    <div className='shadow-sm'>
+      <div className='flex flex-col h-full'>
+        <div className="flex flex-wrap clas items-center space-x-4 bg-white px-2 py-3 rounded-t-lg">
+          <GlobalFilter
+            preGlobalFilteredRows={preGlobalFilteredRows}
+            globalFilter={state.globalFilter}
+            setGlobalFilter={setGlobalFilter}
+          />
+          {headerGroups.map((headerGroup) =>
+            headerGroup.headers.map((column) =>
+              column.Filter ? (
+                <div className="mt-2 sm:mt-0" key={column.id}>
+                  {column.render("Filter")}
+                </div>
+              ) : null
+            )
+          )}
+        </div>
       </div>
-     </div>
       {/* table */}
-      <div className=" flex-1 overflow-y-auto">
-        <div className="overflow-x-auto custom-scrollbar">
-          <div className="inline-block min-w-full align-middle">
-            <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-              <table {...getTableProps()} className="min-w-full divide-y divide-gray-200 table-fixed">
-                <thead className="bg-gray-200">
-                  {headerGroups.map(headerGroup => (
-                    <tr {...headerGroup.getHeaderGroupProps()}>
-                      {headerGroup.headers.map(column => (
-                        <th
-                          scope="col"
-                          className="group px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          {...column.getHeaderProps(column.getSortByToggleProps())}
-                        >
-                          <div className="flex items-center justify-between">
-                            {column.render('Header')}
-                            <span>
-                              {column.isSorted
-                                ? column.isSortedDesc
-                                  ? <SortDownIcon className="w-4 h-4 text-gray-400" />
-                                  : <SortUpIcon className="w-4 h-4 text-gray-400" />
-                                : (
-                                  <SortIcon className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100" />
-                                )}
-                            </span>
-                          </div>
-                        </th>
-                      ))}
-                      {/* Columna opciones */}
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-center"
-                      >
-                        Opciones
-                      </th>
-                    </tr>
+      <div className="flex-1">
+        <div className="overflow-x-auto">
+          <table {...getTableProps()} className="min-w-full table-fixed">
+            <thead className="bg-gray-100">
+              {headerGroups.map(headerGroup => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map(column => (
+                    <th
+                      scope="col"
+                      className="group px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider"
+                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                    >
+                      <div className="flex items-center justify-between">
+                        {column.render('Header')}
+                        <span>
+                          {column.isSorted
+                            ? column.isSortedDesc
+                              ? <SortDownIcon className="w-4 h-4 text-gray-400" />
+                              : <SortUpIcon className="w-4 h-4 text-gray-400" />
+                            : (
+                              <SortIcon className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100" />
+                            )}
+                        </span>
+                      </div>
+                    </th>
                   ))}
-                </thead>
-                <tbody {...getTableBodyProps()} className="bg-white divide-y divide-gray-200">
-                  {page.map((row, i) => {
-                    prepareRow(row);
-                    return (
-                      <tr {...row.getRowProps()}>
-                        {row.cells.map(cell => {
-                          return (
-                            <td
-                              {...cell.getCellProps()}
-                              className="px-6 py-3 text-sm whitespace-normal break-words"
-                              role="cell"
-                            >
-                              {cell.column.Cell.name === "defaultRenderer"
-                                ? <div className="text-sm text-gray-500">{cell.render('Cell')}</div>
-                                : cell.render('Cell')
-                              }
-                            </td>
-                          )
-                        })}
-                        {/* Columna de opciones */}
-                        <td className='px-6 py-3 flex justify-center'>
-                          <OptionsColumn unit={row.original} fetchUnits={fetchUnitsAction} />
+                  {/* Columna opciones */}
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider text-center"
+                  >
+                    Opciones
+                  </th>
+                </tr>
+              ))}
+            </thead>
+            <tbody {...getTableBodyProps()} className="bg-white  text-gray-700">
+              {page.map((row, i) => {
+                prepareRow(row);
+                return (
+                  <tr {...row.getRowProps()}
+                    className='hover:bg-gray-100 group transition duration-200 ease-in-out'
+                  >
+                    {row.cells.map(cell => {
+                      return (
+                        <td
+                          {...cell.getCellProps()}
+                          className="px-6 py-3 text-sm whitespace-normal break-words group-hover:bg-gray-100 transition duration-200 ease-in-out"
+                          role="cell"
+                        >
+                          {cell.column.Cell.name === "defaultRenderer"
+                            ? <div className="text-sm text-gray-500">{cell.render('Cell')}</div>
+                            : cell.render('Cell')
+                          }
                         </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                      )
+                    })}
+                    {/* Columna de opciones */}
+                    <td className='px-6 py-3 flex justify-center group-hover:bg-gray-100  transition duration-200 ease-in-out'>
+                      <OptionsColumn unit={row.original} fetchUnits={fetchUnitsAction} />
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+
         </div>
       </div>
       {/* Pagination */}
-      <div className="flex flex-col sm:flex-row items-center justify-between  pt-2  border-t-2">
+      <div className=" bg-white p-2 pt-2 flex flex-col sm:flex-row items-center justify-between rounded-b-lg">
         <div className="flex-1 flex justify-between sm:hidden mb-4 sm:mb-0">
           <Button onClick={() => previousPage()} disabled={!canPreviousPage} className="px-3 py-1 text-xs">
             Anterior
@@ -180,7 +179,7 @@ function UnitTable({ }) {
             <label className="flex items-center">
               <span className="mr-2 text-sm text-gray-700">Mostrar</span>
               <select
-                className="text-sm   block rounded-lg border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                className="text-sm   block rounded-lg shadow-sm border-2 border-gray-300"
                 value={state.pageSize}
                 onChange={e => setPageSize(Number(e.target.value))}
               >

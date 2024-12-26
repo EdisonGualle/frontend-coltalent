@@ -44,16 +44,16 @@ const Delegations = () => {
             <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0 bg-gray-100">
                 <div className="mb-2">
                     <Typography variant="h5" color="blue-gray" className="font-semibold">
-                        Lista de Delegaciones
+                        Lista de Subrogaciones
                     </Typography>
                     <Typography color="gray" className="mt-1">
-                        Consulta la información sobre las delegaciones disponibles.
+                        Consulta la información sobre las subrogaciones disponibles.
                     </Typography>
                 </div>
             </CardHeader>
 
             {/* Tabs */}
-            <div className="flex border-b mt-4">
+            <div className="flex border-b">
                 {filteredTabs.map((tab, index) => (
                     <button
                         key={index}

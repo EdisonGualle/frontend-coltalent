@@ -36,7 +36,7 @@ const OptionsColumn = ({ position, fetchPositions }) => {
   const handleUpdate = async (formData) => {
     try {
       // Obtener los datos del formulario
-      const { name, function: functionDescription, unit_id: unitId, direction_id: directionId, is_manager: isManager } = formData;
+      const { name, function: functionDescription, unit_id: unitId, direction_id: directionId, is_manager: isManager, responsibilities  } = formData;
 
       // Crear el objeto con los datos actualizados
       const data = {
@@ -45,6 +45,7 @@ const OptionsColumn = ({ position, fetchPositions }) => {
         unit_id: unitId,
         direction_id: directionId,
         is_manager: isManager,
+        responsibilities: responsibilities.map(resp => typeof resp === "string" ? resp : resp.name),
       };
 
       // Crear el objeto con los datos actualizados a enviar a la API
@@ -71,6 +72,7 @@ const OptionsColumn = ({ position, fetchPositions }) => {
         unit_id: errors.unit_id ? errors.unit_id[0] : '',
         direction_id: errors.direction_id ? errors.direction_id[0] : '',
         is_manager: errors.is_manager ? errors.is_manager[0] : '',
+        responsibilities: errors.responsibilities ? errors.responsibilities[0] : '',
       };
 
       // Mostrar alerta si hay errores

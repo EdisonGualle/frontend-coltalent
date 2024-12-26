@@ -167,12 +167,12 @@ const OptionsColumn = ({ unit, fetchUnits }) => {
       <div className="flex gap-2">
         <button
           onClick={handleEditClick}
-          className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-600 rounded-lg transition-colors hover:bg-gray-200">
+          className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-700 rounded-lg transition-colors hover:bg-gray-200">
           <RiEdit2Line />
         </button>
         <button
           onClick={handleOpenToggleDialog}
-          className={`flex items-center justify-center w-8 h-8 ${unit.status === 'Activo' ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200' : 'bg-green-100 text-green-600 hover:bg-green-200'} rounded-lg transition-colors`}
+          className={`flex items-center justify-center w-8 h-8 ${unit.status === 'Activo' ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' : 'bg-green-100 text-green-700 hover:bg-green-200'} rounded-lg transition-colors`}
           title={unit.status === 'Activo' ? 'Desactivar' : 'Activar'}
         >
           {unit.status === 'Activo' ? <RiCloseCircleLine /> : <RiCheckboxCircleLine />}
