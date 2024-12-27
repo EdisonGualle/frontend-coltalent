@@ -7,6 +7,7 @@ import {
   scheduleFixedColumns,
   scheduleGeneralColumns,
   dynamicFilterColumns,
+  scheduleVisibleColumns,
 } from "./Table/schedulesDefinitionColumns";
 import { getAllCellStyle } from "./Table/schedulesDefinitionColumnsStyles";
 import renderDefinitionActions from "./Table/renderDefinitionActions";
@@ -24,8 +25,8 @@ const ScheduleDefinition = () => {
   const { showAlert } = useContext(AlertContext);
 
   // Estados
-  const [isCreateModalOpen, setCreateModalOpen] = useState(false); // Modal de creación
-  const [formErrors, setFormErrors] = useState({}); // Errores del formulario
+  const [isCreateModalOpen, setCreateModalOpen] = useState(false); 
+  const [formErrors, setFormErrors] = useState({}); 
 
   // Datos locales para la tabla
   const [localSchedules, setLocalSchedules] = useState([]);
@@ -88,7 +89,7 @@ const ScheduleDefinition = () => {
         <div className="">
           <SchedulesTable
             allColumns={scheduleGeneralColumns}
-            columns={[...scheduleFixedColumns, ...scheduleGeneralColumns]}
+            columns={[...scheduleFixedColumns, ...scheduleVisibleColumns]}
             fixedColumns={scheduleFixedColumns}
             getCellStyle={getAllCellStyle}
             data={localSchedules}
@@ -111,8 +112,6 @@ const ScheduleDefinition = () => {
       {schedules.length === 0 && status !== "loading" && (
         <p>No hay horarios para mostrar.</p>
       )}
-
-
 
        {/* Modal para crear un horario */}
        <ModalForm

@@ -513,7 +513,7 @@ const SubrogationsTable = ({
                       style={{ minHeight: '50px' }}
                     >
                       {column.render ? (
-                        <span className={`rounded-full px-2 py-1 inline-block ${getCellStyle(column.id, getNestedValue(row, column.id) || '')}`}>
+                        <span className={`rounded-full  py-1 inline-block ${getCellStyle(column.id, getNestedValue(row, column.id) || '')}`}>
                           {column.render(row)}
                         </span>
                       )
@@ -539,7 +539,7 @@ const SubrogationsTable = ({
                               {formatCombinedEvaluators(row, column.combineFields)}
                             </span>
                           ) : (
-                            <span className={`rounded-lg  px-2 py-1 inline-block ${getCellStyle(column.id, getNestedValue(row, column.id) || '')}`}>
+                            <span className={`rounded-lg  py-1 inline-block ${getCellStyle(column.id, getNestedValue(row, column.id) || '')}`}>
                               {(getNestedValue(row, column.id) !== undefined && getNestedValue(row, column.id) !== null) ? formatCellContent(getNestedValue(row, column.id)) : ''}
                             </span>
                           )

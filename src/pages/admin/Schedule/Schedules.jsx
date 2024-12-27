@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { CardHeader, Typography } from "@material-tailwind/react";
 import { FaClock, FaUserClock, FaUser } from "react-icons/fa";
 import ScheduleDefinition from "./Definition/ScheduleDefinition";
+import ScheduleAssignment from "./Assignment/ScheduleAssignment";
 
 const Schedules = () => {
     const [activeTab, setActiveTab] = useState(0);
@@ -12,11 +13,11 @@ const Schedules = () => {
             icon: <FaClock />,
             component: <ScheduleDefinition />,
         },
-        // {
-        //     label: "Asignación de Horarios",
-        //     icon: <FaUserClock />,
-        //     component: <ScheduleAssignment />,
-        // },
+        {
+            label: "Asignación de Horarios",
+            icon: <FaUserClock />,
+            component: <ScheduleAssignment />,
+        },
         // {
         //     label: "Mi Horario",
         //     icon: <FaUser />,

@@ -25,6 +25,7 @@ import leaveHistoryReducer from './Leave/leaveHistorySlince';
 import delegationsReducer from './Delegations/delegationsSlice';
 import configurationReducer from './Configuration/configurationSlice';
 import schedulesReducer from './Schedules/ScheduleSlince';
+import employeeSchedulesReducer from './Schedules/employeeSchedulesSlice'; 
 
 export default configureStore({
   reducer: {
@@ -54,5 +55,6 @@ export default configureStore({
     delegations: delegationsReducer,
     configuration: configurationReducer,
     schedules: schedulesReducer,
+    employeeSchedules: employeeSchedulesReducer, 
   },
 });

@@ -1,6 +1,7 @@
 import { renderWorkHours } from "./renderWorkHours";
 import { renderBreakHours } from "./renderBreakHours";
 import { renderRestDays } from "./renderRestDays";
+
 export const scheduleFixedColumns = [
   {
     id: "name",
@@ -36,7 +37,6 @@ export const scheduleVisibleColumns = [
     label: "Estado",
     order: 5,
   },
-
 
 ];
 
