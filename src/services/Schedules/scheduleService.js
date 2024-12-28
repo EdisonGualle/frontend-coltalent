@@ -16,7 +16,10 @@ const createSchedule = async (scheduleData) => {
         const response = await AxiosInstance.post("/schedules", scheduleData);
         return response.data;
     } catch (error) {
-        throw error;
+        throw {
+            message: error.response?.data?.msg,
+            errors: error.response?.data?.errors || {}, 
+        };
     }
 };
 
@@ -36,7 +39,10 @@ const updateSchedule = async (id, scheduleData) => {
         const response = await AxiosInstance.put(`/schedules/${id}`, scheduleData);
         return response.data;
     } catch (error) {
-        throw error;
+        throw {
+            message: error.response?.data?.msg,
+            errors: error.response?.data?.errors || {},
+        };
     }
 };
 

@@ -1,12 +1,18 @@
 import React from "react";
 import { Menu, MenuButton, MenuItem } from "@szhsin/react-menu";
-import { RiMore2Fill, RiEdit2Line, RiDeleteBin6Line, RiEyeLine } from "react-icons/ri";
+import { RiMore2Fill } from "react-icons/ri";
+import { AiOutlineDelete, AiOutlineCheck, AiOutlineEdit } from "react-icons/ai";
 
-const renderDefinitionActions = ({ row, onEdit, onDelete, onView }) => {
+const renderDefinitionActions = ({ row, onEdit, onToggleStatus }) => {
+  const isDeleted = row.status === "Inactivo";
+
   return (
     <Menu
       menuButton={
-        <MenuButton className="flex items-center justify-center w-8 h-8 hover:bg-gray-200 rounded-lg transition-colors">
+        <MenuButton
+          className="flex items-center justify-center w-8 h-8 hover:bg-gray-200 rounded-lg transition-colors"
+          aria-haspopup="true"
+        >
           <RiMore2Fill className="text-gray-600 " />
         </MenuButton>
       }
@@ -22,17 +28,26 @@ const renderDefinitionActions = ({ row, onEdit, onDelete, onView }) => {
           onClick={() => onEdit(row)}
           className="w-full rounded-lg transition-colors text-xs hover:bg-gray-50 flex items-center gap-2 p-2"
         >
-          <RiEdit2Line className="text-green-600" />
-          <span>Editar</span>
+          <AiOutlineEdit className="text-blue-500 text-sm" />
+          <span className="text-gray-800">Editar</span>
         </button>
       </MenuItem>
       <MenuItem className="p-0 hover:bg-transparent">
         <button
-          onClick={() => onDelete(row)}
+          onClick={onToggleStatus}
           className="w-full rounded-lg transition-colors text-xs hover:bg-gray-50 flex items-center gap-2 p-2"
         >
-          <RiDeleteBin6Line className="text-red-600" />
-          <span>Eliminar</span>
+          {isDeleted ? (
+            <>
+              <AiOutlineCheck className="text-green-500 text-sm" />
+              <span className="text-gray-800">Activar</span>
+            </>
+          ) : (
+            <>
+              <AiOutlineDelete className="text-yellow-500 text-sm" />
+              <span className="text-gray-800">Desactivar</span>
+            </>
+          )}
         </button>
       </MenuItem>
     </Menu>
