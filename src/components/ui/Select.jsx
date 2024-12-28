@@ -108,7 +108,7 @@ const CustomSelect = ({
       ...provided,
       zIndex: 10000,
       position: 'absolute',
-      maxHeight: '160px',
+      maxHeight: '300px',
       overflowY: 'auto',
     }),
   };
@@ -131,6 +131,8 @@ const CustomSelect = ({
         placeholder={placeholder}
         menuPortalTarget={document.body}
         isSearchable={isSearchable}
+        menuPlacement="auto" 
+        menuPosition="fixed"
       />
       {selectError && <p className="text-red-500 text-xs mt-1">{selectError}</p>}
     </div>
