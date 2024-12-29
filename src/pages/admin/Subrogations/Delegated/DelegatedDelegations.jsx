@@ -123,7 +123,7 @@ const DelegatedDelegations = () => {
 
       {/* Si no hay datos disponibles, mostramos un mensaje */}
       {delegatedBy.length === 0 && status !== "loading" && (
-        <p>No hay delegaciones delegadas para mostrar.</p>
+        <p className="py-10 text-gray-400 text-center">No hay delegaciones delegadas para mostrar.</p>
       )}
     </div>
   );

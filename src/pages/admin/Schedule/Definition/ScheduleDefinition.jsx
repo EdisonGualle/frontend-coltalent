@@ -53,7 +53,7 @@ const ScheduleDefinition = () => {
     setCreateModalOpen(false);
   };
 
-  // Crear horario y actualizar la tabla
+  // Crear horario y actualizar la tabla automaticamente mediante Redux
   const handleCreateSubmit = async (scheduleData) => {
     try {
       await dispatch(addNewSchedule(scheduleData)).then(unwrapResult);
@@ -169,7 +169,7 @@ const ScheduleDefinition = () => {
 
       {/* Si no hay datos disponibles, mostramos un mensaje */}
       {schedules.length === 0 && fetchStatus !== "loading" && (
-        <p>No hay horarios para mostrar.</p>
+        <p className="py-10 text-gray-400 text-center">No hay horarios para mostrar.</p>
       )}
 
       {/* Diálogo de confirmación para cambiar el estado del horario */}

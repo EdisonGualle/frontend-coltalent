@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllEmployeeSchedules } from "../../../../redux/Schedules/employeeSchedulesSlice";
+import { unwrapResult } from '@reduxjs/toolkit';
+import { fetchAllEmployeeSchedules, assignSchedule, clearErrors } from "../../../../redux/Schedules/employeeSchedulesSlice";
 import SchedulesTable from "../Table/SheduleTable";
 import LoadingIndicator from "../../../../components/ui/LoadingIndicator";
 import {
@@ -12,25 +13,23 @@ import {
 import { getAllCellStyle } from "./Table/schedulesAssignmentColumnsStyles";
 import renderAssignmentActions from "./Table/renderAssignmentActions";
 import { AlertContext } from "../../../../contexts/AlertContext";
-import AssignEmployeeScheduleForm from "./components/AssignEmployeeScheduleForm";
 import ModalForm from "../../../../components/ui/ModalForm";
-import { RiCalendarScheduleLine } from "react-icons/ri";
+import Dialog2 from "../../../../components/ui/Dialog2";
+import { RiCheckboxCircleLine, RiCloseCircleLine, RiCalendarScheduleLine } from "react-icons/ri";
+import ScheduleAssignmentForm from "./components/ScheduleAssignmentForm";
 
 
 const schedulesAssignment = () => {
     const dispatch = useDispatch();
-    const { employeeSchedules, status, error, hasFetchedAll } = useSelector(
+    const { employeeSchedules, fetchStatus, error, hasFetchedAll } = useSelector(
         (state) => state.employeeSchedules
     );
 
     const { showAlert } = useContext(AlertContext);
 
     // Estados
-    const [isCreateModalOpen, setCreateModalOpen] = useState(false); // Modal de creación
+    const [isCreateModalOpen, setCreateModalOpen] = useState(false);
     const [formErrors, setFormErrors] = useState({}); // Errores del formulario
-
-    // Datos locales para la tabla
-    const [localEmployeeSchedules, setLocalEmployeeSchedules] = useState([]);
 
     useEffect(() => {
         if (!hasFetchedAll) {
@@ -38,24 +37,33 @@ const schedulesAssignment = () => {
         }
     }, [dispatch, hasFetchedAll]);
 
-    useEffect(() => {
-        if (status === "succeeded") {
-            setLocalEmployeeSchedules(employeeSchedules);
-        }
-    }, [employeeSchedules, status]);
-
-
-    const handleOpenCreateModal = () => setCreateModalOpen(true);
-    const handleCloseModal = () => {
-        setCreateModalOpen(false);
+    // Abrir modal para asignar un nuevo horario a un empleado
+    const handleOpenCreateModal = () => {
+        setCreateModalOpen(true);
         setFormErrors({});
+        dispatch(clearErrors());
+    }
+
+    // Cerrar modal para asignar un nuevo horario a un empleado
+    const handleCloseCreateModal = () => {
+        setCreateModalOpen(false);
     };
 
-    const handleCreateSubmit = (formData) => {
-        console.log("Datos enviados:", formData);
-        handleCloseModal();
-        showAlert("Empleado asignado correctamente", "success");
+    // Crear horario y actualizar la tabla automaticamente mediante Redux
+    const handleCreateSubmit = async (formData) => {
+        console.log("Datos enviados al backend:", formData);
+        const { employee_id, ...payload } = formData;
+        try {
+            await dispatch(assignSchedule({ employeeId: employee_id, scheduleData: payload })).then(unwrapResult);
+
+            handleCloseCreateModal();
+            showAlert("Horario assignado correctamete", "success");
+        } catch (error) {
+            setFormErrors(error.errors || {});
+            showAlert(error.message || "Error al asignar el horario", "error");
+        }
     };
+
 
     const handleEdit = (row) => {
         console.log("Editar:", row);
@@ -70,18 +78,18 @@ const schedulesAssignment = () => {
 
     return (
         <div className="">
-            {status === "loading" && employeeSchedules.length === 0 && <LoadingIndicator />}
-            {status === "failed" && <p>Error al obtener horarios: {error}</p>}
+            {fetchStatus === "loading" && employeeSchedules.length === 0 && <LoadingIndicator />}
+            {fetchStatus === "failed" && <p>Error al obtener horarios assignados: {error}</p>}
 
             {/* Solo mostramos la tabla si hay datos */}
-            {status === "succeeded" && employeeSchedules.length > 0 && (
+            {fetchStatus === "succeeded" && employeeSchedules.length > 0 && (
                 <div className="">
                     <SchedulesTable
                         allColumns={assignmentGeneralColumns}
                         columns={[...assignmentFixedColumns, ...assignmentVisibleColumns]}
                         fixedColumns={assignmentFixedColumns}
                         getCellStyle={getAllCellStyle}
-                        data={localEmployeeSchedules}
+                        data={employeeSchedules}
                         dynamicFilterColumns={dynamicFilterColumns}
                         showActions={true}
                         showAddNew={true}
@@ -98,20 +106,22 @@ const schedulesAssignment = () => {
             )}
 
             {/* Si no hay datos disponibles, mostramos un mensaje */}
-            {employeeSchedules.length === 0 && status !== "loading" && (
-                <p>No hay horarios asignados a empleados para mostrar.</p>
+            {employeeSchedules.length === 0 && fetchStatus !== "loading" && (
+                <p className="py-10 text-gray-400 text-center">NNo hay horarios asignados a empleados para mostrar.</p>
             )}
-
+            
+            {/* Modal para asignar un nuevo horario a un empleado */}
             <ModalForm
                 isOpen={isCreateModalOpen}
                 setIsOpen={setCreateModalOpen}
-                title="Asignar Horario" 
+                title="Asignar Horario"
                 icon={<RiCalendarScheduleLine className="w-6 h-6 flex items-center justify-center rounded-full text-blue-500" />}
                 maxWidth="max-w-lg"
             >
-                <AssignEmployeeScheduleForm
+                <ScheduleAssignmentForm
+                    isEditing={false}
                     onSubmit={handleCreateSubmit}
-                    onCancel={handleCloseModal}
+                    onCancel={handleCloseCreateModal}
                     formErrors={formErrors}
                 />
             </ModalForm>

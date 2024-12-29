@@ -6,6 +6,7 @@ import {
   getEmployee,
   getEmployees,
   updateEmployee,
+  getActiveEmployees
 } from "../../services/Employee/EmployeService1";
 
 // fetchEmployees es una acción asíncrona que obtiene todos los empleados
@@ -13,6 +14,15 @@ export const fetchEmployees = createAsyncThunk(
   "employees/fetchEmployees",
   async () => {
     const response = await getEmployees();
+    return response.data;
+  }
+);
+
+// Accion asíncrona para obtener empleados con contratos activos
+export const fetchActiveEmployees = createAsyncThunk(
+  "employees/fetchActiveEmployees",
+  async () => {
+    const response = await getActiveEmployees();
     return response.data;
   }
 );
@@ -79,9 +89,12 @@ export const employeeSlice = createSlice({
   name: "employees",
   initialState: {
     employees: [],
+    employeesActive: [],
     employee: {},
     status: "idle",
+    fetchActiveStatus: "idle", // Estado para obtener empleados con contratos activos
     error: null,
+    hasFetchedActive: false, // Control para evitar múltiples peticiones
   },
   reducers: {
     updateEmployees: (state, action) => {
@@ -152,6 +165,21 @@ export const employeeSlice = createSlice({
       .addCase(deleteOneEmployee.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
+      })
+
+      // Obetener empleados con contratos activos
+      .addCase(fetchActiveEmployees.pending, (state) => {
+        state.fetchActiveStatus = "loading";
+      })
+      .addCase(fetchActiveEmployees.fulfilled, (state, action) => {
+        state.fetchActiveStatus = "succeeded";
+        state.employeesActive = action.payload;
+        state.hasFetchedActive = true;
+      })
+      .addCase(fetchActiveEmployees.rejected, (state, action) => {
+        state.fetchActiveStatus = "failed";
+        state.error = action.error.message;
+        state.hasFetchedActive = false;
       });
   },
 });

@@ -26,7 +26,10 @@ const assignScheduleToEmployee = async (employeeId, scheduleData) => {
         const response = await AxiosInstance.post(`/employee-schedules/${employeeId}`, scheduleData);
         return response.data;
     } catch (error) {
-        throw error;
+        throw {
+            message: error.response?.data?.msg,
+            errors: error.response?.data?.errors || {}, 
+        };
     }
 };
 
@@ -36,7 +39,10 @@ const changeEmployeeSchedule = async (employeeId, scheduleData) => {
         const response = await AxiosInstance.patch(`/employee-schedules/${employeeId}/change`, scheduleData);
         return response.data;
     } catch (error) {
-        throw error;
+        throw {
+            message: error.response?.data?.msg,
+            errors: error.response?.data?.errors || {}, 
+        };
     }
 };
 

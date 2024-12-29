@@ -24,18 +24,21 @@ export const scheduleVisibleColumns = [
     render: renderBreakHours,
     order: 3,
   },
-
   {
     id: "rest_days",
     label: "Días de Descanso",
     render: renderRestDays,
     order: 4,
   },
-
+  {
+    id: "weekly_hours",
+    label: "Horas Semanales",
+    order: 5,
+  },
   {
     id: "status",
     label: "Estado",
-    order: 5,
+    order: 6,
   },
 
 ];

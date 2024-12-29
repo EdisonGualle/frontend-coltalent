@@ -83,7 +83,7 @@ const AssignedDelegations = () => {
       )}
 
       {assignedDelegations.length === 0 && status !== "loading" && (
-        <p>No hay delegaciones asignadas para mostrar.</p>
+        <p className="py-10 text-gray-400 text-center">No hay delegaciones asignadas para mostrar.</p>
       )}
     </div>
   );

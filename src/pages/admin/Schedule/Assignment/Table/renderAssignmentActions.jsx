@@ -1,12 +1,16 @@
 import React from "react";
 import { Menu, MenuButton, MenuItem } from "@szhsin/react-menu";
-import { RiMore2Fill, RiEdit2Line, RiDeleteBin6Line} from "react-icons/ri";
+import { RiMore2Fill, RiEdit2Line, RiDeleteBin6Line } from "react-icons/ri";
 
 const renderAssignmentActions = ({ row, onEdit, onDelete, }) => {
   return (
     <Menu
       menuButton={
-        <MenuButton className="flex items-center justify-center w-8 h-8 hover:bg-gray-200 rounded-lg transition-colors">
+        <MenuButton
+          className="flex items-center justify-center w-8 h-8 hover:bg-gray-200 rounded-lg transition-colors"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
           <RiMore2Fill className="text-gray-600 " />
         </MenuButton>
       }
@@ -15,7 +19,11 @@ const renderAssignmentActions = ({ row, onEdit, onDelete, }) => {
       arrowClassName="bg-gray-200"
       transition
       menuClassName="bg-gray-200 p-1 rounded-lg shadow-sm"
-
+      onMenuChange={(e) => {
+        if (!e.open) {
+          document.activeElement.blur();
+        }
+      }}
     >
       <MenuItem className="p-0 hover:bg-transparent">
         <button

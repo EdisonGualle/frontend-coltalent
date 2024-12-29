@@ -81,7 +81,7 @@ const AllDelegations = () => {
 
     {/* Si no hay datos disponibles, mostramos un mensaje */}
     {allDelegations.length === 0 && status !== "loading" && (
-      <p>No hay historial de subrogaciones para mostrar.</p>
+      <p className="py-10 text-gray-400 text-center">No hay historial de subrogaciones para mostrar.</p>
     )}
   </div>
   );
