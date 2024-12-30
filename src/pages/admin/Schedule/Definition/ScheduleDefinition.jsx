@@ -28,8 +28,11 @@ const ScheduleDefinition = () => {
 
   // Estados
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const [isStatus, setIsStatus] = useState(false);
   const [statusDialogMessage, setStatusDialogMessage] = useState({});
   const [currentSchedule, setCurrentSchedule] = useState(null);
   const [formErrors, setFormErrors] = useState({});
@@ -55,6 +58,7 @@ const ScheduleDefinition = () => {
 
   // Crear horario y actualizar la tabla automaticamente mediante Redux
   const handleCreateSubmit = async (scheduleData) => {
+    setIsCreating(true);
     try {
       await dispatch(addNewSchedule(scheduleData)).then(unwrapResult);
       handleCloseCreateModal();
@@ -62,6 +66,8 @@ const ScheduleDefinition = () => {
     } catch (error) {
       setFormErrors(error.errors || {});
       showAlert(error.message || "Error al crear el horario", "error");
+    } finally {
+      setIsCreating(false);
     }
   }
 
@@ -119,6 +125,7 @@ const ScheduleDefinition = () => {
   // Confirmar cambio de estado del horario
   const handleConfirmStatusChange = async () => {
     setIsStatusDialogOpen(false);
+    setIsStatus(true);
     try {
       if (currentSchedule.status === "Activo") {
         await dispatch(deleteExistingSchedule(currentSchedule.id)).then(unwrapResult);
@@ -129,6 +136,8 @@ const ScheduleDefinition = () => {
       }
     } catch (error) {
       showAlert(error.message || "Error al realizar la acción.", "error");
+    } finally {
+      setIsStatus(false);
     }
   };
 
@@ -184,6 +193,7 @@ const ScheduleDefinition = () => {
         onCancel={handleCancelStatusChange}
         cancelButtonColor="border-gray-400"
         confirmButtonColor={statusDialogMessage.confirmButtonColor}
+        isLoading={isStatus}
         icon={statusDialogMessage.icon}
       />
 
@@ -200,6 +210,7 @@ const ScheduleDefinition = () => {
           onSubmit={handleCreateSubmit}
           onCancel={handleCloseCreateModal}
           formErrors={formErrors}
+          isSubmitting={isCreating}
         />
       </ModalForm>
 
@@ -217,6 +228,7 @@ const ScheduleDefinition = () => {
           onSubmit={handleEditSubmit}
           onCancel={handleCloseEditModal}
           formErrors={formErrors}
+          isSubmitting={isEditing}
         />
       </ModalForm>
     </div>

@@ -118,8 +118,22 @@ const employeeSchedulesSlice = createSlice({
             })
             .addCase(assignSchedule.fulfilled, (state, action) => {
                 state.assignStatus = "succeeded";
-                state.employeeSchedules.push(action.payload);
+
+                // Extraer datos del payload
+                const { updated_current_schedule, new_schedule } = action.payload;
+
+                // Actualizar el horario actual
+                const currentIndex = state.employeeSchedules.findIndex(
+                    (schedule) => schedule.id === updated_current_schedule.id
+                );
+                if (currentIndex !== -1) {
+                    state.employeeSchedules[currentIndex] = updated_current_schedule;
+                }
+
+                // Agregar el nuevo horario
+                state.employeeSchedules.unshift(new_schedule);
             })
+
             .addCase(assignSchedule.rejected, (state, action) => {
                 state.assignStatus = "failed";
                 const { message, errors } = action.payload || {};
@@ -127,21 +141,18 @@ const employeeSchedulesSlice = createSlice({
                 state.fieldErrors = errors || {};
             })
 
-            // Cambiar horario
-            .addCase(changeSchedule.fulfilled, (state, action) => {
-                const index = state.employeeSchedules.findIndex(
-                    (schedule) => schedule.id === action.payload.id
-                );
-                if (index !== -1) {
-                    state.employeeSchedules[index] = action.payload;
-                }
-            })
-
             // Eliminar horario
+            .addCase(deleteSchedule.pending, (state) => {
+                state.deleteStatus = "loading";
+            })
             .addCase(deleteSchedule.fulfilled, (state, action) => {
+                state.deleteStatus = "succeeded";
                 state.employeeSchedules = state.employeeSchedules.filter(
                     (schedule) => schedule.id !== action.payload.id
                 );
+            })
+            .addCase(deleteSchedule.rejected, (state) => {
+                state.deleteStatus = "failed";
             })
 
             // Restaurar horario eliminado

@@ -11,6 +11,7 @@ const Dialog2 = ({
   cancelButtonText,
   onConfirm,
   onCancel,
+  isLoading = false,
   confirmButtonColor = 'bg-red-500', // Color por defecto para el botón de confirmación
   cancelButtonColor = 'border-foreground', // Color por defecto para el botón de cancelar
   icon = <RiDeleteBin2Fill className="w-10 h-10 flex items-center justify-center rounded-full text-red-500" />, // Ícono por defecto
@@ -20,7 +21,7 @@ const Dialog2 = ({
       <Dialog
         as="div"
         className="relative z-10"
-        onClose={() => setIsOpen(false)}
+        onClose={() => !isLoading && setIsOpen(false)}
       >
         <Transition.Child
           as={Fragment}
@@ -60,15 +61,19 @@ const Dialog2 = ({
                 <div className="mt-5 flex items-center gap-x-2">
                   <button
                     type="button"
-                    className={`p-2 px-1 ${confirmButtonColor} rounded-xl text-white w-full outline-none transform transition-all duration-300 hover:scale-105 `}
+                    className={`p-2 px-1 ${confirmButtonColor} rounded-xl text-white w-full outline-none transform transition-all duration-300 hover:scale-105 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
+                      }`}
                     onClick={onConfirm}
+                    disabled={isLoading}
                   >
-                    {confirmButtonText}
+                   {isLoading ? "Enviando..." : confirmButtonText}
                   </button>
                   <button
                     type="button"
-                    className={`p-2 rounded-xl bg-transparent border border-dashed ${cancelButtonColor} w-full outline-none transform transition-all duration-300 hover:scale-105 `}
+                    className={`p-2 rounded-xl bg-transparent border border-dashed ${cancelButtonColor} w-full outline-none transform transition-all duration-300 hover:scale-105 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
+                      }`}
                     onClick={onCancel}
+                    disabled={isLoading}
                   >
                     {cancelButtonText}
                   </button>

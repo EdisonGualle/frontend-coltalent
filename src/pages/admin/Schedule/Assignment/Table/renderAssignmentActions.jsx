@@ -1,8 +1,8 @@
 import React from "react";
 import { Menu, MenuButton, MenuItem } from "@szhsin/react-menu";
-import { RiMore2Fill, RiEdit2Line, RiDeleteBin6Line } from "react-icons/ri";
+import { RiMore2Fill, RiDeleteBin6Line } from "react-icons/ri";
 
-const renderAssignmentActions = ({ row, onEdit, onDelete, }) => {
+const renderAssignmentActions = ({ row, onDelete, }) => {
   return (
     <Menu
       menuButton={
@@ -25,15 +25,6 @@ const renderAssignmentActions = ({ row, onEdit, onDelete, }) => {
         }
       }}
     >
-      <MenuItem className="p-0 hover:bg-transparent">
-        <button
-          onClick={() => onEdit(row)}
-          className="w-full rounded-lg transition-colors text-xs hover:bg-gray-50 flex items-center gap-2 p-2"
-        >
-          <RiEdit2Line className="text-green-600" />
-          <span>Editar</span>
-        </button>
-      </MenuItem>
       <MenuItem className="p-0 hover:bg-transparent">
         <button
           onClick={() => onDelete(row)}

@@ -49,7 +49,7 @@ const changeEmployeeSchedule = async (employeeId, scheduleData) => {
 // Servicio para eliminar un horario asignado a un empleado por ID
 const deleteEmployeeSchedule = async (id) => {
     try {
-        const response = await AxiosInstance.delete(`/employee-schedules/${id}`);
+        const response = await AxiosInstance.delete(`/employee-schedules/${id}/delete`);
         return response.data;
     } catch (error) {
         throw error;

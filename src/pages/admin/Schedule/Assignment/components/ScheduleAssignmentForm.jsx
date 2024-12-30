@@ -63,9 +63,8 @@ const validateField = (name, value, formData, selectedEmployee, selectedSchedule
                 const contractEndDate = contract.end_date ? new Date(contract.end_date) : null;
 
                 if (startDate < contractStartDate || (contractEndDate && startDate > contractEndDate)) {
-                    return `La fecha de inicio debe estar entre ${contract.start_date} y ${
-                        contract.end_date || "Indefinido"
-                    }`;
+                    return `La fecha de inicio debe estar entre ${contract.start_date} y ${contract.end_date || "Indefinido"
+                        }`;
                 }
 
                 if (formData.end_date && startDate > new Date(formData.end_date)) {
@@ -81,9 +80,8 @@ const validateField = (name, value, formData, selectedEmployee, selectedSchedule
                 const contractEndDate = contract.end_date ? new Date(contract.end_date) : null;
 
                 if (endDate < contractStartDate || (contractEndDate && endDate > contractEndDate)) {
-                    return `La fecha de fin debe estar entre ${contract.start_date} y ${
-                        contract.end_date || "Indefinido"
-                    }`;
+                    return `La fecha de fin debe estar entre ${contract.start_date} y ${contract.end_date || "Indefinido"
+                        }`;
                 }
 
                 if (formData.start_date && endDate < new Date(formData.start_date)) {
@@ -116,6 +114,7 @@ const ScheduleAssignmentForm = ({
     onCancel,
     formErrors = {},
     isEditing = false,
+    isSubmitting = false,
     initialData = {},
     confirmButtonText = isEditing ? "Guardar" : "Asignar",
     cancelButtonText = "Cancelar",
@@ -194,7 +193,7 @@ const ScheduleAssignmentForm = ({
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
-    
+
         const updatedErrors = {
             ...errors,
             [name]: validateField(
@@ -205,7 +204,7 @@ const ScheduleAssignmentForm = ({
                 selectedSchedule
             ),
         };
-    
+
         // Validar el campo relacionado solo si ambos tienen valores
         if (name === "start_date" && value && formData.end_date) {
             updatedErrors.end_date = validateField(
@@ -225,52 +224,52 @@ const ScheduleAssignmentForm = ({
                 selectedSchedule
             );
         }
-    
+
         setErrors(updatedErrors);
     };
-    
+
     const handleSubmit = (e) => {
         e.preventDefault();
-    
+
         // Obtiene el ID del empleado seleccionado
         const employeeId = selectedEmployee?.value?.id || null;
-    
+
         // Prepara los datos según los requerimientos del backend
         const finalData = {
             schedule_id: selectedSchedule?.value?.id || null, // ID del horario
             start_date: formData.start_date || null,         // Fecha de inicio o null
             end_date: formData.end_date || null,             // Fecha de fin o null
         };
-    
+
         console.log("Datos preparados para enviar al componente padre:", {
             employee_id: employeeId,
             ...finalData,
         });
-    
+
         // Validar campos
         const validationErrors = validateAllFields(
-            { 
-                ...formData, 
+            {
+                ...formData,
                 employee_id: selectedEmployee?.value?.id || null,
-                schedule_id: selectedSchedule?.value?.id || null 
+                schedule_id: selectedSchedule?.value?.id || null
             },
             selectedEmployee,
             selectedSchedule
         );
-        
-    
+
+
         if (Object.values(validationErrors).some((error) => error)) {
             setErrors(validationErrors);
             return;
         }
-    
+
         // Envía al componente padre
         onSubmit({
             employee_id: employeeId,
             ...finalData,
         });
     };
-    
+
 
 
     return (
@@ -327,18 +326,22 @@ const ScheduleAssignmentForm = ({
             <div className="flex justify-end gap-4 mt-6">
                 <button
                     type="submit"
-                    aria-label={confirmButtonText}
-                    className={`p-2 rounded-xl text-white w-full ${confirmButtonColor} outline-none border border-transparent transform transition-all duration-300 hover:scale-105 ${hasErrors ? "opacity-70 cursor-not-allowed" : ""
+                    aria-label={isSubmitting ? "Enviando..." : confirmButtonText}
+                    className={`p-2 rounded-xl text-white w-full 
+                        ${confirmButtonColor} outline-none border border-transparent transform transition-all duration-300 hover:scale-105 
+                        ${isSubmitting || hasErrors ? "opacity-70 cursor-not-allowed" : ""
                         }`}
                     disabled={hasErrors}
                 >
-                    {confirmButtonText}
+                    {isSubmitting ? "Enviando..." : confirmButtonText}
                 </button>
                 <button
                     type="button"
                     aria-label={cancelButtonText}
-                    className={`p-2 rounded-xl bg-transparent border border-dashed ${cancelButtonColor} w-full outline-none transform transition-all duration-300 hover:scale-105`}
+                    className={`p-2 rounded-xl bg-transparent border border-dashed ${cancelButtonColor} w-full outline-none transform transition-all duration-300 hover:scale-105 ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                        }`}
                     onClick={onCancel}
+                    disabled={isSubmitting}
                 >
                     {cancelButtonText}
                 </button>
