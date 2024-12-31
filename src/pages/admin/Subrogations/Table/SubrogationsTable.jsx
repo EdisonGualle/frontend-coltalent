@@ -291,7 +291,7 @@ const SubrogationsTable = ({
   const isExpanded = actions.length > 2;
 
   return (
-    <div className="table-container bg-white shadow-sm mb-4 rounded-lg py-2">
+    <div className="table-container bg-white shadow-sm mb-4 rounded-se-lg rounded-b-lg py-2">
       <div className="mb-2 pt-1">
         <div className="flex justify-between items-center py-2 px-2">
           <div className="flex items-center space-x-2">

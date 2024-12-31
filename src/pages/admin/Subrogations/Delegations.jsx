@@ -54,14 +54,14 @@ const Delegations = () => {
             </CardHeader>
 
             {/* Tabs */}
-            <div className="flex border-b">
+            <div className="flex border-gray-200">
                 {filteredTabs.map((tab, index) => (
                     <button
                         key={index}
                         onClick={() => setActiveTab(index)}
-                        className={`flex items-center py-3 px-5 text-sm font-medium rounded-t-md ${activeTab === index
-                                ? "bg-blue-500 text-white"
-                                : "bg-gray-100 text-gray-700 hover:bg-blue-100"
+                        className={`flex items-center py-3 px-5 text-sm transition-all duration-300 rounded-t-lg ${activeTab === index
+                                ? "bg-blue-100 text-blue-700 border-t-2 border-x-2 border-blue-200 font-semibold"
+                                : "bg-white text-gray-600 hover:bg-gray-100"
                             }`}
                     >
                         <span className="mr-2 text-lg">{tab.icon}</span>

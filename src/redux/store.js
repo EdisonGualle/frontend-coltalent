@@ -27,6 +27,7 @@ import configurationReducer from './Configuration/configurationSlice';
 import schedulesReducer from './Schedules/ScheduleSlince';
 import employeeSchedulesReducer from './Schedules/employeeSchedulesSlice'; 
 import contractTypesReducer from './Contracts/contractTypeSlince';
+import constractAssignmentReducer from './Contracts/contractAssignmentSlince';
 
 export default configureStore({
   reducer: {
@@ -58,5 +59,6 @@ export default configureStore({
     schedules: schedulesReducer,
     employeeSchedules: employeeSchedulesReducer, 
     contractTypes: contractTypesReducer,
+    contractAssignments: constractAssignmentReducer,
   },
 });

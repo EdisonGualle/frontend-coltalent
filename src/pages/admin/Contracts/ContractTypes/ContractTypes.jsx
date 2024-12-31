@@ -156,7 +156,7 @@ const ContractTypes = () => {
       {fetchStatus === "loading" && <LoadingIndicator />}
       {fetchStatus === "failed" && showAlert("Error al cargar los tipos de contrato", "error")}
 
-      {/* Solo Mosramos la tabla si hay datos*/}
+      {/* Solo Mostramos la tabla si hay datos*/}
       {fetchStatus === "succeeded" && contractTypes.length > 0 && (
         <ContractTable
           allColumns={contractTypesGeneralColumns}

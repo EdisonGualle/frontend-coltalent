@@ -1,10 +1,10 @@
 import React from "react";
 import { Menu, MenuButton, MenuItem } from "@szhsin/react-menu";
-import { RiMore2Fill} from "react-icons/ri";
-import { AiOutlineDelete, AiOutlineCheck, AiOutlineEdit } from "react-icons/ai";
+import { RiMore2Fill } from "react-icons/ri";
+import { IoBan } from "react-icons/io5";
+import { LuRefreshCw } from "react-icons/lu";
 
-const renderContractTypeActions = ({ row, onEdit, onToggleStatus }) => {
-    const isActive = row.status === "Activo";
+const renderContractAssignmentActions = ({ row, onRenew, onTerminate }) => {
     return (
         <Menu
             menuButton={
@@ -34,34 +34,25 @@ const renderContractTypeActions = ({ row, onEdit, onToggleStatus }) => {
         >
             <MenuItem className="p-0 hover:bg-transparent">
                 <button
-                    onClick={() => onEdit(row)}
+                    onClick={() => onRenew(row)}
                     className="w-full rounded-lg transition-colors text-xs hover:bg-gray-50 flex items-center gap-2 p-2"
                 >
-                    <AiOutlineEdit className="text-blue-500" />
-                    <span>Editar</span>
+                    <LuRefreshCw className="text-blue-500" />
+                    <span>Renovar</span>
                 </button>
             </MenuItem>
 
             <MenuItem className="p-0 hover:bg-transparent">
                 <button
-                    onClick={() => onToggleStatus(row)}
+                    onClick={() => onTerminate(row)}
                     className="w-full rounded-lg transition-colors text-xs hover:bg-gray-50 flex items-center gap-2 p-2"
                 >
-                    {isActive ? (
-                        <>
-                            <AiOutlineDelete className="text-yellow-500" />
-                            <span>Desactivar</span>
-                        </>
-                    ) : (
-                        <>
-                            <AiOutlineCheck className="text-green-500" />
-                            <span>Activar</span>
-                        </>
-                    )}
-                </button>
+                    <IoBan className="text-red-500" />
+                    <span>Terminar</span>
+                </button>   
             </MenuItem>
         </Menu>
-    );
-};
+    )
+}
 
-export default renderContractTypeActions;
+export default renderContractAssignmentActions

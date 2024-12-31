@@ -549,7 +549,6 @@ const ContractTable = ({
                       className="py-3 px-4 text-center text-sm bg-white z-10 group-hover:bg-gray-100 transition duration-200 ease-in-out"
                       style={{
                         minWidth: '50px',
-                        maxWidth: '300px',
                         width: 'auto',
                         verticalAlign: 'middle',
                         display: 'table-cell',

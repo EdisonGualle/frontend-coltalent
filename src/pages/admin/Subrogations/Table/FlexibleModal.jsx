@@ -80,7 +80,7 @@ const FlexibleModal = ({ data, config, title, onClose }) => {
   return (
     <div
       id="modal-background"
-      className="fixed inset-0 bg-gray-800 bg-opacity-60 flex justify-center items-center z-50"
+      className="fixed inset-0 bg-gray-300 bg-opacity-40 flex justify-center items-center z-50"
       onClick={handleClickOutside}
     >
       <div

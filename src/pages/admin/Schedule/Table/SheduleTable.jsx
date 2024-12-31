@@ -545,7 +545,7 @@ const SheduleTable = ({
                   ))}
 
                   {showActions && (
-                    <td className=" flex py-3 px-4 text-center justify-center text-sm bg-white z-10 group-hover:bg-gray-100  transition duration-200 ease-in-out" style={{ minWidth: '50px', maxWidth: '300px', width: 'auto' }}>
+                    <td className=" flex py-3 px-4 text-center justify-center text-sm bg-white z-10 group-hover:bg-gray-100  transition duration-200 ease-in-out" style={{ minWidth: '50px', width: 'auto' }}>
                       {typeof actions === 'function' ? actions(row) : null}
                     </td>
                   )}
