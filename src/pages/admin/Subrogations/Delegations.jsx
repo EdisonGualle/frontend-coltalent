@@ -5,6 +5,7 @@ import AssignedDelegations from "./Assigned/AssignedDelegations";
 import DelegatedDelegations from "./Delegated/DelegatedDelegations";
 import AllDelegations from "./All/AllDelegations";
 import { useAuth } from "../../../hooks/useAuth";
+import MotionWrapper from "../../../components/ui/MotionWrapper";
 
 const Delegations = () => {
     const { user } = useAuth();
@@ -58,11 +59,10 @@ const Delegations = () => {
                     <button
                         key={index}
                         onClick={() => setActiveTab(index)}
-                        className={`flex items-center py-3 px-5 text-sm font-medium rounded-t-md ${
-                            activeTab === index
+                        className={`flex items-center py-3 px-5 text-sm font-medium rounded-t-md ${activeTab === index
                                 ? "bg-blue-500 text-white"
                                 : "bg-gray-100 text-gray-700 hover:bg-blue-100"
-                        }`}
+                            }`}
                     >
                         <span className="mr-2 text-lg">{tab.icon}</span>
                         {tab.label}
@@ -71,9 +71,10 @@ const Delegations = () => {
             </div>
 
             {/* Content */}
-            <div className="">
+            <MotionWrapper keyProp={activeTab}>
                 {filteredTabs[activeTab]?.component}
-            </div>
+            </MotionWrapper>
+
         </div>
     );
 };

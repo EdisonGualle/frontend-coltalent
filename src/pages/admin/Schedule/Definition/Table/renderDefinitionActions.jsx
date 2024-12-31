@@ -24,8 +24,13 @@ const renderDefinitionActions = ({ row, onEdit, onToggleStatus }) => {
       menuClassName="bg-gray-200 p-1 rounded-lg shadow-sm"
       onMenuChange={(e) => {
         if (!e.open) {
-          document.activeElement.blur();
-        }
+          setTimeout(() => {
+              const menuButton = document.querySelector('[aria-haspopup="true"]');
+              if (menuButton) {
+                  menuButton.focus();
+              }
+          }, 0);
+      }
       }}
     >
       <MenuItem className="p-0 hover:bg-transparent">

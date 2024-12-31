@@ -56,7 +56,7 @@ import AnotherComponent from "./pages/admin/Employee/AnotherComponent";
 // Prueba subrogaciones
 import Delegations from "./pages/admin/Subrogations/Delegations";
 import Schedule from "./pages/admin/Schedule/Schedules";
-
+import Contracts from "./pages/admin/Contracts/Contracts";
 
 
 function App() {
@@ -79,6 +79,11 @@ function App() {
                   {/* User */}
                   <Route path="/usuarios" element={<ProtectedRoute allowedRoles={['Administrador']} />}>
                     <Route path="" element={<UserIndex />} />
+                  </Route>
+
+                  {/* Contratos */}
+                  <Route path="/contratos" element={<ProtectedRoute allowedRoles={['Administrador']} />}>
+                    <Route path="" element={<Contracts />} />
                   </Route>
 
                   {/* Employee */}

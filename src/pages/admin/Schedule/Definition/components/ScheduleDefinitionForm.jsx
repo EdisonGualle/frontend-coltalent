@@ -154,7 +154,7 @@ const ScheduleDefinitionForm = ({
         });
         setErrors((prev) => ({ ...prev, rest_days: fieldError }));
     };
-    
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -253,31 +253,29 @@ const ScheduleDefinitionForm = ({
                     error={errors.rest_days}
                 />
             </div>
-            
+
             {/* Botones */}
             <div className="flex justify-end gap-4 mt-6">
-    <button
-        type="submit"
-        className={`p-2 px-1 rounded-xl text-white w-full outline-none border border-transparent transform transition-all duration-300 hover:scale-105 ${
-            isSubmitAttempted && hasErrors
-                ? `${confirmButtonColor} opacity-70 cursor-not-allowed`
-                : `${confirmButtonColor}`
-        }`}
-        disabled={isSubmitting || (isSubmitAttempted && hasErrors)} 
-    >
-        {isSubmitting ? "Enviando..." : confirmButtonText} 
-    </button>
-    <button
-        type="button"
-        className={`p-2 rounded-xl bg-transparent border border-dashed ${cancelButtonColor} w-full outline-none transform transition-all duration-300 hover:scale-105 ${
-            isSubmitting ? "opacity-70 cursor-not-allowed" : ""
-        }`}
-        onClick={onCancel}
-        disabled={isSubmitting} 
-    >
-        {cancelButtonText}
-    </button>
-</div>
+                <button
+                    type="submit"
+                    className={`p-2 px-1 rounded-xl text-white w-full outline-none border border-transparent transform transition-all duration-300 hover:scale-105 ${isSubmitAttempted && hasErrors
+                            ? `${confirmButtonColor} opacity-70 cursor-not-allowed`
+                            : `${confirmButtonColor}`
+                        }`}
+                    disabled={isSubmitting || (isSubmitAttempted && hasErrors)}
+                >
+                    {isSubmitting ? "Enviando..." : confirmButtonText}
+                </button>
+                <button
+                    type="button"
+                    className={`p-2 rounded-xl bg-transparent border border-dashed ${cancelButtonColor} w-full outline-none transform transition-all duration-300 hover:scale-105 ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                        }`}
+                    onClick={onCancel}
+                    disabled={isSubmitting}
+                >
+                    {cancelButtonText}
+                </button>
+            </div>
 
         </form>
     );

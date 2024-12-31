@@ -118,7 +118,7 @@ const ScheduleAssignmentForm = ({
     initialData = {},
     confirmButtonText = isEditing ? "Guardar" : "Asignar",
     cancelButtonText = "Cancelar",
-    confirmButtonColor = "bg-blue-500",
+    confirmButtonColor = "bg-blue-600",
     cancelButtonColor = "border-gray-400",
 }) => {
     const dispatch = useDispatch();
@@ -167,8 +167,6 @@ const ScheduleAssignmentForm = ({
 
     const handleEmployeeChange = (option) => {
         setSelectedEmployee(option);
-
-        console.log('Empleado seleccionado', option);
         // Actualiza únicamente el error del empleado
         const updatedErrors = {
             ...errors,
@@ -180,8 +178,6 @@ const ScheduleAssignmentForm = ({
 
     const handleScheduleChange = (option) => {
         setSelectedSchedule(option);
-
-        console.log('Calendario seleccionado', option);
         // Actualiza únicamente el error del horario
         const updatedErrors = {
             ...errors,
@@ -240,11 +236,6 @@ const ScheduleAssignmentForm = ({
             start_date: formData.start_date || null,         // Fecha de inicio o null
             end_date: formData.end_date || null,             // Fecha de fin o null
         };
-
-        console.log("Datos preparados para enviar al componente padre:", {
-            employee_id: employeeId,
-            ...finalData,
-        });
 
         // Validar campos
         const validationErrors = validateAllFields(
@@ -322,7 +313,6 @@ const ScheduleAssignmentForm = ({
                     />
                 </div>
             </div>
-
             <div className="flex justify-end gap-4 mt-6">
                 <button
                     type="submit"

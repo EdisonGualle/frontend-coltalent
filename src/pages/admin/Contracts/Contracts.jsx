@@ -1,25 +1,26 @@
-import React, { useState } from "react";
-import { CardHeader, Typography, Button } from "@material-tailwind/react";
-import { FaClock, FaUserClock, FaUser } from "react-icons/fa";
-import ScheduleDefinition from "./Definition/ScheduleDefinition";
-import ScheduleAssignment from "./Assignment/ScheduleAssignment";
+import React, {useState} from "react";
+import {CardHeader, Typography, Button} from "@material-tailwind/react";
+import {FaFileContract, FaUserClock} from "react-icons/fa";
+import { MdAssignmentInd } from "react-icons/md";
 import MotionWrapper from "../../../components/ui/MotionWrapper";
+import ContractTypes from "./ContractTypes/ContractTypes";
+import ContractAssignment from "./ContractAssignment/ContractAssignment";
 
-const Schedules = () => {
+const Contracts = () => {
     const [activeTab, setActiveTab] = useState(0);
     const allTabs = [
         {
-            label: "Definición de Horarios",
-            icon: <FaClock />,
+            label: "Tipos de Contrato",
+            icon: <FaFileContract />,
             component: (
-                <ScheduleDefinition />
+                <ContractTypes/>
             ),
         },
         {
-            label: "Asignación de Horarios",
-            icon: <FaUserClock />,
+            label: "Asignación de Contratos",
+            icon: <MdAssignmentInd />,
             component: (
-                <ScheduleAssignment />
+                <ContractAssignment/>
             ),
         },
     ];
@@ -31,10 +32,10 @@ const Schedules = () => {
                 <div className="mb-2 flex items-center justify-between gap-8">
                     <div>
                         <Typography variant="h5" color="blue-gray" className="font-semibold">
-                            Gestión de Horarios
+                            Gestión de Contratos
                         </Typography>
                         <Typography color="gray" className="mt-1">
-                            Administra, consulta los horarios y asignaciones.
+                            Administra, consulta los contratos y asignaciones.
                         </Typography>
                     </div>
                 </div>
@@ -61,8 +62,8 @@ const Schedules = () => {
             <MotionWrapper keyProp={activeTab}>
                 {allTabs[activeTab]?.component}
             </MotionWrapper>
-        </div >
+        </div>
     );
 };
 
-export default Schedules;
+export default Contracts;

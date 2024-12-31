@@ -15,7 +15,7 @@ import renderAssignmentActions from "./Table/renderAssignmentActions";
 import { AlertContext } from "../../../../contexts/AlertContext";
 import ModalForm from "../../../../components/ui/ModalForm";
 import Dialog2 from "../../../../components/ui/Dialog2";
-import { RiCheckboxCircleLine, RiCloseCircleLine, RiCalendarScheduleLine, RiDeleteBin6Line} from "react-icons/ri";
+import { RiCalendarScheduleLine, RiDeleteBin6Line} from "react-icons/ri";
 import ScheduleAssignmentForm from "./components/ScheduleAssignmentForm";
 
 
@@ -30,11 +30,12 @@ const schedulesAssignment = () => {
     // Estados
     const [isCreateModalOpen, setCreateModalOpen] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
-    const [formErrors, setFormErrors] = useState({}); // Errores del formulario
+    const [formErrors, setFormErrors] = useState({}); 
     const [isDeleting, setIsDeleting] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [scheduleToDelete, setScheduleToDelete] = useState(null);
 
+    // Obtener todos los horarios assignados a empleados
     useEffect(() => {
         if (!hasFetchedAll) {
             dispatch(fetchAllEmployeeSchedules());
@@ -89,12 +90,10 @@ const schedulesAssignment = () => {
         }
     };
 
-
-
     return (
         <div className="">
             {fetchStatus === "loading" && employeeSchedules.length === 0 && <LoadingIndicator />}
-            {fetchStatus === "failed" && <p>Error al obtener horarios assignados: {error}</p>}
+            {fetchStatus === "failed" &&  showAlert("Error al obtener los horarios asignados", "error")}
 
             {/* Solo mostramos la tabla si hay datos */}
             {fetchStatus === "succeeded" && employeeSchedules.length > 0 && (
@@ -103,8 +102,8 @@ const schedulesAssignment = () => {
                         allColumns={assignmentGeneralColumns}
                         columns={[...assignmentFixedColumns, ...assignmentVisibleColumns]}
                         fixedColumns={assignmentFixedColumns}
-                        getCellStyle={getAllCellStyle}
                         data={employeeSchedules}
+                        getCellStyle={getAllCellStyle}
                         dynamicFilterColumns={dynamicFilterColumns}
                         showActions={true}
                         showAddNew={true}

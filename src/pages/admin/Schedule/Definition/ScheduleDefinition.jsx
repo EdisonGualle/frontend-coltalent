@@ -86,6 +86,7 @@ const ScheduleDefinition = () => {
 
   // Actualizar horario y tabla local
   const handleEditSubmit = async (scheduleData) => {
+    setIsEditing(true);
     try {
       await dispatch(updateExistingSchedule({ id: currentSchedule.id, scheduleData })).then(unwrapResult);
       handleCloseEditModal();
@@ -93,6 +94,8 @@ const ScheduleDefinition = () => {
     } catch (error) {
       setFormErrors(error.errors || {});
       showAlert(error.message || "Error al actualizar el horario", "error");
+    } finally {
+      setIsEditing(false);
     }
   };
 
@@ -150,7 +153,7 @@ const ScheduleDefinition = () => {
   return (
     <div className="">
       {fetchStatus === "loading" && schedules.length === 0 && <LoadingIndicator />}
-      {fetchStatus === "failed" && <p>Error al obtener horarios: {error}</p>}
+      {fetchStatus === "failed" &&showAlert("Error al cargar los horarios", "error")}
 
       {/* Solo mostramos la tabla si hay datos */}
       {fetchStatus === "succeeded" && schedules.length > 0 && (

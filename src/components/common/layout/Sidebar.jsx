@@ -14,10 +14,11 @@ import {
   RiShieldUserLine,
   RiFileUserLine,
   RiFileTextLine,
-  RiAccountCircleLine,
   RiCalendarScheduleLine
 } from "react-icons/ri";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
+import { LiaFileContractSolid } from "react-icons/lia";
+
 
 import { useAuth } from "../../../hooks/useAuth";
 
@@ -110,6 +111,25 @@ const Sidebar = () => {
                     : "text-gray-800 group-hover:text-blue-700"
                     }`} />
                   <span className="font-medium">Empleados</span>
+                </Link>
+              </li>
+            )}
+
+            {/* Contratos - Acceso Administrador */}
+            {(userRole === 'Administrador') && (
+              <li className="group">
+                <Link
+                  to="/contratos"
+                  className={`w-full flex items-center gap-4 py-2 px-4 rounded-lg ${location.pathname === `/contratos`
+                    ? "bg-gray-100 text-blue-700 shadow"
+                    : "hover:bg-blue-50 hover:text-blue-700 "
+                    }`}
+                >
+                  <LiaFileContractSolid className={`text-xl ${location.pathname === `/contratos`
+                    ? "text-blue-700"
+                    : "text-gray-800 group-hover:text-blue-700"
+                    }`} />
+                  <span className="font-medium">Contratos</span>
                 </Link>
               </li>
             )}
@@ -223,13 +243,13 @@ const Sidebar = () => {
                   }`}
               >
                 <RiCalendarScheduleLine className={`text-xl ${location.pathname === `/horarios`
-                  ? "text-blue-700" 
+                  ? "text-blue-700"
                   : "text-gray-800 group-hover:text-blue-700"
                   }`} />
                 <span className="font-medium">Horarios</span>
               </Link>
             </li>
-      
+
             {/* Subrogaciones */}
             <li className="group">
               <Link
@@ -324,12 +344,11 @@ const Sidebar = () => {
                 </Link>
               </li>
             )}
-
           </ul>
         </div>
 
         {/* Cerrar sesión */}
-        <nav className="p-4">
+        {/* <nav className="p-4">
           <hr className="mb-4" />
           <button
             onClick={handleLogout}
@@ -338,9 +357,9 @@ const Sidebar = () => {
             <RiLogoutCircleRLine className="text-gray-800 text-xl group-hover:text-blue-700" />
             <span className="font-medium">Cerrar sesión</span>
           </button>
-        </nav>
+        </nav> */}
+     
       </div>
-
       {/* Botón para mostrar/ocultar el menú */}
       <button
         onClick={() => setShowMenu(!showMenu)}
