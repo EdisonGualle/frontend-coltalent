@@ -4,7 +4,7 @@ import Textarea from "../../../../../components/ui/Textarea";
 const ContractTerminateForm = ({
     onSubmit,
     onCancel,
-    formErrors = {}, 
+    formErrors = {},
     isSubmitting = false,
 }) => {
     const [formData, setFormData] = useState({
@@ -77,25 +77,25 @@ const ContractTerminateForm = ({
 
             {/* Botones */}
             <div className="flex justify-end gap-4">
-            <button
-        type="submit"
-        aria-label="Terminar contrato"
-        className={`p-2 rounded-xl text-white bg-red-500 w-full border border-transparent transform transition-all duration-300 hover:scale-105 
+                <button
+                    type="submit"
+                    aria-label="Terminar contrato"
+                    className={`p-2 rounded-xl text-white bg-red-500 w-full border border-transparent transform transition-all duration-300 hover:scale-105 
             ${isSubmitting || Object.values(errors).some((error) => error) ? "opacity-70 cursor-not-allowed" : ""}`}
-        disabled={isSubmitting || Object.values(errors).some((error) => error)}
-    >
-        {isSubmitting ? "Terminando..." : "Terminar"}
-    </button>
-    <button
-        type="button"
-        aria-label="Cancelar"
-        className={`p-2 rounded-xl bg-transparent border border-dashed border-gray-400 w-full transform transition-all duration-300 hover:scale-105 
+                    disabled={isSubmitting || Object.values(errors).some((error) => error)}
+                >
+                    {isSubmitting ? "Terminando..." : "Terminar"}
+                </button>
+                <button
+                    type="button"
+                    aria-label="Cancelar"
+                    className={`p-2 rounded-xl bg-transparent border border-dashed border-gray-400 w-full transform transition-all duration-300 hover:scale-105 
             ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
-        onClick={onCancel}
-        disabled={isSubmitting}
-    >
-        Cancelar
-    </button>
+                    onClick={onCancel}
+                    disabled={isSubmitting}
+                >
+                    Cancelar
+                </button>
             </div>
         </form>
     );
