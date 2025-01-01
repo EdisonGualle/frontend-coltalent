@@ -105,6 +105,7 @@ const contractTypeSlice = createSlice({
             .addCase(fetchAllContractTypes.rejected, (state, action) => {
                 state.fetchStatus = "failed";
                 state.error = action.error.message;
+                state.hasFetchedAll = false;
             })
 
             // Crear un nuevo tipo de contrato
@@ -149,8 +150,6 @@ const contractTypeSlice = createSlice({
                 state.deleteStatus = "loading";
             })
             .addCase(deleteContract.fulfilled, (state, action) => {
-                console.log("Payload recibido en deleteContract.fulfilled:", action.payload);
-
                 state.deleteStatus = "succeeded";
                 // Actualizar el estado del contrato eliminado
                 state.contractTypes = state.contractTypes.map((contractType) =>

@@ -95,6 +95,7 @@ export const employeeSlice = createSlice({
     fetchActiveStatus: "idle", // Estado para obtener empleados con contratos activos
     error: null,
     hasFetchedActive: false, // Control para evitar múltiples peticiones
+    hasFetchedAll: false, // Control para evitar múltiples peticiones
   },
   reducers: {
     updateEmployees: (state, action) => {
@@ -109,10 +110,12 @@ export const employeeSlice = createSlice({
       .addCase(fetchEmployees.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.employees = action.payload;
+        state.hasFetchedAll = true;
       })
       .addCase(fetchEmployees.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
+        state.hasFetchedAll = false;
       })
       .addCase(fetchEmployee.pending, (state) => {
         state.status = "loading";

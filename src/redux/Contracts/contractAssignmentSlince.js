@@ -54,9 +54,9 @@ export const renewExistingContractAssignment = createAsyncThunk(
 // Acción asíncrona para terminar un contrato
 export const terminateExistingContractAssignment = createAsyncThunk(
     "contractAssignments/terminateExisting",
-    async ({ id }, { rejectWithValue }) => {
+    async ({ id, data  }, { rejectWithValue }) => {
         try {
-            const response = await terminateContractAssignment(id);
+            const response = await terminateContractAssignment(id, data);
             return response.data;
         } catch (error) {
             return rejectWithValue(error);
@@ -99,6 +99,71 @@ const contractAssignmentSlice = createSlice({
                 state.fetchStatus = "failed";
                 state.error = action.payload?.message;
             })
+            .addCase(createNewContractAssignment.pending, (state) => {
+                state.createStatus = "loading";
+                state.error = null; 
+                state.fieldErrors = {}; 
+            })
+            .addCase(createNewContractAssignment.fulfilled, (state, action) => {
+                state.createStatus = "succeeded";
+                state.contractAssignments.unshift(action.payload);
+            })
+            .addCase(createNewContractAssignment.rejected, (state, action) => {
+                state.createStatus = "failed";
+                const { message, errors } = action.payload || {};
+                state.error = message || null;
+                state.fieldErrors = errors || {};
+            })
+            // Renovar contrato existente
+            .addCase(renewExistingContractAssignment.pending, (state) => {
+                state.renewStatus = "loading";
+                state.error = null;
+                state.fieldErrors = {};
+            })
+            .addCase(renewExistingContractAssignment.fulfilled, (state, action) => {
+                state.renewStatus = "succeeded";
+
+                const { current_contract, new_contract } = action.payload;
+
+                // Actualizar el contrato antiguo
+                const currentIndex = state.contractAssignments.findIndex(
+                    (contract) => contract.id === current_contract.id
+                );
+                if (currentIndex !== -1) {
+                    state.contractAssignments[currentIndex] = current_contract;
+                }
+
+                // Insertar el nuevo contrato
+                state.contractAssignments.unshift(new_contract);
+            })
+            .addCase(renewExistingContractAssignment.rejected, (state, action) => {
+                state.renewStatus = "failed";
+                const { message, errors } = action.payload || {};
+                state.error = message || null;
+                state.fieldErrors = errors || {};
+            })
+
+            // Terminar contrato existente
+            .addCase(terminateExistingContractAssignment.pending, (state) => {
+                state.terminateStatus = "loading";
+                state.error = null;
+                state.fieldErrors = {};
+            })
+            .addCase(terminateExistingContractAssignment.fulfilled, (state, action) => {            
+                state.terminateStatus = "succeeded";
+            
+                // Actualizar el contrato terminado en el estado
+                state.contractAssignments = state.contractAssignments.map((contract) =>
+                    contract.id === action.payload.id ? action.payload : contract
+                );
+            })
+            .addCase(terminateExistingContractAssignment.rejected, (state, action) => {
+                state.terminateStatus = "failed";
+                const { message, errors } = action.payload || {};
+                state.error = message || null;
+                state.fieldErrors = errors || {};
+            });
+            
     },
 });
 

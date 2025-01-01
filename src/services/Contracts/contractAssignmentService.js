@@ -47,9 +47,9 @@ const  renewContractAssignment = async (id) => {
 };
 
 // Servicio para terminar un contrato de empleado por ID
-const terminateContractAssignment = async (id) => {
+const terminateContractAssignment = async (id, data) => {
     try {
-        const response = await AxiosInstance.patch(`/contracts/${id}/terminate`);
+        const response = await AxiosInstance.patch(`/contracts/${id}/terminate`, data);
         return response.data;
     } catch (error) {
         throw {

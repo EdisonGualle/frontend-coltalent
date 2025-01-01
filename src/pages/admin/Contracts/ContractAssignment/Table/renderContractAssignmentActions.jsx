@@ -5,6 +5,7 @@ import { IoBan } from "react-icons/io5";
 import { LuRefreshCw } from "react-icons/lu";
 
 const renderContractAssignmentActions = ({ row, onRenew, onTerminate }) => {
+    const isActive = row.status === "Activo";
     return (
         <Menu
             menuButton={
@@ -32,25 +33,33 @@ const renderContractAssignmentActions = ({ row, onRenew, onTerminate }) => {
                 }
             }}
         >
-            <MenuItem className="p-0 hover:bg-transparent">
-                <button
-                    onClick={() => onRenew(row)}
-                    className="w-full rounded-lg transition-colors text-xs hover:bg-gray-50 flex items-center gap-2 p-2"
-                >
-                    <LuRefreshCw className="text-blue-500" />
-                    <span>Renovar</span>
-                </button>
-            </MenuItem>
-
-            <MenuItem className="p-0 hover:bg-transparent">
-                <button
-                    onClick={() => onTerminate(row)}
-                    className="w-full rounded-lg transition-colors text-xs hover:bg-gray-50 flex items-center gap-2 p-2"
-                >
-                    <IoBan className="text-red-500" />
-                    <span>Terminar</span>
-                </button>   
-            </MenuItem>
+            {isActive ? (
+                <>
+                     <MenuItem className="p-0 hover:bg-transparent">
+                    <button
+                        onClick={() => onRenew(row)}
+                        className="w-full rounded-lg transition-colors text-xs hover:bg-gray-50 flex items-center gap-2 p-2"
+                    >
+                        <LuRefreshCw className="text-blue-500" />
+                        <span>Renovar</span>
+                    </button>
+                </MenuItem>
+                  <MenuItem className="p-0 hover:bg-transparent">
+                  <button
+                      onClick={() => onTerminate(row)}
+                      className="w-full rounded-lg transition-colors text-xs hover:bg-gray-50 flex items-center gap-2 p-2"
+                  >
+                      <IoBan className="text-red-500" />
+                      <span>Terminar</span>
+                  </button>
+              </MenuItem>
+                </>
+               
+            ): (
+                <div className="text-gray-500 px-4 py-2 text-xs">
+                    Sin acciones disponibles
+                </div>
+            )}
         </Menu>
     )
 }
