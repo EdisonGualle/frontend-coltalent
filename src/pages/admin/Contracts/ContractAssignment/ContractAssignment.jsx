@@ -27,7 +27,7 @@ import { IoBan } from "react-icons/io5";
 
 
 import { LuRefreshCw } from "react-icons/lu";
-import { fetchEmployees } from "../../../../redux/Employee/employeSlice";
+import { fetchEmployees, fetchActiveEmployees } from "../../../../redux/Employee/employeSlice";
 
 const ContractAssignment = () => {
   const dispatch = useDispatch();
@@ -76,6 +76,7 @@ const ContractAssignment = () => {
       await dispatch(createNewContractAssignment(data)).then(unwrapResult);
       handleCloseCreateModal();
       dispatch(fetchEmployees());
+      dispatch(fetchActiveEmployees());
       showAlert("Contrato creado exitosamente", "success");
     } catch (error) {
       setFormErrors(error.errors || {});
@@ -100,6 +101,7 @@ const ContractAssignment = () => {
       await dispatch(renewExistingContractAssignment({ id: currentContract.id })).then(unwrapResult);
       setRenewDialogOpen(false);
       dispatch(fetchEmployees());
+      dispatch(fetchActiveEmployees());
       showAlert("Contrato renovado exitosamente", "success");
     } catch (error) {
       showAlert(error.message || "Error al renovar el contrato", "error", 3500);
@@ -129,6 +131,7 @@ const ContractAssignment = () => {
     try {
       await dispatch(terminateExistingContractAssignment({ id: currentContract.id, data })).then(unwrapResult);
       dispatch(fetchEmployees());
+      dispatch(fetchActiveEmployees());
       showAlert("Contrato terminado exitosamente", "success");
     } catch (error) {
       setFormErrors(error.errors || {});

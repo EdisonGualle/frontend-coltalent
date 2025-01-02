@@ -7,8 +7,9 @@ export const renderDaysDetails = (row, asText = false) => {
     }
 
     return (
-        <div className="flex flex-col text-sm text-gray-700">
-            <span className="font-medium">{isRecurring}</span>
+        <div className="flex gap-4">
+            <span className={row.is_recurring ? "text-green-600" : "text-red-500"}>{isRecurring}</span>
+            <span className="font-semibold">-</span>
             <span>{appliesToAll}</span>
         </div>
     );

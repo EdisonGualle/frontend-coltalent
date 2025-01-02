@@ -8,7 +8,6 @@ import {
     daysFixedColumns,
     daysVisibleColumns,
     daysGeneralColumns,
-    dynamicFilterColumns
 } from "./Table/daysColumns";
 import { getAllCellStyle } from "./Table/DaysColumnsStyles";
 import renderDaysActions from "./Table/renderDaysActions";
@@ -137,8 +136,8 @@ const DaysManagement = () => {
                     fixedColumns={daysFixedColumns}
                     data={holidays}
                     getCellStyle={getAllCellStyle}
-                    dynamicFilterColumns={dynamicFilterColumns}
                     showActions={true}
+                    showFilters={false}
                     showAddNew={true}
                     onAddNew={handleOpenCreateModal}
                     actions={(row) => renderDaysActions({
@@ -155,8 +154,8 @@ const DaysManagement = () => {
                 <div className="py-10 text-gray-400 text-center">No hay días festivos disponibles</div>
             )}
 
-              {/* Diálogo para confirmar eliminación */}
-              <Dialog2
+            {/* Diálogo para confirmar eliminación */}
+            <Dialog2
                 isOpen={isDeleteDialogOpen}
                 setIsOpen={setIsDeleteDialogOpen}
                 title="¿Está seguro de eliminar este día festivo?"

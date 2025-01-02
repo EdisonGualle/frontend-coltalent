@@ -255,13 +255,7 @@ const HolidaysTable = ({
     };
   }, []);
 
-  useEffect(() => {
-    if (showMenu) {
-      const buttonRect = buttonRef.current.getBoundingClientRect();
-      menuRef.current.style.top = `${buttonRect.bottom}px`;
-      menuRef.current.style.left = `${buttonRect.left}px`;
-    }
-  }, [showMenu]);
+
 
   const selectedCount = Object.keys(selectedRows).length;
   const allSelected = selectedCount === data.length;
@@ -408,7 +402,8 @@ const HolidaysTable = ({
         <table className="min-w-full leading-normal">
           <thead className="sticky top-0 bg-gray-100  z-0">
             <tr className=" text-gray-600 uppercase text-xs leading-normal">
-              {showActions && onDelete && (
+              {/* Eliminar */}
+              {onDelete && (
                 <th className="py-4 px-6 text-left relative" style={{ minHeight: '50px' }}>
                   <button
                     ref={buttonRef}
@@ -421,7 +416,8 @@ const HolidaysTable = ({
                   {showMenu && (
                     <div
                       ref={menuRef}
-                      className="fixed mt-2 py-2 w-40 bg-white rounded-lg shadow-xl text-xs z-50"
+                      className="absolute mt-2 py-2 w-48 bg-white rounded-lg shadow-xl text-xs z-50"
+                      style={{ top: '100% !important', left: '0 !important' }}
                     >
                       {allSelected ? (
                         <>
