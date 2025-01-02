@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {CardHeader, Typography, Button} from "@material-tailwind/react";
-import {FaFileContract, FaUserClock} from "react-icons/fa";
+import {FaFileContract} from "react-icons/fa";
 import { MdAssignmentInd } from "react-icons/md";
 import MotionWrapper from "../../../components/ui/MotionWrapper";
 import ContractTypes from "./ContractTypes/ContractTypes";

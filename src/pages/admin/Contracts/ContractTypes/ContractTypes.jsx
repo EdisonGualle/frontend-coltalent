@@ -198,8 +198,6 @@ const ContractTypes = () => {
         icon={statusDialogMessage.icon} // Aquí se pasa el ícono generado
       />
 
-
-
       {/* Modal para crear un nuevo tipo de contrato */}
       <ModalForm
         isOpen={isCreateModalOpen}

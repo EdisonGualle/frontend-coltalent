@@ -6,6 +6,7 @@ import {
   renewExistingContractAssignment,
   terminateExistingContractAssignment
 } from "../../../../redux/Contracts/contractAssignmentSlince";
+
 import ContractTable from "../Table/ContractTable";
 import LoadingIndicator from "../../../../components/ui/LoadingIndicator";
 import {
@@ -26,6 +27,7 @@ import { IoBan } from "react-icons/io5";
 
 
 import { LuRefreshCw } from "react-icons/lu";
+import { fetchEmployees } from "../../../../redux/Employee/employeSlice";
 
 const ContractAssignment = () => {
   const dispatch = useDispatch();
@@ -73,6 +75,7 @@ const ContractAssignment = () => {
     try {
       await dispatch(createNewContractAssignment(data)).then(unwrapResult);
       handleCloseCreateModal();
+      dispatch(fetchEmployees());
       showAlert("Contrato creado exitosamente", "success");
     } catch (error) {
       setFormErrors(error.errors || {});
@@ -96,6 +99,7 @@ const ContractAssignment = () => {
     try {
       await dispatch(renewExistingContractAssignment({ id: currentContract.id })).then(unwrapResult);
       setRenewDialogOpen(false);
+      dispatch(fetchEmployees());
       showAlert("Contrato renovado exitosamente", "success");
     } catch (error) {
       showAlert(error.message || "Error al renovar el contrato", "error", 3500);
@@ -124,6 +128,7 @@ const ContractAssignment = () => {
     setIsTerminating(true);
     try {
       await dispatch(terminateExistingContractAssignment({ id: currentContract.id, data })).then(unwrapResult);
+      dispatch(fetchEmployees());
       showAlert("Contrato terminado exitosamente", "success");
     } catch (error) {
       setFormErrors(error.errors || {});

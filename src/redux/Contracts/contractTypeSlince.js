@@ -166,8 +166,6 @@ const contractTypeSlice = createSlice({
                 state.restoreStatus = "loading";
             })
             .addCase(restoreContract.fulfilled, (state, action) => {
-                console.log("Payload recibido en restoreContract.fulfilled:", action.payload);
-
                 state.restoreStatus = "succeeded";
                 // Actualizar el estado del contrato restaurado
                 state.contractTypes = state.contractTypes.map((contractType) =>

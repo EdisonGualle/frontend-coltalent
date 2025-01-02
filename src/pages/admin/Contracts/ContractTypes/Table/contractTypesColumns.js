@@ -31,7 +31,7 @@ export const contractTypesVisibleColumns = [
         label: "Vacaciones",
         render: renderContractTypeVacationDetails,
         autoWidth: true,
-        order: 5, 
+        order: 4, 
     },
 
     {
@@ -39,12 +39,12 @@ export const contractTypesVisibleColumns = [
         label: "Jornada Semanal",
         render: renderContractTypeWeeklyHours,
         sstyle: { minWidth: '150px' },
-        order: 8,
+        order: 5,
     },
     {
         id: "status",
         label: "Estado",
-        order: 9,
+        order: 6,
     },
 ];
 

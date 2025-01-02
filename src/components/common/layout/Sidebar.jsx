@@ -10,7 +10,6 @@ import {
   RiDashboardLine,
   RiUserStarLine,
   RiSettings3Line,
-  RiProfileLine,
   RiShieldUserLine,
   RiFileUserLine,
   RiFileTextLine,
@@ -234,20 +233,51 @@ const Sidebar = () => {
             </li>
 
             {/* Horarios */}
-            <li className="group">
-              <Link
-                to="/horarios"
-                className={`w-full flex items-center gap-4 py-2 px-4 mb-4 rounded-lg ${location.pathname === `/horarios`
-                  ? "bg-gray-100 text-blue-700 shadow"
-                  : "hover:bg-blue-50 hover:text-blue-700"
+            <li>
+              <button
+                onClick={() => toggleSubMenu(5)}
+                className="group w-full flex items-center justify-between py-2 px-4 rounded-lg hover:bg-blue-50 hover:text-blue-700"
+              >
+                <span className="flex items-center gap-4">
+                  <RiCalendarScheduleLine className="text-xl text-gray-800 group-hover:text-blue-700" />
+                  <span className="font-medium">Horarios</span>
+                </span>
+                <RiArrowRightSLine
+                  className={`${activeSubmenu === 3 ? "rotate-90 text-blue-700" : "text-gray-800 "
+                    } transition-transform`}
+                />
+              </button>
+              <ul
+                className={`mt-2 space-y-1 pl-8 overflow-hidden transition-all ${activeSubmenu === 5 ? "h-auto" : "h-0"
                   }`}
               >
-                <RiCalendarScheduleLine className={`text-xl ${location.pathname === `/horarios`
-                  ? "text-blue-700"
-                  : "text-gray-800 group-hover:text-blue-700"
-                  }`} />
-                <span className="font-medium">Horarios</span>
-              </Link>
+                <li>
+                  <Link
+                    to="/horarios"
+                    className={`w-full flex items-start py-2 px-4 text-sm rounded-lg ${location.pathname === `/horarios`
+                      ? "bg-gray-100 text-blue-700 shadow"
+                      : "hover:bg-blue-50 "
+                      }`}
+                  >
+                    Horarios Laborales
+                  </Link>
+                </li>
+
+                {/* Días Festivos - Acceso Administrador*/}
+                {(userRole === 'Administrador') && (
+                  <li>
+                    <Link
+                      to="/dias-festivos"
+                      className={`block py-2 px-4 text-sm rounded-lg ${location.pathname === "/dias-festivos"
+                        ? "bg-gray-100 text-blue-700 shadow"
+                        : "hover:bg-blue-50 hover:text-blue-700"
+                        }`}
+                    >
+                      Días Festivos
+                    </Link>
+                  </li>
+                )}
+              </ul>
             </li>
 
             {/* Subrogaciones */}
@@ -358,7 +388,7 @@ const Sidebar = () => {
             <span className="font-medium">Cerrar sesión</span>
           </button>
         </nav> */}
-     
+
       </div>
       {/* Botón para mostrar/ocultar el menú */}
       <button

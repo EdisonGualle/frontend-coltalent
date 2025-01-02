@@ -57,7 +57,7 @@ import AnotherComponent from "./pages/admin/Employee/AnotherComponent";
 import Delegations from "./pages/admin/Subrogations/Delegations";
 import Schedule from "./pages/admin/Schedule/Schedules";
 import Contracts from "./pages/admin/Contracts/Contracts";
-
+import Holidays from "./pages/admin/Holidays/Holidays";
 
 function App() {
   return (
@@ -94,7 +94,10 @@ function App() {
                   {/* Horarios */}
                   <Route path="/horarios" element={<Schedule/>} />
 
+                  {/* Días festivos */}
+                  <Route path="/dias-festivos" element={<Holidays />} />
 
+                  
                   {/* Subrogaciones */}
                     <Route path="/subrogaciones" element={<Delegations />} />
 

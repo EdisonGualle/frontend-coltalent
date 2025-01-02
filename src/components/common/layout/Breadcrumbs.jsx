@@ -92,6 +92,9 @@ const Breadcrumbs = () => {
       case 'motivos-rechazo':
         label = 'Motivos de Rechazo';
         break;
+      case 'dias-festivos':
+        label = 'Días Festivos';
+        break;
       default:
         break;
     }
