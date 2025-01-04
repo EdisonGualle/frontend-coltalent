@@ -17,7 +17,7 @@ const getNestedValue = (obj, path) => {
   return path.split('.').reduce((acc, part) => acc && acc[part], obj);
 };
 
-const HolidaysTable = ({
+const OvertimeTable = ({
   allColumns,
   columns,
   data,
@@ -282,7 +282,7 @@ const HolidaysTable = ({
   const isExpanded = actions.length > 2;
 
   return (
-    <div className="table-container bg-white shadow-sm mb-4 rounded-se-lg rounded-b-lg py-2">
+    <div className="table-container bg-white shadow-sm mb-4 rounded-lg py-2">
       <div className="mb-2 pt-1">
         <div className="flex justify-between items-center py-2 px-2">
           <div className="flex items-center space-x-2">
@@ -404,7 +404,7 @@ const HolidaysTable = ({
             <tr className=" text-gray-600 uppercase text-xs leading-normal">
               {/* Eliminar */}
               {onDelete && (
-                <th className="custom-column py-4 px-6 text-left relative">
+                <th className="py-4 px-6 text-left relative" style={{ minHeight: '50px' }}>
                   <button
                     ref={buttonRef}
                     className={`focus:outline-none ${someSelected || allSelected ? 'text-blue-600' : 'text-gray-600'} hover:text-blue-600`}
@@ -491,7 +491,7 @@ const HolidaysTable = ({
                   style={{ minHeight: '50px' }}
                 >
                   {onDelete && (
-                    <td className="custom-column auto-width py-3 px-6 text-left  group-hover:bg-gray-100  transition duration-200 ease-in-out">
+                    <td className="py-3 px-6 text-left whitespace-nowrap group-hover:bg-gray-100  transition duration-200 ease-in-out" style={{ minHeight: '50px' }}>
                       <input
                         type="checkbox"
                         checked={!!selectedRows[row.id]}
@@ -502,10 +502,7 @@ const HolidaysTable = ({
                   {visibleColumns.map((column) => (
                     <td
                       key={column.id}
-                      className={`py-3 px-6 text-left text-sm group-hover:bg-gray-100 transition duration-200 ease-in-out ${
-                        column.autoWidth ? 'whitespace-nowrap sm:auto-width' : ''
-                      }`}
-                      
+                      className={`py-3 px-6 text-left text-sm group-hover:bg-gray-100  transition duration-200 ease-in-out ${column.autoWidth ? 'whitespace-nowrap auto-width' : ''}`}
                       style={{ minHeight: '50px' }}
                     >
                       {column.render ? (
@@ -597,4 +594,4 @@ const HolidaysTable = ({
   );
 };
 
-export default HolidaysTable;
+export default OvertimeTable;

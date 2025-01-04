@@ -277,6 +277,21 @@ const Sidebar = () => {
                     </Link>
                   </li>
                 )}
+
+                 {/* Turnos Especiales - Acceso Administrador*/}
+                 {(userRole === 'Administrador') && (
+                  <li>
+                    <Link
+                      to="/turnos-especiales"
+                      className={`block py-2 px-4 text-sm rounded-lg ${location.pathname === "/turnos-especiales"
+                        ? "bg-gray-100 text-blue-700 shadow"
+                        : "hover:bg-blue-50 hover:text-blue-700"
+                        }`}
+                    >
+                      Turnos Especiales
+                    </Link>
+                  </li>
+                )}
               </ul>
             </li>
 

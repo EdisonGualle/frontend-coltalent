@@ -40,7 +40,7 @@ export const fetchHolidayAssignmentsByEmployee = createAsyncThunk(
 // Acción asíncrona para eliminar una asignación de día festivo
 export const deleteHoliday = createAsyncThunk(
     "holidays/deleteHoliday",
-    async (data) => {
+    async ({data}, {rejectWithValue}) => {
         try {
             const response = await deleteHolidayAssignment(data);
             return response;

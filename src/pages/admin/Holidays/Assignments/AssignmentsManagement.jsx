@@ -11,11 +11,9 @@ import {
   dynamicFilterColumns,
 } from "./Table/assignmentsColumns";
 
-import renderAssignmentsActions from "./Table/renderAssignmentsActions";
 import { AlertContext } from "../../../../contexts/AlertContext";
 import ModalForm from "../../../../components/ui/ModalForm";
 import Dialog2 from "../../../../components/ui/Dialog2";
-import { RiCheckboxCircleLine, RiCloseCircleLine } from "react-icons/ri";
 import { LiaCalendarDaySolid } from "react-icons/lia";
 
 import AsssignmentManagementForm from "./components/AsssignmentManagementForm";
@@ -86,7 +84,7 @@ const AssignmentsManagement = () => {
   const handleConfirmDelete = async () => {
     setIsDeleting(true);
     try {
-      const result = await dispatch(deleteHoliday(selectedIds)).then(unwrapResult);
+      const result = await dispatch(deleteHoliday({data: selectedIds})).then(unwrapResult);
       showAlert(`Se eliminaron ${result.data.ids.length} asignaciones correctamente.`, "success");
     } catch (error) {
       showAlert(error.message || "Error al eliminar las asignaciones", "error");
@@ -105,7 +103,7 @@ const AssignmentsManagement = () => {
         <HolidaysTable
           allColumns={assignmentsGeneralColumns}
           columns={[...assignmentsFixedColumns, ...assignmentsVisibleColumns]}
-          fixeedColumns={assignmentsFixedColumns}
+          fixedColumns={assignmentsFixedColumns}
           data={holidayAssignments}
           dynamicFilterColumns={dynamicFilterColumns}
           showActions={false}
@@ -117,7 +115,6 @@ const AssignmentsManagement = () => {
       )}
       {/*Si no hay datos disponibles, mostrar mensaje*/}
       {holidayAssignments.length === 0 && fetchStatus !== "loading" && (
-
         <div className="py-10 text-gray-400 text-center">No hay  días festivos asignados para mostrar</div>
       )}
 
@@ -150,6 +147,7 @@ const AssignmentsManagement = () => {
         onCancel={handleCancelDelete}
         confirmButtonColor="bg-red-500"
         cancelButtonColor="border-gray-400"
+        isLoading={isDeleting}
       />
 
     </>

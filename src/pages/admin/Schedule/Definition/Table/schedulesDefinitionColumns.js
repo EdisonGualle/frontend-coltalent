@@ -6,7 +6,6 @@ export const scheduleFixedColumns = [
   {
     id: "name",
     label: "Nombre del Horario",
-    autoWidth: true,
     order: 1,
   },
 ];
@@ -14,7 +13,7 @@ export const scheduleFixedColumns = [
 export const scheduleVisibleColumns = [
   {
     id: "work_hours",
-    label: "Horas de Trabajo",
+    label: "Periodo de Trabajo",
     render: renderWorkHours,
     order: 2,
   },
@@ -40,7 +39,6 @@ export const scheduleVisibleColumns = [
     label: "Estado",
     order: 6,
   },
-
 ];
 
 export const scheduleGeneralColumns = [

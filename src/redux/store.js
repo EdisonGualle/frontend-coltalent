@@ -30,6 +30,7 @@ import contractTypesReducer from './Contracts/contractTypeSlince';
 import constractAssignmentReducer from './Contracts/contractAssignmentSlince';
 import holidaysReducer from './Holidays/holidaysSlince';
 import holidaysAssignmentReducer from './Holidays/holidaysAssignmentSlince';
+import overtimereducer from './Overtime/overtimeSlince';
 
 export default configureStore({
   reducer: {
@@ -64,5 +65,6 @@ export default configureStore({
     contractAssignments: constractAssignmentReducer,
     holidays: holidaysReducer,
     holidayAssignments: holidaysAssignmentReducer,
+    overtime: overtimereducer,
   },
 });

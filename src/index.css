@@ -57,6 +57,14 @@
 }
 
 
+.custom-column {
+  width: 40px !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+
 
 .pagination-container {
   bottom: 0;

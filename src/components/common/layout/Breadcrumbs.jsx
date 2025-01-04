@@ -13,7 +13,7 @@ const Breadcrumbs = () => {
       try {
         const response = await getEmployee(id);
         if (response && response.data && response.data.employee_name) {
-          setEmployeeName(response.data.employee_name); 
+          setEmployeeName(response.data.employee_name);
         }
       } catch (error) {
         // Puedes manejar el error aquí si es necesario, por ejemplo, mostrando un mensaje al usuario
@@ -37,7 +37,7 @@ const Breadcrumbs = () => {
     const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
 
     // Añade casos específicos para rutas conocidas y ajusta la etiqueta según sea necesario
-    switch(segment) {
+    switch (segment) {
       case 'empleados':
         label = 'Empleados';
         break;
@@ -94,6 +94,9 @@ const Breadcrumbs = () => {
         break;
       case 'dias-festivos':
         label = 'Días Festivos';
+        break;
+      case 'turnos-especiales':
+        label = 'Turnos Especiales';
         break;
       default:
         break;

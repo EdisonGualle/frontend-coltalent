@@ -130,6 +130,7 @@ const AsssignmentManagementForm = ({
                     onChange={handleHolidayChange}
                     placeholder="Selecciona un día festivo"
                     error={errors.holiday}
+                    isSearchable={true}
                     labelKey="name"
                 />
             </div>

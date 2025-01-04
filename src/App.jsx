@@ -58,6 +58,7 @@ import Delegations from "./pages/admin/Subrogations/Delegations";
 import Schedule from "./pages/admin/Schedule/Schedules";
 import Contracts from "./pages/admin/Contracts/Contracts";
 import Holidays from "./pages/admin/Holidays/Holidays";
+import Overtime from "./pages/admin/Overtime/Overtime";
 
 function App() {
   return (
@@ -97,7 +98,9 @@ function App() {
                   {/* Días festivos */}
                   <Route path="/dias-festivos" element={<Holidays />} />
 
-                  
+                  {/* Horas extras */}
+                  <Route path="/turnos-especiales" element={<Overtime />} />
+
                   {/* Subrogaciones */}
                     <Route path="/subrogaciones" element={<Delegations />} />
 
