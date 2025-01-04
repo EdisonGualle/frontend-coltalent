@@ -10,6 +10,7 @@ import { createNewEmployee, fetchEmployees } from '../../../redux/Employee/emplo
 import { AlertContext } from '../../../contexts/AlertContext';
 import ExportConfigForm from './ExportConfigForm';
 import { exportEmployees } from '../../../services/Exports/employeeExportService';
+import MotionWrapper from '../../../components/ui/MotionWrapper';
 
 const EmployeeIndex = () => {
   const dispatch = useDispatch();
@@ -34,7 +35,7 @@ const EmployeeIndex = () => {
     setIsOpenModal(false);
   };
 
-  
+
   const handleOpenExportModal = () => {
     setIsExportModalOpen(true);
   };
@@ -46,7 +47,7 @@ const EmployeeIndex = () => {
   const handleSubmit = async (formData) => {
     try {
       await dispatch(createNewEmployee(formData)).unwrap();
-      dispatch(fetchEmployees()); 
+      dispatch(fetchEmployees());
       setIsOpenModal(false);
       showAlert('Empleado creado exitosamente.', 'success');
     } catch (error) {
@@ -58,8 +59,8 @@ const EmployeeIndex = () => {
       }
     }
   };
-  
-  
+
+
 
   const handleExportSubmit = async (exportParams) => {
     try {
@@ -125,11 +126,13 @@ const EmployeeIndex = () => {
         </div>
       </CardHeader>
       <div className="flex-1 overflow-y-auto">
-        {showList ? (
-          <EmployeeList />
-        ) : (
-          <EmployeeTable />
-        )}
+        <MotionWrapper keyProp={showList ? "employee-list" : "employee-table"}>
+          {showList ? (
+            <EmployeeList />
+          ) : (
+            <EmployeeTable />
+          )}
+        </MotionWrapper>
       </div>
       <ModalForm
         isOpen={isOpenModal}
@@ -147,7 +150,7 @@ const EmployeeIndex = () => {
 
       <ModalForm
         isOpen={isExportModalOpen}
-        
+
         setIsOpen={setIsExportModalOpen}
         title="Configuración de reporte de empleados"
         icon={<RiDownloadLine className="w-6 h-6 flex items-center justify-center rounded-full text-blue-500" />}

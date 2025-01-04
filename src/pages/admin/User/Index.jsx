@@ -9,6 +9,7 @@ import UserForm from './components/UserForm';
 import { fetchUsers } from '../../../redux/User/userSlice';
 import { createUser } from '../../../services/User/UserService';
 import { AlertContext } from '../../../contexts/AlertContext';
+import MotionWrapper from '../../../components/ui/MotionWrapper';
 
 
 // Componente principal de la pagina de usuarios
@@ -73,56 +74,58 @@ const UserIndex = () => {
 
   return (
     <>
-    <div className='flex flex-col h-full overflow-auto mb-4'>
-    <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0 bg-gray-100">
-        <div className="mb-2 flex items-center justify-between gap-8">
-          <div>
-            <Typography variant="h5" color="blue-gray" className="font-semibold">
-              Lista de usuarios
-            </Typography>
-            <Typography color="gray" className="mt-1">
-              Ver información sobre todos los usuarios
-            </Typography>
+      <div className='flex flex-col h-full overflow-auto mb-4'>
+        <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0 bg-gray-100">
+          <div className="mb-2 flex items-center justify-between gap-8">
+            <div>
+              <Typography variant="h5" color="blue-gray" className="font-semibold">
+                Lista de usuarios
+              </Typography>
+              <Typography color="gray" className="mt-1">
+                Ver información sobre todos los usuarios
+              </Typography>
+            </div>
+            <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+              <Button className="flex items-center bg-cyan-500 text-white hover:bg-cyan-600 transition-colors rounded-xl" size="sm" onClick={() => handleViewChange('gallery')}>
+                <RiGalleryView2 className="h-5 w-5" />
+              </Button>
+              <Button className="flex items-center bg-teal-500 text-white hover:bg-teal-600 transition-colors rounded-xl" size="sm" onClick={() => handleViewChange('table')}>
+                <RiListView className="h-5 w-5" />
+              </Button>
+              <Button className="flex items-center gap-3 bg-blue-500 text-white hover:bg-blue-600 transition-colors rounded-xl py-2 px-5"
+                size="sm"
+                onClick={handleOpenCreateModal}>
+                <RiUserAddLine className="h-5 w-5" />
+                <span className="font-semibold">Nuevo Usuario</span>
+              </Button>
+            </div>
           </div>
-          <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-            <Button className="flex items-center bg-cyan-500 text-white hover:bg-cyan-600 transition-colors rounded-xl" size="sm" onClick={() => handleViewChange('gallery')}>
-              <RiGalleryView2 className="h-5 w-5" />
-            </Button>
-            <Button className="flex items-center bg-teal-500 text-white hover:bg-teal-600 transition-colors rounded-xl" size="sm" onClick={() => handleViewChange('table')}>
-              <RiListView className="h-5 w-5" />
-            </Button>
-            <Button className="flex items-center gap-3 bg-blue-500 text-white hover:bg-blue-600 transition-colors rounded-xl py-2 px-5"
-              size="sm"
-              onClick={handleOpenCreateModal}>
-              <RiUserAddLine className="h-5 w-5" />
-              <span className="font-semibold">Nuevo Usuario</span>
-            </Button>
-          </div>
+        </CardHeader>
+
+        <div className='flex-1 overflow-y-auto'>
+          <MotionWrapper keyProp={showList ? "user-list" : "user-table"}>
+            {showList ? (
+              <UserList />
+            ) : (
+              <UserTable />
+            )}
+          </MotionWrapper>
         </div>
-      </CardHeader>
+        <ModalForm
+          isOpen={isOpenCreateModal}
+          setIsOpen={setIsOpenCreateModal}
+          title="Crear nuevo usuario"
+          icon={<RiUserAddLine className="w-6 h-6 flex items-center justify-center rounded-full text-blue-500" />}
+        >
+          <UserForm
+            isEditing={false}
+            onSubmit={handleCreateUser}
+            onCancel={() => setIsOpenCreateModal(false)}
+            formErrors={formErrors}
+          />
+        </ModalForm>
 
-      <div className='flex-1 overflow-y-auto'>
-        {showList ? (
-          <UserList />
-        ) : (
-          <UserTable />
-        )}
       </div>
-      <ModalForm
-        isOpen={isOpenCreateModal}
-        setIsOpen={setIsOpenCreateModal}
-        title="Crear nuevo usuario"
-        icon={<RiUserAddLine className="w-6 h-6 flex items-center justify-center rounded-full text-blue-500" />}
-      >
-        <UserForm
-          isEditing={false}
-          onSubmit={handleCreateUser}
-          onCancel={() => setIsOpenCreateModal(false)}
-          formErrors={formErrors}
-        />
-      </ModalForm>
-
-    </div>
     </>
   );
 };

@@ -8,8 +8,10 @@ import { isValidName, isValidDateOfBirth, isValidEthnicity, isValidNationality, 
 import { validateEmail, validateLandlinePhone, validateMobilePhone } from '../../../Utils/validationsV2.js';
 import { RiUserLine, RiMailLine, RiPhoneLine, RiHomeLine, RiBriefcaseLine, RiCalendarLine, RiSmartphoneLine } from 'react-icons/ri';
 import { getCantons, getParishes, getProvinces } from '../../../services/Employee/Address/addressService.js';
+
 import { getDirections, getUnitsAndPositions, getPositions } from '../../../services/Employee/Organization/organizationService.js';
 import { getEmployee } from '../../../services/Employee/EmployeService1.js';
+
 import {
   BsPersonVcard, BsGlobeAmericas, BsPassport, BsGeoAlt,
   BsSignpost, BsHouseDoor, BsSignpostSplit, BsCompass
@@ -17,7 +19,6 @@ import {
 
 import { fetchRoles } from '../../../redux/User/rolSlice.js';
 import CustomSelect from '../../../components/ui/Select.jsx';
-import WorkScheduleForm from './WorkScheduleForm.jsx';
 
 
 const steps = [
@@ -25,7 +26,6 @@ const steps = [
   { number: 2, title: "Información de Contacto", icon: "📞" },
   { number: 3, title: "Información de Residencia", icon: "🏠" },
   { number: 4, title: "Información Laboral", icon: "💼" },
-  { number: 5, title: "Horario de Trabajo", icon: "🕒" }
 ];
 const maritalStatusOptions = {
   hombre: ['Soltero', 'Casado', 'Viudo', 'Divorciado', 'Separado', 'Otro'],
@@ -81,17 +81,6 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
   const [selectedRole, setSelectedRole] = useState(null);
 
   const [scheduleErrors, setScheduleErrors] = useState({});
-
-  const [workSchedule, setWorkSchedule] = useState({
-    monday: { start_time: '', end_time: '', has_lunch_break: false, lunch_start_time: '', lunch_end_time: '' },
-    tuesday: { start_time: '', end_time: '', has_lunch_break: false, lunch_start_time: '', lunch_end_time: '' },
-    wednesday: { start_time: '', end_time: '', has_lunch_break: false, lunch_start_time: '', lunch_end_time: '' },
-    thursday: { start_time: '', end_time: '', has_lunch_break: false, lunch_start_time: '', lunch_end_time: '' },
-    friday: { start_time: '', end_time: '', has_lunch_break: false, lunch_start_time: '', lunch_end_time: '' },
-    saturday: { start_time: '', end_time: '', has_lunch_break: false, lunch_start_time: '', lunch_end_time: '' },
-    sunday: { start_time: '', end_time: '', has_lunch_break: false, lunch_start_time: '', lunch_end_time: '' },
-  });
-
 
 
   // Cargar roles al montar el componente, solo si no están ya en el estado global
@@ -331,6 +320,7 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
       if (!selectedRole) {
         newErrors['user.role_id'] = 'Por favor, selecciona un rol.';
       }
+
       setErrors((prevErrors) => ({
         ...prevErrors,
         ...newErrors,
@@ -925,18 +915,14 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
                 error={errors.user?.role_id}
                 isSearchable={true}
               />
+              {errors.user?.role_id && (
+    <p className="mt-1 text-xs text-red-500">{errors.user.role_id}</p>
+)}
             </div>
           </div>
         )}
 
-        {currentStep === 5 && (
-          <WorkScheduleForm
-            workSchedule={workSchedule}
-            setWorkSchedule={setWorkSchedule}
-            setScheduleErrors={setScheduleErrors} // Pasar la función de manejo de errores
-          />
-        )}
-
+    
         <div className="flex justify-between mt-4">
           <motion.button
             whileHover={{ scale: 1.05 }}

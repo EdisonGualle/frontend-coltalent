@@ -8,6 +8,7 @@ import PositionForm from './PositionForm';
 import { AlertContext } from '../../../../contexts/AlertContext';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { createNewPosition, fetchAllPositionsIncludingDeleted } from '../../../../redux/Organization/PositionSlice';
+import MotionWrapper from '../../../../components/ui/MotionWrapper';
 
 const PositionIndex = () => {
   const dispatch = useDispatch();
@@ -76,7 +77,9 @@ const PositionIndex = () => {
       </CardHeader>
 
       {/* Tabla */}
+      <MotionWrapper keyProp="position-table">
         <PositionTable />
+      </MotionWrapper>
         
       {/* Modal para crear un nuevo cargo */}
       <ModalForm

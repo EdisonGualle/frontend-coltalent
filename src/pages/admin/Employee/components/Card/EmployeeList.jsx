@@ -100,16 +100,17 @@ const EmployeeList = () => {
                 />
               ))}
             </div>
-          ) : (
+          ) : filterValue ? (
             <div className="flex items-center justify-center h-full">
               <p className="text-base text-red-300">No hay empleados que coincidan con su búsqueda.</p>
             </div>
-          )
+          ) : null
         ) : (
           <div className="flex items-center justify-center h-full">
             <p className="text-base text-gray-500">No hay empleados registrados.</p>
           </div>
         )}
+
       </div>
     </div>
   );

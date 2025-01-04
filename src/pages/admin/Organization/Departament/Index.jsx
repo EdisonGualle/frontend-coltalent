@@ -9,6 +9,7 @@ import { AlertContext } from '../../../../contexts/AlertContext';
 import DepartmentForm from './DepartmentForm';
 import { createNewDepartment, fetchAllDepartmentsIncludingDeleted } from '../../../../redux/Organization/DepartamentSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
+import MotionWrapper from '../../../../components/ui/MotionWrapper';
 
 const DepartamentIndex = () => {
   const dispatch = useDispatch();
@@ -82,7 +83,9 @@ const DepartamentIndex = () => {
 
       {/* Tabla*/}
       <div className='flex-1 overflow-y-auto'>
-        <DepartamentTable />
+        <MotionWrapper keyProp="department-table">
+          <DepartamentTable />
+        </MotionWrapper>
       </div>
       {/* Formulario */}
       <ModalForm

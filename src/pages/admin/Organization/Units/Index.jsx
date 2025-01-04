@@ -9,6 +9,7 @@ import UnitForm from './UnitForm';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { createNewUnit, fetchAllUnitsIncludingDeleted } from '../../../../redux/Organization/UnitSlince';
 import { PiOfficeChairLight } from "react-icons/pi";
+import MotionWrapper from '../../../../components/ui/MotionWrapper';
 
 const UnitIndex = () => {
   const dispatch = useDispatch();
@@ -74,7 +75,9 @@ const UnitIndex = () => {
       </CardHeader>
 
       {/* Tabla */}
-      <UnitTable />
+      <MotionWrapper keyProp="unit-table">
+        <UnitTable />
+      </MotionWrapper>
 
       {/* Modal para crear una nueva unidad */}
       <ModalForm
