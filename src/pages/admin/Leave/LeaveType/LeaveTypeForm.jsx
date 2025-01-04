@@ -134,36 +134,39 @@ const LeaveTypeForm = ({
         }
     }, [isEditing, leaveType]);
 
-    // Cargar configuraciones desde la base de datos
     useEffect(() => {
         const fetchConfigurations = async () => {
             try {
                 const response = await getConfigurations();
-                if (Array.isArray(response)) {
-                    const configData = {};
-                    response.forEach(config => {
-                        configData[config.key] = config.value;
-                    });
-                    setConfigurations(configData);
-                } else {
-                    console.error("La respuesta no es un array:", response);
-                }
+                console.log("Respuesta completa de getConfigurations:", response);
+    
+                // Accede al array dentro de la propiedad data
+                const configArray = Array.isArray(response.data) ? response.data : [];
+                
+                const configData = {};
+                configArray.forEach(config => {
+                    configData[config.key] = config.value;
+                });
+    
+                setConfigurations(configData);
             } catch (error) {
                 console.error("Error al cargar las configuraciones:", error);
             }
         };
-
+    
         fetchConfigurations();
     }, []);
+    
+    
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
+    
         setFormData({
             ...formData,
             [name]: value,
         });
-
+    
         let error = "";
         if (value.trim() === "") {
             switch (name) {
@@ -191,21 +194,15 @@ const LeaveTypeForm = ({
                 default:
                     break;
             }
-        } else {
-            if (name === "name") {
-                error = validateNames(value);
-            }
-            if (name === "description") {
-                error = validateDescripcion(value);
-            }
+        } else if (Object.keys(configurations).length > 0) { // Validar solo si las configuraciones están listas
             if (name === "max_duration" && time_unit === "Días" && (value < 1 || value > parseInt(configurations.max_duration_days))) {
                 error = `La duración máxima en días debe estar entre 1 y ${configurations.max_duration_days}.`;
             } else if (name === "max_duration" && time_unit === "Horas") {
                 const [hours, minutes] = value.split(":").map(Number);
                 const totalMinutes = hours * 60 + minutes;
-                const minDuration = parseInt(configurations.max_duration_hours_min.split(":").map(Number)[0] * 60 + configurations.max_duration_hours_min.split(":").map(Number)[1]);
-                const maxDuration = parseInt(configurations.max_duration_hours_max.split(":").map(Number)[0] * 60 + configurations.max_duration_hours_max.split(":").map(Number)[1]);
-
+                const minDuration = parseInt(configurations.max_duration_hours_min.split(":")[0]) * 60 + parseInt(configurations.max_duration_hours_min.split(":")[1]);
+                const maxDuration = parseInt(configurations.max_duration_hours_max.split(":")[0]) * 60 + parseInt(configurations.max_duration_hours_max.split(":")[1]);
+    
                 if (totalMinutes < minDuration || totalMinutes > maxDuration) {
                     error = `La duración máxima en horas debe estar entre ${configurations.max_duration_hours_min} y ${configurations.max_duration_hours_max}.`;
                 }
@@ -213,13 +210,12 @@ const LeaveTypeForm = ({
                 error = `Los días de anticipación deben estar entre 1 y ${configurations.advance_notice_days}.`;
             }
         }
-
+    
         setErrors({
             ...errors,
             [name]: error,
         });
     };
-
     const handleIconChange = (selectedOption) => {
         setFormData({
             ...formData,
@@ -396,8 +392,6 @@ const LeaveTypeForm = ({
                         value={advance_notice_days}
                         onChange={handleChange}
                         error={errors.advance_notice_days}
-                        min="1"
-                        max="10"
                     />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
