@@ -277,7 +277,7 @@ const ActionModal = ({ action, data, onClose, onSuccess }) => {
                                         </div>
 
                                         {/* Checkbox para habilitar delegación */}
-                                        {isFirstApproval && data.requires_subrogation && (
+                                        {action === 'Aprobar' && isFirstApproval && data.requires_subrogation && (
                                             <div className="mb-4 flex items-center gap-2">
                                                 <input
                                                     type="checkbox"
@@ -294,7 +294,7 @@ const ActionModal = ({ action, data, onClose, onSuccess }) => {
 
 
                                         {/* Formulario de delegación condicional */}
-                                        {showDelegationForm && (
+                                        {action === 'Aprobar' && showDelegationForm && (
                                             <DelegationForm
                                                 responsibilities={responsibilities}
                                                 selectedResponsibilities={selectedResponsibilities}

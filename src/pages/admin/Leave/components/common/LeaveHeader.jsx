@@ -16,14 +16,8 @@ const LeaveHeader = () => {
     }
   }, [dispatch, employeeId]);
 
-  if (loading) {
-    return <div></div>;
-  }
-
-
-
   return (
-    <div className="flex items-center shadow rounded-t-lg p-4">
+    <div className="flex bg-white items-center shadow-sm rounded-lg p-4">
       <FaRegClipboard className="text-2xl text-gray-500 mr-2" />
       <span className="text-gray-600 text-lg font-semibold">Resumen de Permisos</span>
       <div className="flex ml-auto space-x-4">

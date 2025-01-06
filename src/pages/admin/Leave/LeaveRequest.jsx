@@ -535,7 +535,6 @@ const Request = () => {
       formData.append('attachment', attachment);
     }
 
-    
     // Lógica para enviar el formulario
     setIsConfirmationOpen(true);
     setConfirmAction(() => async () => {

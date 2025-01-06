@@ -34,8 +34,13 @@ const LeaveTypes = ({ leaveTypes, selectedLeave, handleLeaveTypeChange, togglePa
             {leaveTypes.map((leave, idx) => (
                 <div
                     key={idx}
-                    className={`relative p-4 bg-white text-gray-700 rounded-lg shadow-md m-2 flex flex-col items-center w-40 cursor-pointer transition-transform transform hover:scale-105 ${selectedLeave === leave ? "border-2 border-blue-400 shadow-md" : ""
-                        }`}
+                    className={`relative bg-white  p-4 rounded-lg shadow-lg m-2 flex flex-col items-center w-40 cursor-pointer transition-all transform hover:scale-105 ${
+                        selectedLeave === leave
+                            ? "border-2 border-blue-400 text-blue-700 shadow-md"
+                            : "border border-gray-300 text-gray-800 hover:shadow-md"
+                    }`}
+                    
+                    
                     onClick={() => handleLeaveTypeChange(leave)} // Llama a la función correctamente
                 >
                     <FaInfoCircle
