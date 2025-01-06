@@ -174,8 +174,8 @@ const FormOverTime = ({
                     className={`w-full border rounded-md px-3 py-2 text-sm ${errors.date ? "border-red-500" : "border-gray-300"
                         } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                     disabled={isSubmitting}
-                    minDate={new Date()} // Bloquear fechas pasadas
-                    maxDate={new Date(new Date().setFullYear(new Date().getFullYear() + 1))}
+                    minDate={new Date(new Date().setMonth(new Date().getMonth() - 1))} // Bloquear antes de hace un mes
+                    maxDate={new Date()} // Bloquear fechas futuras
                 />
                 {/* Mostrar errores de validación si existen */}
                 {errors.date && <span className="text-xs text-red-500">{errors.date}</span>}
@@ -262,6 +262,10 @@ const FormOverTime = ({
                 </div>
             </div>
 
+            {/* Nota informativa */}
+            <div className="text-xs text-gray-600 bg-gray-50 border border-gray-300 rounded-md p-2 mt-4 ">
+                <span className="font-semibold">Nota:</span> Solo se registran trabajos ya realizados. Por favor, asegúrese de ingresar la información de manera precisa.
+            </div>
 
             {/* Botones */}
             <div className="flex justify-end gap-4">
@@ -271,13 +275,12 @@ const FormOverTime = ({
                         }`}
                     disabled={isSubmitting || hasErrors}
                 >
-                    Crear
+                    Registrar
                 </button>
                 <button
                     type="button"
-                    className={`p-2 rounded-xl bg-transparent border border-dashed border-gray-400 w-full outline-none transform transition-all duration-300 hover:scale-105 ${
-                        isSubmitting ? "opacity-70 cursor-not-allowed" : ""
-                    }`}
+                    className={`p-2 rounded-xl bg-transparent border border-dashed border-gray-400 w-full outline-none transform transition-all duration-300 hover:scale-105 ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                        }`}
                     onClick={onCancel}
                     disabled={isSubmitting}
                 >

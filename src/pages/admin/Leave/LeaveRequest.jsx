@@ -2,51 +2,27 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
-import {
-  FaHouseDamage, FaUmbrellaBeach,
-  FaBriefcaseMedical, FaHome, FaUserMd,
-  FaUniversity, FaPlus, FaPlane, FaHospital,
-  FaChild, FaGraduationCap, FaSuitcase,
-  FaRegClock, FaInfoCircle
-} from 'react-icons/fa';
-import { FaHandshakeAngle } from "react-icons/fa6";
 import Input from '../../../components/ui/Input';
 import Textarea from '../../../components/ui/Textarea';
 import { fetchLeaveTypes } from '../../../redux/Leave/leaveTypeSlince';
 import { createOneLeave } from '../../../redux/Leave/leaveSince';
 import { AlertContext } from '../../../contexts/AlertContext';
 import ConfirmationModal from './Request/ConfirmationModal';
-import { BsCalendarCheck, BsCalendarX } from "react-icons/bs";
+import { BsCalendarCheck } from "react-icons/bs";
 import { BsClock, BsClockHistory } from "react-icons/bs";
-
-import { getEmployeeWorkSchedules } from '../../../services/Employee/Schedules/workScheduleService';
-
 import { getConfigurations } from "../../../services/configurationService";
+import { getEmployeeCalendar } from "../../../services/Calendar/calendarService";
+
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { es } from "date-fns/locale";
+registerLocale("es", es); // Registrar el idioma español para react-datepicker
+import DatePickerInput from "../../../components/ui/DatePickerInput";
+
+import LeaveTypes from './LeaveTypes';
+import FileUpload from './FileUpload';
 
 // Mapping of string names to icon components
-const iconMap = {
-  FaHouseDamage,
-  FaUmbrellaBeach,
-  FaBriefcaseMedical,
-  FaHome,
-  FaUserMd,
-  FaUniversity,
-  FaPlus,
-  FaPlane,
-  FaHospital,
-  FaChild,
-  FaGraduationCap,
-  FaSuitcase,
-  FaRegClock,
-  FaHandshakeAngle
-};
-const chunkArray = (array, chunkSize) => {
-  const chunks = [];
-  for (let i = 0; i < array.length; i += chunkSize) {
-    chunks.push(array.slice(i, i + chunkSize));
-  }
-  return chunks;
-};
 
 const Request = () => {
   const { id: employee_id } = useParams();
@@ -55,11 +31,9 @@ const Request = () => {
 
   const { leaveTypes, status, hasFetchedOnce } = useSelector((state) => state.leaveType);
 
-
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [infoPanelLeave, setInfoPanelLeave] = useState(null); // Nuevo estado para el panel de información
   const [timeUnit, setTimeUnit] = useState('Horas'); // Estado para gestionar el tipo de permiso
-
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [startTime, setStartTime] = useState('');
@@ -67,20 +41,14 @@ const Request = () => {
   const [reason, setReason] = useState(''); // Estado para gestionar la razón del permiso
   const [attachment, setAttachment] = useState(null);
   const [attachmentError, setAttachmentError] = useState('');
-
   const [errors, setErrors] = useState({}); // Estado para manejar los errores
-
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
-
   const [configurations, setConfigurations] = useState({});
-
-
-
-  const [workSchedules, setWorkSchedules] = useState([]);
-
-
   const panelRef = useRef(null);
+
+  const [employeeCalendar, setEmployeeCalendar] = useState([]);
+
 
   useEffect(() => {
     const fetchConfigurations = async () => {
@@ -93,17 +61,29 @@ const Request = () => {
             configData[config.key] = config.value;
           });
           setConfigurations(configData);
-        } else {
-          console.error("Error al cargar las configuraciones:", response);
         }
       } catch (error) {
-        console.error("Error al cargar las configuraciones:", error);
+        throw new Error("Hubo un problema al obtener las configuraciones.");
       }
     };
 
     fetchConfigurations();
   }, []);
 
+  useEffect(() => {
+    const fetchEmployeeCalendar = async () => {
+      try {
+        const calendar = await getEmployeeCalendar(employee_id);
+        setEmployeeCalendar(calendar);
+      } catch (error) {
+        throw new Error("Hubo un problema al obtener el calendario del empleado.");
+      }
+    };
+
+    if (employee_id) {
+      fetchEmployeeCalendar();
+    }
+  }, [employee_id]);
 
   useEffect(() => {
     if (!hasFetchedOnce && status !== 'loading') {
@@ -142,154 +122,115 @@ const Request = () => {
     resetForm();
   };
 
+  const handleStartDateChange = (date) => {
+    setStartDate(date);
 
+    let newErrors = {}; // Reiniciar errores
 
-    useEffect(() => {
-      // Función para obtener los horarios de trabajo del empleado
-      const fetchWorkSchedules = async () => {
-        try {
-          const response = await getEmployeeWorkSchedules(employee_id);
-          setWorkSchedules(response.data); // Accede al array `data` dentro de la respuesta
-        } catch (error) {
-          console.error("Error fetching work schedules:", error);
-        }
-      };
+    if (!date) {
+      newErrors.start_date = "Debe seleccionar una fecha válida.";
+      setErrors(newErrors);
+      return;
+    }
 
-      fetchWorkSchedules();
-
-    }, [employee_id]);
-
-
-  const handleStartDateChange = (e) => {
-    const value = e.target.value;
-    setStartDate(value);
-
-    // Obtener la fecha actual y la seleccionada
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Para asegurarnos de comparar solo las fechas, sin las horas
-    const selectedDate = new Date(value);
-    selectedDate.setHours(0, 0, 0, 0); // Para asegurarnos de comparar solo las fechas, sin las horas
-
-    // Calcular la diferencia en días entre hoy y la fecha seleccionada, incluyendo hoy como primer día
-    const diffTime = selectedDate - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Incluye el día de hoy como primer día
-
-    let newErrors = { ...errors };
-
-    // Validar la anticipación de días
+    // Validar días de anticipación según el tipo de permiso
     if (selectedLeave && selectedLeave.advance_notice_days) {
-      const advanceNoticeDays = selectedLeave.advance_notice_days;
-      if (diffDays < advanceNoticeDays) {
-        newErrors.start_date = `Debe solicitar el permiso con al menos ${advanceNoticeDays} ${advanceNoticeDays === 1 ? 'día' : 'días'} de anticipación.`;
-      } else {
-        delete newErrors.start_date;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Asegurar que se comparen solo las fechas
+      const selectedDate = new Date(date.setHours(0, 0, 0, 0));
+      const diffDays = Math.ceil((selectedDate - today) / (1000 * 60 * 60 * 24)); // Diferencia en días
+
+
+      if (diffDays < selectedLeave.advance_notice_days) {
+        newErrors.start_date = `Debe solicitar el permiso con al menos ${selectedLeave.advance_notice_days} ${selectedLeave.advance_notice_days === 1 ? "día" : "días"} de anticipación.`;
       }
     }
 
-    // Si pasa la validación de anticipación, continuar con la validación del horario laboral
-    if (!newErrors.start_date) {
-      // Obtener el día de la semana (0 para domingo, 1 para lunes, etc.)
-      let dayOfWeek = selectedDate.getDay(); // getDay() devuelve 0 para domingo, 6 para sábado
+    // Validar si la fecha seleccionada es un día laboral
+    const formattedDate = new Date(date.setHours(0, 0, 0, 0)).toISOString().split("T")[0];
+    const calendarEntry = employeeCalendar.find((entry) => entry.date === formattedDate);
 
-      // Ajuste para que lunes sea 1 y domingo sea 7
-      dayOfWeek = dayOfWeek + 1;
-
-      // Buscar el horario correspondiente al día de la semana seleccionado
-      const scheduleForDay = workSchedules.find(schedule => schedule.day_of_week === dayOfWeek);
-
-      if (!scheduleForDay) {
-        newErrors.start_date = 'No hay horario configurado para este día.';
-      } else {
-        delete newErrors.start_date;
-      }
+    if (!calendarEntry || calendarEntry.type !== "work_day") {
+      newErrors.start_date = `La fecha seleccionada (${formattedDate}) no es válida: ${calendarEntry?.reason || "Día no laboral"}.`;
     }
 
-    setErrors(newErrors);
+    // Si se encuentran errores, actualizarlos
+    if (Object.keys(newErrors).length > 0) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        ...newErrors,
+      }));
+      return;
+    }
 
-    // Revalidar las horas si ya están seleccionadas
-    if (startTime && endTime) {
+    // Si no hay errores, limpiar el estado de errores para la fecha
+    setErrors((prevErrors) => {
+      const { start_date, ...rest } = prevErrors;
+      return rest;
+    });
+
+    // Validar otras dependencias como horas (si aplica en tu flujo actual).
+    if (timeUnit === "Horas" && startTime) {
       validateTimes(startTime, endTime);
     }
   };
 
 
   const validateDates = (start, end) => {
-    let newErrors = { ...errors };
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Para comparar solo la fecha sin la hora
-  
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-  
-    // Validación 1: Fecha de inicio no debe ser en el pasado
-    if (startDate < today) {
-      newErrors.start_date = 'La fecha de inicio debe ser una fecha futura.';
-    } else {
-      delete newErrors.start_date;
+
+    let newErrors = {}; // Reiniciar errores para esta validación
+    const startDate = new Date(start.setHours(0, 0, 0, 0)); // Asegurar solo fecha
+    const endDate = new Date(end.setHours(0, 0, 0, 0)); // Asegurar solo fecha
+
+    // Validar el inicio
+    const formattedStartDate = startDate.toISOString().split("T")[0]; // Formatear fecha a YYYY-MM-DD
+    const startEntry = employeeCalendar.find((entry) => entry.date === formattedStartDate);
+
+    if (!startEntry || startEntry.type !== "work_day") {
+      newErrors.start_date = `La fecha de inicio (${formattedStartDate}) no es válida: ${startEntry?.reason || "Día no laboral"}.`;
     }
-  
-    // Validación 2: Fecha de fin no debe ser en el pasado
-    if (endDate < today) {
-      newErrors.end_date = 'La fecha de fin debe ser una fecha futura.';
-    } else {
-      delete newErrors.end_date;
+
+    // Validar el extremo
+    const formattedEndDate = endDate.toISOString().split("T")[0]; // Formatear fecha a YYYY-MM-DD
+    const endEntry = employeeCalendar.find((entry) => entry.date === formattedEndDate);
+
+    if (!newErrors.start_date && (!endEntry || endEntry.type !== "work_day")) {
+      newErrors.end_date = `La fecha de fin (${formattedEndDate}) no es válida: ${endEntry?.reason || "Día no laboral"}.`;
     }
-  
-    // Validación 3: Fecha de fin debe ser posterior o igual a la fecha de inicio
-    if (endDate < startDate) {
-      newErrors.end_date = 'La fecha de fin debe ser posterior o igual a la fecha de inicio.';
-    } else {
-      delete newErrors.end_date;
+
+    // Validar anticipación solo si no hay errores previos
+    if (!newErrors.start_date && !newErrors.end_date && selectedLeave?.advance_notice_days) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const advanceNoticeDays = parseInt(selectedLeave.advance_notice_days, 10);
+      const diffDaysAdvance = Math.ceil((startDate - today) / (1000 * 60 * 60 * 24));
+
+      if (diffDaysAdvance < advanceNoticeDays) {
+        newErrors.start_date = `Debe solicitar el permiso con al menos ${advanceNoticeDays} ${advanceNoticeDays === 1 ? "día" : "días"} de anticipación.`;
+      }
     }
-  
-    // Validación 4: Duración del permiso no debe exceder el máximo permitido
-    if (selectedLeave && selectedLeave.max_duration) {
-      const maxDuration = selectedLeave.max_duration;
-      const diffTime = endDate - startDate;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 para incluir el día de inicio
-  
+
+    // Validar duración máxima solo si no hay errores previos
+    if (!newErrors.start_date && !newErrors.end_date && selectedLeave?.max_duration) {
+      const maxDuration = parseInt(selectedLeave.max_duration, 10);
+      const diffDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
       if (diffDays > maxDuration) {
         newErrors.end_date = `La duración del permiso no debe exceder los ${maxDuration} días.`;
-      } else if (!newErrors.end_date) {
-        delete newErrors.end_date;
       }
     }
-  
-    // Validación 5: El permiso debe solicitarse con días de anticipación
-    if (selectedLeave && selectedLeave.advance_notice_days) {
-      const advanceNoticeDays = selectedLeave.advance_notice_days;
-      const diffTimeAdvance = startDate - today;
-      const diffDaysAdvance = Math.ceil(diffTimeAdvance / (1000 * 60 * 60 * 24));
-  
-      if (diffDaysAdvance < advanceNoticeDays) {
-        newErrors.start_date = `Debe solicitar el permiso con al menos ${advanceNoticeDays} ${advanceNoticeDays === 1 ? 'día' : 'días'} de anticipación.`;
-      } else {
-        delete newErrors.start_date;
-      }
-    }
-  
-    // Validación 6: Fecha de fin debe tener horario configurado
-    if (!newErrors.end_date) { // Realizar esta validación solo si las anteriores pasaron
-      const endDateObj = new Date(end);
-      endDateObj.setHours(0, 0, 0, 0); // Asegurar que solo se comparen fechas sin horas
-  
-      let dayOfWeek = endDateObj.getDay() + 1; // Obtener el día de la semana (lunes es 1, domingo es 7)
-      const scheduleForDay = workSchedules.find(schedule => schedule.day_of_week === dayOfWeek);
-  
-      if (!scheduleForDay) {
-        newErrors.end_date = 'No hay horario configurado para la fecha de fin seleccionada.';
-      } else {
-        delete newErrors.end_date;
-      }
-    }
-  
-    setErrors(newErrors);
-  };
 
-  const handleEndDateChange = (e) => {
-    const value = e.target.value;
-    setEndDate(value);
-    validateDates(startDate, value);
+    // Si no hay errores nuevos, limpiar todos los errores relacionados con fechas
+    if (Object.keys(newErrors).length === 0) {
+      delete errors.start_date;
+      delete errors.end_date;
+    }
+
+    // Actualizar estado de errores
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      ...newErrors, // Añade o actualiza los errores relacionados con las fechas
+    }));
   };
 
 
@@ -305,17 +246,26 @@ const Request = () => {
     validateTimes(startTime, value);
   };
 
+
   const validateTimes = (start, end) => {
-    let newErrors = {};  // Inicializamos newErrors como un objeto vacío
+    let newErrors = {}; // Reiniciar errores
+
 
     if (!startDate) {
-      newErrors.start_time = 'Primero selecciona una fecha válida.';
+      newErrors.start_time = "Primero selecciona una fecha válida.";
       setErrors(newErrors);
       return;
     }
 
-    const [startHours, startMinutes] = start.split(':').map(Number);
-    const [endHours, endMinutes] = end.split(':').map(Number);
+
+    // Validaciones 
+    const formattedDate = new Date(startDate.setHours(0, 0, 0, 0)).toISOString().split("T")[0];
+    const calendarEntry = employeeCalendar.find((entry) => entry.date === formattedDate);
+
+    const schedule = calendarEntry.work_schedule;
+
+    const [startHours, startMinutes] = start.split(":").map(Number);
+    const [endHours, endMinutes] = end.split(":").map(Number);
 
     const startTime = new Date();
     startTime.setHours(startHours, startMinutes, 0, 0);
@@ -323,89 +273,84 @@ const Request = () => {
     const endTime = new Date();
     endTime.setHours(endHours, endMinutes, 0, 0);
 
-    // Calcular la duración
-    let duration;
-    if (endTime < startTime) {
-      duration = ((endTime.getTime() + (24 * 60 * 60 * 1000)) - startTime.getTime()) / (1000 * 60);
-    } else {
-      duration = (endTime - startTime) / (1000 * 60);
+    // Aquí corregimos el problema asegurándonos de que los segundos y milisegundos sean 0
+    const workStartTime = new Date();
+    const workEndTime = new Date();
+    const breakStartTime = new Date();
+    const breakEndTime = new Date();
+
+    const [workStartHours, workStartMinutes] = schedule.start_time.split(":").map(Number);
+    const [workEndHours, workEndMinutes] = schedule.end_time.split(":").map(Number);
+    const [breakStartHours, breakStartMinutes] = schedule.break_start_time.split(":").map(Number);
+    const [breakEndHours, breakEndMinutes] = schedule.break_end_time.split(":").map(Number);
+
+    workStartTime.setHours(workStartHours, workStartMinutes, 0, 0);
+    workEndTime.setHours(workEndHours, workEndMinutes, 0, 0);
+    breakStartTime.setHours(breakStartHours, breakStartMinutes, 0, 0);
+    breakEndTime.setHours(breakEndHours, breakEndMinutes, 0, 0);
+
+    // Validar si `startTime` está dentro del horario laboral (incluyendo límites)
+    if (startTime < workStartTime || startTime > workEndTime) {
+      newErrors.start_time = "La hora de inicio debe estar dentro del horario laboral.";
     }
 
-    const date = new Date(startDate);
-    const dayOfWeek = date.getDay() + 1;
-
-    const scheduleForDay = workSchedules.find(schedule => schedule.day_of_week === dayOfWeek);
-
-    if (scheduleForDay) {
-      const workStartTime = new Date();
-      const workEndTime = new Date();
-      const lunchStartTime = new Date();
-      const lunchEndTime = new Date();
-
-      workStartTime.setHours(...scheduleForDay.start_time.split(':').map(Number));
-      workEndTime.setHours(...scheduleForDay.end_time.split(':').map(Number));
-      lunchStartTime.setHours(...scheduleForDay.lunch_start_time.split(':').map(Number));
-      lunchEndTime.setHours(...scheduleForDay.lunch_end_time.split(':').map(Number));
-
-      // Truncar a horas y minutos
-      startTime.setSeconds(0, 0);
-      workStartTime.setSeconds(0, 0);
-      workEndTime.setSeconds(0, 0);
-
-      // Validar horario laboral (prioridad alta)
-      let hasWorkScheduleError = false;
-      if (startTime < workStartTime || startTime > workEndTime) {
-        newErrors.start_time = 'La hora de inicio debe estar dentro del horario laboral.';
-        hasWorkScheduleError = true;
-      }
-      if (endTime < workStartTime || endTime > workEndTime) {
-        newErrors.end_time = 'La hora de fin debe estar dentro del horario laboral.';
-        hasWorkScheduleError = true;
-      }
-
-      // Validar almuerzo (prioridad media)
-      if (!hasWorkScheduleError && scheduleForDay.has_lunch_break) {
-        if (startTime >= lunchStartTime && startTime < lunchEndTime) {
-          newErrors.start_time = 'El horario de inicio no puede comenzar durante el horario de almuerzo.';
-        }
-        if (endTime > lunchStartTime && endTime <= lunchEndTime) {
-          newErrors.end_time = 'El horario de fin no puede terminar durante el horario de almuerzo.';
-        }
-      }
-
-      // Validar duración del permiso (prioridad baja)
-      if (!hasWorkScheduleError && selectedLeave) {
-        if (selectedLeave.time_unit === 'Horas') {
-          const [minHours, minMinutes] = configurations.max_duration_hours_min.split(':').map(Number);
-          const minDuration = (minHours * 60) + minMinutes;
-
-          const [maxHours, maxMinutes] = selectedLeave.max_duration.split(':').map(Number);
-          const maxDuration = maxHours * 60 + maxMinutes;
-
-          if (duration < minDuration) {
-            newErrors.end_time = `La duración mínima del permiso debe ser de ${formatDuration(minDuration)}.`;
-          } else if (duration > maxDuration) {
-            newErrors.end_time = `La duración del permiso no debe exceder ${formatDuration(maxDuration)}.`;
-          }
-        } else if (selectedLeave.time_unit === 'Días') {
-          const [minHours, minMinutes] = configurations.max_duration_hours_min.split(':').map(Number);
-          const minDuration = (minHours * 60) + minMinutes;
-
-          const [maxHours, maxMinutes] = configurations.max_duration_hours_max.split(':').map(Number);
-          const maxDuration = maxHours * 60 + maxMinutes;
-
-          if (duration < minDuration) {
-            newErrors.end_time = `La duración mínima del permiso debe ser de ${formatDuration(minDuration)}.`;
-          } else if (duration > maxDuration) {
-            newErrors.end_time = `La duración del permiso no debe exceder ${formatDuration(maxDuration)}.`;
-          }
-        }
-      }
-    } else {
-      newErrors.start_time = 'No hay horario configurado para este día.';
+    // Validar si `endTime` está dentro del horario laboral (incluyendo límites)
+    if (endTime < workStartTime || endTime > workEndTime) {
+      newErrors.end_time = "La hora de fin debe estar dentro del horario laboral.";
     }
 
-    setErrors(newErrors);  // Establecemos los nuevos errores (o la ausencia de ellos)
+    // Validar si `startTime` cae en el horario de descanso
+    if (startTime >= breakStartTime && startTime < breakEndTime) {
+      newErrors.start_time = "La hora de inicio no puede estar dentro del horario de descanso.";
+    }
+
+    // Validar si `endTime` cae en el horario de descanso
+    if (endTime > breakStartTime && endTime <= breakEndTime) {
+      newErrors.end_time = "La hora de fin no puede estar dentro del horario de descanso.";
+    }
+
+    // Validar que `endTime` sea mayor que `startTime`
+    if (startTime >= endTime) {
+      newErrors.end_time = "La hora de fin debe ser mayor que la hora de inicio.";
+    }
+
+    // Validar que se cumpla el minimo de horas requeridas para el permiso en base a la configuración max_duration_hours_min
+    const [minHours, minMinutes] = configurations.max_duration_hours_min.split(":").map(Number);
+    const minDuration = minHours * 60 + minMinutes;
+    const duration = (endTime - startTime) / (1000 * 60);
+    if (duration < minDuration) {
+      newErrors.end_time = `La duración mínima del permiso debe ser de ${formatDuration(minDuration)}.`;
+    }
+
+    // Validar que no se pase de la duración máxima permitida para el permiso (dependiendo si es por horas o días)
+    let maxDuration;
+
+    if (selectedLeave.time_unit === "Días") {
+      const [maxHours, maxMinutes] = configurations.max_duration_hours_max.split(":").map(Number);
+      maxDuration = maxHours * 60 + maxMinutes;
+    } else if (timeUnit === "Horas") {
+      const [maxHours, maxMinutes] = selectedLeave.max_duration.split(":").map(Number);
+      maxDuration = maxHours * 60 + maxMinutes;
+    } else {
+      return;
+    }
+
+    // Validar si la duración calculada excede la duración máxima permitida
+    if (duration > maxDuration) {
+      newErrors.end_time = `La duración del permiso no debe exceder de ${formatDuration(maxDuration)}.`;
+    }
+
+    // Si no hay errores, eliminarlos
+    if (Object.keys(newErrors).length === 0) {
+      delete errors.start_time;
+      delete errors.end_time;
+    }
+
+    // Actualizar errores en el estado
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      ...newErrors, // Actualizar errores relacionados con el tiempo
+    }));
   };
 
   // Función auxiliar para formatear la duración
@@ -421,7 +366,9 @@ const Request = () => {
       message += `${mins} ${mins > 1 ? 'minutos' : 'minuto'}`;
     }
     return message;
-  }; const calculateTotalDuration = () => {
+  };
+
+  const calculateTotalDuration = () => {
     if (timeUnit === 'Días' && startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
@@ -490,24 +437,50 @@ const Request = () => {
     setErrors(newErrors);
   };
 
-  const handleRemoveAttachment = (e) => {
-    e.preventDefault();
-    setAttachment(null);
-  }
-
-  const leaveChunks = chunkArray(leaveTypes, 5);
+  const handleRemoveAttachment = () => {
+    // Si el permiso requiere documento, se debe mostrar el error
+    if (selectedLeave?.requires_document === "Si") {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        attachment: "El documento es requerido.",
+      }));
+    } else {
+      setErrors((prevErrors) => {
+        const newErrors = { ...prevErrors };
+        delete newErrors.attachment; // Elimina el error si no es necesario
+        return newErrors;
+      });
+    }
+  };
 
   const togglePanel = (leave) => {
     setInfoPanelLeave(infoPanelLeave === leave ? null : leave);
   };
 
-
-  // Nueva función para manejar el cambio de tipo de permiso
   const handleLeaveTypeChange = (leave) => {
+    // Reinicia todos los errores y valores del formulario
+    setErrors({});
+    resetForm();
+
+    // Configura el nuevo permiso seleccionado
     setSelectedLeave(leave);
     setTimeUnit(leave.time_unit === 'Horas' ? 'Horas' : 'Días');
-    // Resetear campos y errores
-    resetForm();
+
+    // Limpia y revalida fechas si ya hay valores seleccionados
+    if (startDate || endDate) {
+      setStartDate('');
+      setEndDate('');
+    }
+
+    // Si hay reglas específicas para documentos, actualiza los errores
+    if (leave.requires_document !== 'Si') {
+      setErrors((prevErrors) => {
+        const newErrors = { ...prevErrors };
+        delete newErrors.attachment;
+        return newErrors;
+      });
+    }
+
   };
 
   const getDurationColor = () => {
@@ -516,8 +489,6 @@ const Request = () => {
     }
     return 'text-gray-700';
   };
-
-
 
   if (status === 'loading') {
     return <div className="loading">Cargando...</div>;
@@ -532,78 +503,67 @@ const Request = () => {
 
     let newErrors = {};
 
-    if (!startDate) {
-      newErrors.start_date = 'La fecha de inicio es requerida.';
-    }
-
-    if (!endDate && timeUnit === 'Días') {
-      newErrors.end_date = 'La fecha de fin es requerida.';
-    }
-
-    if (!startTime && timeUnit === 'Horas') {
-      newErrors.start_time = 'La hora de inicio es requerida.';
-    }
-
-    if (!endTime && timeUnit === 'Horas') {
-      newErrors.end_time = 'La hora de fin es requerida.';
-    }
-
-    if (!reason) {
-      newErrors.reason = 'La razón es requerida.';
-    }
-
-    if (selectedLeave && selectedLeave.requires_document === 'Si' && !attachment) {
+    // Validaciones básicas de campos requeridos
+    if (!startDate) newErrors.start_date = 'La fecha de inicio es requerida.';
+    if (!endDate && timeUnit === 'Días') newErrors.end_date = 'La fecha de fin es requerida.';
+    if (!startTime && timeUnit === 'Horas') newErrors.start_time = 'La hora de inicio es requerida.';
+    if (!endTime && timeUnit === 'Horas') newErrors.end_time = 'La hora de fin es requerida.';
+    if (!reason) newErrors.reason = 'La razón es requerida.';
+    if (selectedLeave?.requires_document === "Si" && !attachment) {
       newErrors.attachment = 'El documento es requerido.';
     }
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+    // Convertir fechas al formato esperado (YYYY-MM-DD)
+    const formattedStartDate = startDate ? new Date(startDate).toISOString().split('T')[0] : '';
+    const formattedEndDate = endDate ? new Date(endDate).toISOString().split('T')[0] : '';
+
+    // Crear instancia de FormData
+    const formData = new FormData();
+
+    // Agregar valores al FormData
+    formData.append('employee_id', employee_id || '');
+    formData.append('leave_type_id', selectedLeave?.id || '');
+    formData.append('start_date', formattedStartDate || '');
+    if (timeUnit === 'Días') {
+      formData.append('end_date', formattedEndDate || '');
     } else {
-      setIsConfirmationOpen(true);
-      setConfirmAction(() => async () => {
-        const formData = new FormData();
-        formData.append('employee_id', employee_id);
-        formData.append('leave_type_id', selectedLeave.id);
-        formData.append('start_date', startDate);
-        if (timeUnit === 'Días') {
-          formData.append('end_date', endDate);
-        } else {
-          formData.append('start_time', startTime);
-          formData.append('end_time', endTime);
-        }
-        formData.append('reason', reason);
-        if (attachment) {
-          formData.append('attachment', attachment);
-        }
-
-        try {
-          const resultAction = await dispatch(createOneLeave({ employeeId: employee_id, leave: formData }));
-          unwrapResult(resultAction);
-
-          // Resetear campos y errores
-          setSelectedLeave(null);
-          setTimeUnit('Horas');
-          resetForm();
-          showAlert('Solicitud creada correctamente', 'success', 3000);
-        } catch (error) {
-          const errorMsg = JSON.parse(error.message);
-
-          if (errorMsg.msg) {
-            showAlert(errorMsg.msg, 'error', 3000);
-          }
-
-          if (errorMsg.errors) {
-            const backendErrors = errorMsg.errors;
-            let newErrors = {};
-            for (const [key, value] of Object.entries(backendErrors)) {
-              newErrors[key] = value[0];
-            }
-            setErrors(newErrors);
-          }
-        }
-      });
+      formData.append('start_time', startTime || '');
+      formData.append('end_time', endTime || '');
     }
+    formData.append('reason', reason || '');
+    if (attachment) {
+      formData.append('attachment', attachment);
+    }
+
+    
+    // Lógica para enviar el formulario
+    setIsConfirmationOpen(true);
+    setConfirmAction(() => async () => {
+      try {
+        await dispatch(createOneLeave({ employeeId: employee_id, leave: formData })).then(unwrapResult);
+        // Resetear campos y mostrar mensaje de éxito
+        resetForm();
+        setSelectedLeave(null);
+        setTimeUnit('Horas');
+        showAlert('Solicitud creada correctamente', 'success', 3000);
+      } catch (error) {
+        console.error('Error al enviar la solicitud:', error);
+
+        const errorMsg = JSON.parse(error.message);
+        if (errorMsg.msg) showAlert(errorMsg.msg, 'error', 3000);
+
+        if (errorMsg.errors) {
+          const backendErrors = errorMsg.errors;
+          let newErrors = {};
+          for (const [key, value] of Object.entries(backendErrors)) {
+            newErrors[key] = value[0];
+          }
+          setErrors(newErrors);
+        }
+      }
+    });
   };
+
 
   // Funciones de confirmación y cancelación
   const handleConfirm = async () => {
@@ -619,31 +579,14 @@ const Request = () => {
   };
 
   return (
-    <form className="px-4" onSubmit={handleSubmit}>
+    <form className="p-4" onSubmit={handleSubmit}>
       {/* Parte del renderizado de los botones */}
-      {leaveChunks.map((chunk, index) => {
-        return (
-          <div key={index} className="flex justify-center items-center flex-wrap mb-4">
-            {chunk.map((leave, idx) => (
-              <div
-                key={idx}
-                className={`relative p-4 bg-white text-gray-700 rounded-lg shadow-md m-2 flex flex-col items-center w-40 cursor-pointer transition-transform transform hover:scale-105 ${selectedLeave === leave ? 'border-2 border-blue-400 shadow-md' : ''}`}
-                onClick={() => handleLeaveTypeChange(leave)}
-              >
-                <FaInfoCircle
-                  className="absolute top-0 right-0 m-2 cursor-pointer text-gray-500 hover:text-blue-500"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    togglePanel(leave);
-                  }}
-                />
-                {React.createElement(iconMap[leave.icon] || FaRegClock, { className: "text-3xl mb-2" })}
-                <span className="text-center text-sm font-semibold">{leave.name.toUpperCase()}</span>
-              </div>
-            ))}
-          </div>
-        );
-      })}
+      <LeaveTypes
+        leaveTypes={leaveTypes}
+        selectedLeave={selectedLeave}
+        togglePanel={togglePanel}
+        handleLeaveTypeChange={handleLeaveTypeChange} // Añade esta prop
+      />
 
       {/* Panel de información */}
       {infoPanelLeave && (
@@ -704,14 +647,29 @@ const Request = () => {
               <div className="flex space-x-4">
                 <div className="w-1/2">
 
-                  <Input
-                    label="Fecha de solicitud del permiso"
-                    id="startDate"
-                    type="date"
+                  <DatePickerInput
+                    label="Fecha solicitada"
+                    selected={startDate ? new Date(startDate) : null}
+                    onChange={(date) => {
+                      setStartDate(date);
+                      handleStartDateChange(date); // Llamar a la validación al cambiar la fecha
+                    }}
+                    startDate={startDate ? new Date(startDate) : null}
+                    placeholderText="Selecciona una fecha"
+                    minDate={new Date()}
+                    maxDate={
+                      configurations.max_days_for_leave
+                        ? new Date(
+                          new Date().setDate(
+                            new Date().getDate() + parseInt(configurations.max_days_for_leave)
+                          )
+                        )
+                        : null
+                    }
+                    dateFormat="d 'de' MMMM 'de' yyyy"
+                    locale="es"
+                    errorStartDate={errors.start_date}
                     icon={BsCalendarCheck}
-                    value={startDate}
-                    onChange={handleStartDateChange}
-                    error={errors.start_date}
                   />
                 </div>
                 <div className="w-1/2">
@@ -741,35 +699,45 @@ const Request = () => {
           )}
           {timeUnit === 'Días' && (
             <>
-              <div className="flex space-x-4">
-                <div className="w-1/2">
-                  <Input
-                    label="Fecha de inicio del permiso"
-                    id="startDate"
-                    type="date"
-                    icon={BsCalendarCheck}
-                    value={startDate}
-                    onChange={handleStartDateChange}
-                    error={errors.start_date}
-                  />
-                </div>
-                <div className="w-1/2">
-                  <Input
-                    label="Fecha de fin del permiso"
-                    id="endDate"
-                    type="date"
-                    icon={BsCalendarX}
-                    value={endDate}
-                    onChange={handleEndDateChange}
-                    error={errors.end_date}
-                  />
-                </div>
-              </div>
+              {/* Nuevo Input con DatePicker */}
+              <DatePickerInput
+                label="Rango de fechas solicitadas"
+                selected={startDate ? new Date(startDate) : null}
+                onChange={(update) => {
+                  const [start, end] = update;
+                  setStartDate(start);
+                  setEndDate(end);
+
+                  if (start && end) {
+                    validateDates(start, end);
+                  } else if (start) {
+                    validateDates(start, start);
+                  }
+                }}
+                startDate={startDate ? new Date(startDate) : null}
+                endDate={endDate ? new Date(endDate) : null}
+                selectsRange
+                placeholderText="Selecciona un rango de fechas"
+                minDate={new Date()}
+                maxDate={
+                  configurations.max_days_for_leave
+                    ? new Date(
+                      new Date().setDate(
+                        new Date().getDate() + parseInt(configurations.max_days_for_leave)
+                      )
+                    )
+                    : null
+                }
+                dateFormat="d 'de' MMMM 'de' yyyy"
+                locale="es"
+                errorStartDate={errors.start_date} // Mostrar error en fecha inicial
+                errorEndDate={errors.end_date} // Mostrar error en fecha final
+                icon={BsCalendarCheck}
+              />
             </>
           )}
         </>
       )}
-
       {selectedLeave && (
         <div className="flex space-x-4 mt-3">
           <div className="w-1/2">
@@ -784,78 +752,14 @@ const Request = () => {
             />
           </div>
           <div className="w-1/2">
-            <div className="mb-3">
-              <label className="block text-base font-semibold text-gray-700 mb-1">
-                Adjuntar Documento
-              </label>
-              <div className="flex justify-center items-center w-full  h-16 px-2 transition bg-white border-2 border-gray-300 border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none">
-                <input
-                  type="file"
-                  name="file_upload"
-                  className="hidden"
-                  accept=".jpg,.jpeg,.png,.pdf"
-                  id="attachment"
-                  onChange={handleAttachmentChange}
-                />
-                <label
-                  htmlFor="attachment"
-                  className="flex flex-col items-center justify-center cursor-pointer w-full h-full"
-                >
-                  {!attachment ? (
-                    <>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-6 h-6 text-gray-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                        />
-                      </svg>
-                      <span className="font-medium text-gray-600">
-                        Arrastra un documento para adjuntar, o{" "}
-                        <span className="text-blue-600 underline">examinar</span>
-                      </span>
-                    </>
-                  ) : (
-                    <div className="flex items-center">
-                      <span className="text-sm text-gray-700">{attachment.name}</span>
-                      <button
-                        type="button"
-                        onClick={handleRemoveAttachment}
-                        className="ml-2 text-red-600 hover:text-red-800 focus:outline-none"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="w-5 h-5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  )}
-                </label>
-              </div>
-              {attachmentError && (
-                <p className="mt-1 text-xs text-red-600">{attachmentError}</p>
-              )}
-              {errors.attachment && (
-                <p className="mt-1 text-xs text-red-600">{errors.attachment}</p>
-              )}
-            </div>
+            <FileUpload
+              attachment={attachment}
+              setAttachment={setAttachment}
+              attachmentError={errors.attachment} // Control del error desde el componente principal
+              handleAttachmentChange={handleAttachmentChange}
+              handleRemoveAttachment={handleRemoveAttachment} // Lógica de eliminación conectada al formulario
+            />
+
           </div>
         </div>
       )}

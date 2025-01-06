@@ -35,12 +35,6 @@ export const overtimeVisibleColumns = [
         order: 4,
     },
     {
-        id: "worked_value",
-        label: "Horas trabajadas",
-        autoWidth: true,
-        order: 6,
-    },
-    {
         id: "generates_compensatory",
         label: "Genera compensatorio",
         render: renderGeneratesCompensatory,

@@ -122,13 +122,17 @@ const employeeSchedulesSlice = createSlice({
                 // Extraer datos del payload
                 const { updated_current_schedule, new_schedule } = action.payload;
 
-                // Actualizar el horario actual
-                const currentIndex = state.employeeSchedules.findIndex(
-                    (schedule) => schedule.id === updated_current_schedule.id
-                );
-                if (currentIndex !== -1) {
-                    state.employeeSchedules[currentIndex] = updated_current_schedule;
+                // Verificar si `updated_current_schedule` no es null
+                if (updated_current_schedule) {
+                    // Actualizar el horario actual
+                    const currentIndex = state.employeeSchedules.findIndex(
+                        (schedule) => schedule.id === updated_current_schedule.id
+                    );
+                    if (currentIndex !== -1) {
+                        state.employeeSchedules[currentIndex] = updated_current_schedule;
+                    }
                 }
+
 
                 // Agregar el nuevo horario
                 state.employeeSchedules.unshift(new_schedule);

@@ -131,7 +131,7 @@ const Overtime = () => {
                         showFilters={true}
                         showAddNew={true}
                         onAddNew={handleOpenCreateModal}
-                        onDelete={handleClickDelete}
+                        // onDelete={handleClickDelete}
                     />
                 )}
 
@@ -145,7 +145,7 @@ const Overtime = () => {
             <ModalForm
                 isOpen={isCreateModalOpen}
                 setIsOpen={setCreateModalOpen}
-                title="Crear Turno Especial"
+                title="Registrar Turno Especial"
                 icon={<FiClipboard className="w-10 h-10 flex items-center justify-center rounded-full text-blue-500" />}
             >
                 <FormOverTime

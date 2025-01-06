@@ -5,7 +5,6 @@ const getUsers = async () => {
     const response = await AxiosInstance.get('/users');
     return response.data;
   } catch (error) {
-    console.error('Error al obtener los usuarios:', error);
     throw error;
   }
 };
@@ -17,7 +16,6 @@ const createUser = async (newUser) => {
     const response = await AxiosInstance.post('/users', newUser);
     return response.data;
   } catch (error) {
-    console.error('Error al crear el usuario:', error);
     throw error;
   }
 };
