@@ -33,7 +33,7 @@ const WeeklySchedule = () => {
     }
 
     if (!weeklySchedule || !Array.isArray(weeklySchedule.data) || weeklySchedule.data.length === 0) {
-        return <div className="text-gray-500">No hay datos disponibles para este empleado.</div>;
+        return <div className="text-gray-500 pt-2">No tienes un horario asignado para esta semana.</div>;
     }
 
     return (

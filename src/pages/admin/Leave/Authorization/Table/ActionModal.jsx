@@ -45,6 +45,13 @@ const ActionModal = ({ action, data, onClose, onSuccess }) => {
         }
     }, [dispatch, action, hasFetchedOnce]);
 
+    const leaveTypeId = data.leave_type?.id; // Obtén el ID del tipo de permiso solicitado
+
+    // Filtrar los motivos de rechazo asociados al tipo de permiso solicitado
+    const filteredRejectionReasons = rejectionReasons.filter((reason) =>
+        reason.leave_types.some((type) => type.id === leaveTypeId)
+    );
+
     useEffect(() => {
         const handleKeyDown = (event) => {
             if (event.key === 'Escape' && !showConfirmation) {
@@ -219,8 +226,6 @@ const ActionModal = ({ action, data, onClose, onSuccess }) => {
         setShowDelegationReasonError(false);
     };
 
-
-
     return (
         <>
             <Transition appear show={true} as={Fragment}>
@@ -254,7 +259,7 @@ const ActionModal = ({ action, data, onClose, onSuccess }) => {
                                             <div className="mb-4">
                                                 <CustomSelect
                                                     label="Motivo de Rechazo"
-                                                    options={rejectionReasons}
+                                                    options={filteredRejectionReasons}
                                                     value={selectedReason}
                                                     onChange={handleReasonChange}
                                                     placeholder="Selecciona un motivo de rechazo"
