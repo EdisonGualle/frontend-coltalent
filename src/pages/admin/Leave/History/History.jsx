@@ -38,7 +38,6 @@ const History = () => {
 
   // Manejo del permiso seleccionado
   const handleViewDetails = (leave) => {
-    console.log("Permiso seleccionado para el modal:", leave); // Muestra los datos enviados al modal
     setDetailModalData(leave); // Pasa el permiso seleccionado
     setIsDetailModalOpen(true); // Abre el modal
   };
