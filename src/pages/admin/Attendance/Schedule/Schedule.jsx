@@ -1,10 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState, useContext } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { unwrapResult } from '@reduxjs/toolkit';
 import { useParams } from 'react-router-dom';
 import WeeklySchedule from './WeeklySchedule';
 import { getEmployeeWorkSchedules } from '../../../../services/Employee/Schedules/workScheduleService.js';
 import LoadingSpinner from '../../../../components/ui/LoadingIndicator.jsx';
+import LoadingIndicator from "../../../../components/ui/LoadingIndicator";
+import { fetchEmployeeSchedule } from '../../../../redux/Calendar/weeklyScheduleSlince.js';
 
 const Schedule = () => {
+  const dispatch = useDispatch();
+  const {weekSchedule, fetchStatus, hasFetchedAll} = useSelector(
+    (state) => state.weeklySchedule
+  );
+  
   const { id: employee_id } = useParams();
   const [schedule, setSchedule] = useState({
     Domingo: {},  // Domingo al inicio

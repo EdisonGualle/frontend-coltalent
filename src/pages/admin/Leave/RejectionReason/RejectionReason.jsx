@@ -3,27 +3,27 @@ import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { CardHeader, Typography } from "@material-tailwind/react";
 import { RiEdit2Line, RiCheckboxCircleLine, RiCloseCircleLine } from 'react-icons/ri';
-import LeaveTable from '../components/Table/LeaveTable';
+import SchedulesTable from "../../Schedule/Table/SheduleTable";
 import rejectionReasonColumns from './Table/rejectionReasonColumns';
 import Dialog2 from '../../../../components/ui/Dialog2';
 import { AlertContext } from '../../../../contexts/AlertContext';
 import {
-  fetchRejectionReasons, deleteOneRejectionReason,
+  fetchRejectionReasons,
   updateOneRejectionReason, createNewRejectionReason,
   fetchAllRejectionReasonsIncludingDeleted, toggleOneRejectionReasonStatus
 } from '../../../../redux/Leave/rejectionReasonSlince';
-import SkeletonTable from '../components/Table/SkeletonTable';
 import ModalForm from '../../../../components/ui/ModalForm';
 import { TbMessageX } from "react-icons/tb";
 import RejectionReasonForm from './RejectionReasonForm';
 import { getCellStyle } from './Table/getCellStyle';
 import LoadingIndicator from '../../../../components/ui/LoadingIndicator';
-
+import renderRejectionReasonActions from './Table/renderRejectionReasonActions';
 
 const RejectionReason = () => {
   const dispatch = useDispatch();
   const { showAlert } = useContext(AlertContext);
   const { status, hasFetchedOnce, allRejectionReasons } = useSelector((state) => state.rejectionReason);
+
   const [data, setData] = useState([]);
   const [isLoadingInitial, setIsLoadingInitial] = useState(true);
   const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
@@ -85,12 +85,16 @@ const RejectionReason = () => {
   const handleSubmit = async (formData) => {
     try {
       if (isEditing && currentRejectionReason) {
-        const { reason } = formData;
+        const { reason, leave_type_ids } = formData;
 
         const updatedRejectionReasonData = {
-          rejectionReasonId: currentRejectionReason.id,
-          updateRejectionReason: { reason },
+            rejectionReasonId: currentRejectionReason.id,
+            updateRejectionReason: {
+                reason,
+                leave_type_ids, // Asegúrate de incluir los IDs aquí
+            },
         };
+        console.log(updatedRejectionReasonData);
         const resultAction = await dispatch(updateOneRejectionReason(updatedRejectionReasonData));
         unwrapResult(resultAction);
         showAlert('Registro actualizado correctamente', 'success');
@@ -153,6 +157,7 @@ const RejectionReason = () => {
     setSelectedReason(row);
     setIsOpenToggleDialog(true);
   };
+
 
   const handleConfirmToggle = async () => {
     try {
@@ -224,19 +229,26 @@ const RejectionReason = () => {
         {isLoadingInitial && !allRejectionReasons.length ? (
           <LoadingIndicator />
         ) : (
-          <LeaveTable
-            columns={rejectionReasonColumns}
-            data={data}
-            actions={renderActions}
-            onAddNew={handleOpenModalForm}
-            showFilters={false}
-            showExport={false}
-            showAddNew={true}
-            showColumnOptions={false}
-            showActions={true}
-            onDelete={null}
-            getCellStyle={getCellStyle}
-          />
+          <div>
+            <SchedulesTable
+              columns={rejectionReasonColumns}
+              getCellStyle={getCellStyle}
+              data={data}
+              showAddNew={true}
+              showFilters={false}
+              showColumnOptions={false}
+              onAddNew={handleOpenModalForm}
+              showActions={true}
+              actions={(row) =>
+                renderRejectionReasonActions({
+                  row,
+                  onEdit: handleEdit, // Pasar la función de editar
+                  onToggleStatus: () => handleToggleClick(row), // Pasar la función de toggle
+                })
+              }
+            />
+
+          </div>
         )}
         {/* <Dialog2
           isOpen={isOpenDialogDelete}

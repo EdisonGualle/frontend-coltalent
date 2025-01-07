@@ -153,7 +153,7 @@ const ScheduleDefinition = () => {
   return (
     <div className="">
       {fetchStatus === "loading" && schedules.length === 0 && <LoadingIndicator />}
-      {fetchStatus === "failed" &&showAlert("Error al cargar los horarios", "error")}
+      {fetchStatus === "failed" && showAlert("Error al cargar los horarios", "error")}
 
       {/* Solo mostramos la tabla si hay datos */}
       {fetchStatus === "succeeded" && schedules.length > 0 && (

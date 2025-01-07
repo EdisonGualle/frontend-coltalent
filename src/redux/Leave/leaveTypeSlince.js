@@ -84,6 +84,7 @@ export const leaveTypeSlice = createSlice({
     status: "idle",
     error: null,
     hasFetchedOnce: false,
+    hasFetchedAll: false, // Control para evitar múltiples peticiones
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -95,11 +96,13 @@ export const leaveTypeSlice = createSlice({
         state.status = "succeeded";
         state.leaveTypes = action.payload;
         state.hasFetchedOnce = true;
+        state.hasFetchedAll = true;
       })
       .addCase(fetchLeaveTypes.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
         state.hasFetchedOnce = false;
+        state.hasFetchedAll = false;
       })
       .addCase(fetchLeaveType.pending, (state) => {
         state.status = "loading";

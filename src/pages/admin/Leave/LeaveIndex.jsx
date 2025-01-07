@@ -8,6 +8,7 @@ import { getEmployee } from "../../../services/Employee/EmployeService1";
 import History from "./History/History";
 import Schedule from "../Attendance/Schedule/Schedule";
 import LoadingIndicator from "../../../components/ui/LoadingIndicator";
+import WeeklySchedule from "../Leave/Schedule/WeeklySchedule";
 
 const LeaveIndex = () => {
   const { id } = useParams();
@@ -68,7 +69,7 @@ const LeaveIndex = () => {
             <Route path="solicitar" element={<LeaveRequest />} />
             <Route path="historial" element={<History />} />
             <Route path="motivos-de-rechazo" element={<RejectionReason />} />
-            <Route path="horario" element={<Schedule />} />
+            <Route path="horario" element={<WeeklySchedule />} />
             <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>
         </div>

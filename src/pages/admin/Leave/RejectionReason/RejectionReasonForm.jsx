@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { unwrapResult } from '@reduxjs/toolkit';
 import Input from "../../../../components/ui/Input";
 import { RiCloseCircleLine } from "react-icons/ri";
+import { fetchLeaveTypes } from '../../../../redux/Leave/leaveTypeSlince';
+
+import TaggableSelect from "../../../../components/ui/TaggableSelect";
 
 const REJECTION_REASON_REQUIRED = "Por favor, ingrese el motivo de rechazo.";
+const LEAVE_TYPES_REQUIRED = "Por favor, seleccione al menos un tipo de permiso.";
 
 const RejectionReasonForm = ({
     rejectionReason,
@@ -15,7 +21,31 @@ const RejectionReasonForm = ({
     cancelButtonColor = "border-gray-400",
     formErrors = {},
 }) => {
+    const dispatch = useDispatch();
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+    const { leaveTypes, hasFetchedAll } = useSelector((state) => state.leaveType);
+    const [selectedLeaveTypes, setSelectedLeaveTypes] = useState([]);
+
+
+    // Tipos de permisos
+    useEffect(() => {
+        if (!hasFetchedAll) {
+            dispatch(fetchLeaveTypes());
+        }
+    }, [dispatch, hasFetchedAll]);
+
+    const handleLeaveTypesChange = (selectedOptions) => {
+        const selectedIds = selectedOptions.map((option) => option.value);
+        setSelectedLeaveTypes(selectedIds);
+    
+        // Validar inmediatamente después de cambiar
+        if (selectedIds.length === 0) {
+            setErrors((prev) => ({ ...prev, leaveTypes: LEAVE_TYPES_REQUIRED }));
+        } else {
+            setErrors((prev) => ({ ...prev, leaveTypes: "" }));
+        }
+    };
+    
 
     // Estados locales para manejar los errores y los datos del formulario
     const [formData, setFormData] = useState({
@@ -23,6 +53,7 @@ const RejectionReasonForm = ({
     });
     const [errors, setErrors] = useState({
         reason: "",
+        leaveTypes: "",
     });
 
     // Desestructurar los datos del formulario
@@ -38,16 +69,20 @@ const RejectionReasonForm = ({
         const isDisabled = Object.values(errors).some((error) => error);
         setIsSubmitDisabled(isDisabled);
     }, [errors]);
+    
 
     // Efecto para cargar los datos del motivo de rechazo en el formulario cuando se edite
     useEffect(() => {
-        if(isEditing && rejectionReason) {
+        if (isEditing && rejectionReason) {
             setFormData({
                 reason: rejectionReason.reason,
             });
 
+            setSelectedLeaveTypes(rejectionReason.leave_types?.map((type) => type.id) || []);
+
             setErrors({
                 reason: "",
+                leaveTypes: "",
             });
         }
     }, [isEditing, rejectionReason]);
@@ -77,16 +112,32 @@ const RejectionReasonForm = ({
     // Función para manejar el envío del formulario
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
+        const newErrors = {};
+    
         if (!reason.trim()) {
-            setErrors({
-                reason: REJECTION_REASON_REQUIRED,
-            });
+            newErrors.reason = REJECTION_REASON_REQUIRED;
+        }
+    
+        if (selectedLeaveTypes.length === 0) {
+            newErrors.leaveTypes = LEAVE_TYPES_REQUIRED;
+        }
+    
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
             return;
         }
-
-        onSubmit(formData);
+    
+        const formattedData = {
+            ...formData,
+            leave_type_ids: selectedLeaveTypes,
+        };
+    
+        console.log(formattedData);
+    
+        onSubmit(formattedData);
     };
+    
 
     return (
         <form onSubmit={handleSubmit}>
@@ -99,6 +150,19 @@ const RejectionReasonForm = ({
                     icon={RiCloseCircleLine}
                     onChange={handleChange}
                     error={errors.reason}
+                />
+
+                <TaggableSelect
+                    label="Tipos de Permiso Asociados"
+                    id="leave_types"
+                    placeholder="Selecciona los tipos de permisos"
+                    options={leaveTypes.map((type) => ({ label: type.name, value: type.id }))}
+                    value={leaveTypes.filter((type) => selectedLeaveTypes.includes(type.id)).map((type) => ({
+                        label: type.name,
+                        value: type.id,
+                    }))}
+                    onChange={handleLeaveTypesChange}
+                    error={errors.leaveTypes || ""}
                 />
             </div>
             <div className="flex items-center gap-x-2 mt-4">
