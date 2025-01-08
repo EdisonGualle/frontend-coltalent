@@ -16,17 +16,12 @@ const LeaveHeader = () => {
     }
   }, [dispatch, employeeId]);
 
+  console.log("statistics", statistics);
   return (
     <div className="flex bg-white items-center shadow-sm rounded-lg p-4">
       <FaRegClipboard className="text-2xl text-gray-500 mr-2" />
       <span className="text-gray-600 text-lg font-semibold">Resumen de Permisos</span>
       <div className="flex ml-auto space-x-4">
-        <div className="text-center">
-          <span className="block text-xs text-gray-500">Permisos Totales</span>
-          <span className="block bg-gray-100 text-gray-600 text-lg font-semibold px-4 py-0.5 rounded-full">
-            {statistics?.totalPermissions || 0}
-          </span>
-        </div>
         <div className="text-center">
           <span className="block text-xs text-gray-500">Permisos Aprobados</span>
           <span className="block bg-green-100 text-green-600 text-lg font-semibold px-4 py-0.5 rounded-full">
@@ -37,6 +32,12 @@ const LeaveHeader = () => {
           <span className="block text-xs text-gray-500">Permisos Desaprobados</span>
           <span className="block bg-red-100 text-red-500 text-lg font-semibold px-4 py-0.5 rounded-full">
             {statistics?.disapprovedPermissions || 0}
+          </span>
+        </div>
+        <div className="text-center">
+          <span className="block text-xs text-gray-500">Saldo de Vacaciones</span>
+          <span className="block bg-blue-100 text-blue-500 text-lg font-semibold px-4 py-0.5 rounded-full">
+            {statistics?.vacationBalance || 0}
           </span>
         </div>
       </div>

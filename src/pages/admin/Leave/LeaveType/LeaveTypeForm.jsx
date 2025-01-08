@@ -210,8 +210,6 @@ const LeaveTypeForm = ({
     const handleSubmit = async (e) => {
         e.preventDefault();
     
-        console.log("Formulario enviado con datos iniciales:", formData);
-    
         const nameError = validateNames(name);
         const descriptionError = validateDescripcion(description);
     
@@ -226,14 +224,6 @@ const LeaveTypeForm = ({
         }
     
         if (!name || !description || !advance_notice_days || !time_unit || !max_duration || !icon) {
-            console.log("Validaciones fallaron. Campos requeridos faltantes:", {
-                name,
-                description,
-                advance_notice_days,
-                time_unit,
-                max_duration,
-                icon,
-            });
             setErrors({
                 name: !name ? NAME_REQUIRED : "",
                 description: !description ? DESCRIPTION_REQUIRED : "",
@@ -247,16 +237,13 @@ const LeaveTypeForm = ({
             return;
         }
     
-        console.log("Formulario válido, enviando al componente padre:", formData);
     
         if (typeof onSubmit === "function") {
             onSubmit({
                 ...formData,
                 requires_document: requires_document || "No",
             });
-        } else {
-            console.error("Error: onSubmit no es una función válida.");
-        }
+        } 
     };
     
 
