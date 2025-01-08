@@ -8,14 +8,38 @@ const CardConfigurable = ({ config, onSave, relatedConfigValue, translatedKey, s
   const [maxError, setMaxError] = useState('');
 
   // Definir timeFields fuera de useEffect para que esté disponible en todo el componente
-  const timeFields = ['max_weekly_hours', 'min_weekly_hours', 'max_daily_hours', 'min_daily_hours'];
+  const timeFields = ['max_weekly_hours', 'min_weekly_hours', 'max_daily_hours', 'min_daily_hours', 'min_break_duration', 'max_break_duration', 'min_daily_work', 'max_daily_work', 'min_daily_break', 'max_daily_break'];
+
+  const numberFields = [
+    'overtime_min_hours',
+    'overtime_max_hours',
+    'holiday_min_hours',
+    'holiday_max_hours',
+    'rest_day_min_hours',
+    'rest_day_max_hours',
+    'max_consecutive_hours',
+    'min_consecutive_hours',
+    'weekly_hours_min',
+    'weekly_hours_max',
+    'min_daily_work',
+    'max_daily_work',
+    'min_daily_break',
+    'max_daily_break',
+  ];
+
 
   useEffect(() => {
     const validateValues = () => {
       let validationMinError = '';
       let validationMaxError = '';
 
-      if (timeFields.includes(config.key)) {
+      if (numberFields.includes(config.key)) {
+        // Validación específica para campos numéricos
+        const numericValue = parseInt(value, 10);
+        if (isNaN(numericValue) || numericValue <= 0) {
+          validationMinError = validationMaxError = 'El valor debe ser un número mayor que 0.';
+        }
+      } else if (timeFields.includes(config.key)) {      
         if (!/^\d{2,}:[0-5]\d$/.test(value)) {
           validationMinError = 'El valor debe estar en el formato HH:MM.';
         } else if (relatedConfigValue) {
@@ -90,7 +114,12 @@ const CardConfigurable = ({ config, onSave, relatedConfigValue, translatedKey, s
   };
 
   // Verifica si el campo actual debe manejarse como texto en formato HH:MM o como número
-  const inputType = timeFields.includes(config.key) || config.key.includes('hours') ? 'text' : 'number';
+  const inputType = numberFields.includes(config.key)
+  ? 'number'
+  : timeFields.includes(config.key) || config.key.includes('hours')
+  ? 'text'
+  : 'number';
+
 
   return (
     <li className="flex flex-col py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200 ease-in-out">

@@ -8,17 +8,52 @@ import LoadingIndicator from '../components/ui/LoadingIndicator'
 const keyTranslations = {
   'max_intentos': 'máximo_intentos',
   'tiempo_bloqueo': 'tiempo_bloqueo',
-  'max_duration_days': 'duracion_maxima_dias',
-  'max_duration_hours_min': 'duracion_minima_horas',
-  'max_duration_hours_max': 'duracion_maxima_horas',
+  'max_duration_days': 'dias_max',
+  'max_duration_hours_min': 'horas_min',
+  'max_duration_hours_max': 'horas_max',
   'advance_notice_days': 'dias_anticipacion',
-  'max_weekly_hours': 'horas_semanales_maximas',
-  'min_weekly_hours': 'horas_semanales_minimas',
-  'max_daily_hours': 'horas_diarias_maximas',
-  'min_daily_hours': 'horas_diarias_minimas',
+  'max_days_for_leave': 'dias_solicitud_max',
+
+  'max_weekly_hours': 'semanales_max',
+  'min_weekly_hours': 'semanales_min',
+  'max_daily_hours': 'diarias_max',
+  'min_daily_hours': 'diarias_min',
+
   'min_days_for_subrogation': 'dias_subrogacion',
+  'contract_renewal_days_limit': 'dias_renovacion',
+  'contract_min_days_to_terminate': 'dias_terminacion',
+  'weekly_hours_min': 'horas_min_semanales',
+  'weekly_hours_max': 'horas_max_semanales',
+  'overtime_min_hours': 'extras_min',
+  'overtime_max_hours': 'extras_max',
+  'holiday_min_hours': 'festivo_min',
+  'holiday_max_hours': 'festivo_max',
+  'rest_day_min_hours': 'descanso_min',
+  'rest_day_max_hours': 'descanso_max',
+  'max_consecutive_hours': 'consecutivas_max',
+  'min_consecutive_hours': 'consecutivas_min',
+  'min_break_duration': 'descanso_min',
+  'max_break_duration': 'descanso_max',
+  'min_daily_work': 'trabajo_diario_min',
+  'max_daily_work': 'trabajo_diario_max',
+  'min_daily_break': 'descanso_diario_min',
+  'max_daily_break': 'descanso_diario_max',
+
+
   // Puedes agregar más claves aquí si es necesario
 };
+
+
+const categoryOrder = [
+  'Sistema',
+  'Contratos',
+  'Trabajo',
+  'Horarios',
+  'Permisos',
+  'Subrogaciones',
+  'Trabajo Extra',
+];
+
 
 // Función para traducir las claves
 const translateKey = (key) => {
@@ -90,28 +125,30 @@ const Configurations = () => {
       {loading && <LoadingIndicator />}
       <div className="divide-y divide-gray-200 grid grid-cols-3 gap-4">
         {/* Iteramos sobre cada categoría y mostramos una card por cada una */}
-        {Object.keys(groupedConfigurations).map((category) => (
-          <div key={category} className="bg-white shadow-sm rounded-lg p-6 ">
-            <h2 className="text-xl font-semibold">{category}</h2>
-            <ul>
-              {groupedConfigurations[category].map(config => (
-                <CardConfigurable
-                  key={config.id}
-                  config={config} // Pasamos la config con su key original para las validaciones
-                  translatedKey={translateKey(config.key)} // Pasamos la clave traducida para mostrar
-                  onSave={handleSave}
-                  showAlert={showAlert}
-                  isEditing={isEditing}
-                  setIsEditing={setIsEditing}
-                  relatedConfigValue={configurations.find(c =>
-                    (config.key === 'max_duration_hours_min' && c.key === 'max_duration_hours_max') ||
-                    (config.key === 'max_duration_hours_max' && c.key === 'max_duration_hours_min')
-                  )?.value}
-                />
-              ))}
-            </ul>
-          </div>
-        ))}
+        {categoryOrder.map((category) => (
+          groupedConfigurations[category] && (
+            <div key={category} className="bg-white shadow-sm rounded-lg p-6 ">
+              <h2 className="text-xl font-semibold">{category}</h2>
+              <ul>
+                {groupedConfigurations[category].map(config => (
+                  <CardConfigurable
+                    key={config.id}
+                    config={config} // Pasamos la config con su key original para las validaciones
+                    translatedKey={translateKey(config.key)} // Pasamos la clave traducida para mostrar
+                    onSave={handleSave}
+                    showAlert={showAlert}
+                    isEditing={isEditing}
+                    setIsEditing={setIsEditing}
+                    relatedConfigValue={configurations.find(c =>
+                      (config.key === 'max_duration_hours_min' && c.key === 'max_duration_hours_max') ||
+                      (config.key === 'max_duration_hours_max' && c.key === 'max_duration_hours_min')
+                    )?.value}
+                  />
+                ))}
+              </ul>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
