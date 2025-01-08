@@ -395,7 +395,7 @@ const Sidebar = () => {
         </div>
 
         {/* Cerrar sesión */}
-        {/* <nav className="p-4">
+        <nav className="px-4 pb-4">
           <hr className="mb-4" />
           <button
             onClick={handleLogout}
@@ -404,7 +404,7 @@ const Sidebar = () => {
             <RiLogoutCircleRLine className="text-gray-800 text-xl group-hover:text-blue-700" />
             <span className="font-medium">Cerrar sesión</span>
           </button>
-        </nav> */}
+        </nav>
 
       </div>
       {/* Botón para mostrar/ocultar el menú */}

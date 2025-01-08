@@ -741,7 +741,7 @@ const Request = () => {
         <div className="flex space-x-4 mt-3">
           <div className="w-1/2">
             <Textarea
-              label="Razón"
+              label="Motivo"
               id="reason"
               placeholder="Ingrese el motivo de la solicitud"
               value={reason}

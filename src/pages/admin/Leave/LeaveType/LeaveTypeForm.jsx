@@ -39,21 +39,6 @@ const options = Object.keys(iconOptions).map(key => ({
     icon: React.createElement(iconOptions[key])
 }));
 
-const colorOptions = [
-    { value: '#FF0000', label: 'Rojo', color: '#FF0000' },
-    { value: '#00FF00', label: 'Verde', color: '#00FF00' },
-    { value: '#0000FF', label: 'Azul', color: '#0000FF' },
-    { value: '#FFFF00', label: 'Amarillo', color: '#FFFF00' },
-    { value: '#FFA500', label: 'Naranja', color: '#FFA500' },
-    { value: '#800080', label: 'Púrpura', color: '#800080' },
-    { value: '#FFC0CB', label: 'Rosa', color: '#FFC0CB' },
-    { value: '#A52A2A', label: 'Marrón', color: '#A52A2A' },
-    { value: '#808080', label: 'Gris', color: '#808080' },
-    { value: '#000000', label: 'Negro', color: '#000000' },
-    { value: '#FFFFFF', label: 'Blanco', color: '#FFFFFF' }
-];
-
-
 
 const NAME_REQUIRED = "Por favor, ingrese el nombre del tipo de permiso.";
 const DESCRIPTION_REQUIRED = "Por favor, ingrese la descripción del tipo de permiso.";
@@ -61,7 +46,6 @@ const ADVANCE_NOTICE_DAYS_REQUIRED = "Por favor, ingrese los días de anticipaci
 const TIME_UNIT_REQUIRED = "Por favor, seleccione la unidad de tiempo.";
 const MAX_DURATION_REQUIRED = "Por favor, ingrese la duración máxima.";
 const ICON_REQUIRED = "Por favor, seleccione un icono.";
-const COLOR_REQUIRED = "Por favor, seleccione un color.";
 
 const LeaveTypeForm = ({
     leaveType,
@@ -84,7 +68,7 @@ const LeaveTypeForm = ({
         requires_document: "",
         advance_notice_days: "",
         icon: "",
-        color: "",
+        deducts_from_vacation: 0,
     });
     const [errors, setErrors] = useState({
         name: "",
@@ -93,7 +77,7 @@ const LeaveTypeForm = ({
         time_unit: "",
         advance_notice_days: "",
         icon: "",
-        color: "",
+        deducts_from_vacation: "",
     });
 
     const [configurations, setConfigurations] = useState({});
@@ -118,7 +102,7 @@ const LeaveTypeForm = ({
                 time_unit: leaveType.time_unit,
                 advance_notice_days: leaveType.advance_notice_days,
                 icon: leaveType.icon,
-                color: leaveType.color,
+                deducts_from_vacation: leaveType.deducts_from_vacation ? 1 : 0,
             });
 
             setErrors({
@@ -129,7 +113,7 @@ const LeaveTypeForm = ({
                 requires_document: "",
                 advance_notice_days: "",
                 icon: "",
-                color: "",
+                deducts_from_vacation: "",
             });
         }
     }, [isEditing, leaveType]);
@@ -138,35 +122,34 @@ const LeaveTypeForm = ({
         const fetchConfigurations = async () => {
             try {
                 const response = await getConfigurations();
-                console.log("Respuesta completa de getConfigurations:", response);
-    
+
                 // Accede al array dentro de la propiedad data
                 const configArray = Array.isArray(response.data) ? response.data : [];
-                
+
                 const configData = {};
                 configArray.forEach(config => {
                     configData[config.key] = config.value;
                 });
-    
+
                 setConfigurations(configData);
             } catch (error) {
                 console.error("Error al cargar las configuraciones:", error);
             }
         };
-    
+
         fetchConfigurations();
     }, []);
-    
-    
+
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-    
+
         setFormData({
             ...formData,
             [name]: value,
         });
-    
+
         let error = "";
         if (value.trim() === "") {
             switch (name) {
@@ -188,9 +171,6 @@ const LeaveTypeForm = ({
                 case "icon":
                     error = ICON_REQUIRED;
                     break;
-                case "color":
-                    error = COLOR_REQUIRED;
-                    break;
                 default:
                     break;
             }
@@ -202,7 +182,7 @@ const LeaveTypeForm = ({
                 const totalMinutes = hours * 60 + minutes;
                 const minDuration = parseInt(configurations.max_duration_hours_min.split(":")[0]) * 60 + parseInt(configurations.max_duration_hours_min.split(":")[1]);
                 const maxDuration = parseInt(configurations.max_duration_hours_max.split(":")[0]) * 60 + parseInt(configurations.max_duration_hours_max.split(":")[1]);
-    
+
                 if (totalMinutes < minDuration || totalMinutes > maxDuration) {
                     error = `La duración máxima en horas debe estar entre ${configurations.max_duration_hours_min} y ${configurations.max_duration_hours_max}.`;
                 }
@@ -210,7 +190,7 @@ const LeaveTypeForm = ({
                 error = `Los días de anticipación deben estar entre 1 y ${configurations.advance_notice_days}.`;
             }
         }
-    
+
         setErrors({
             ...errors,
             [name]: error,
@@ -227,31 +207,16 @@ const LeaveTypeForm = ({
         });
     };
 
-    const formatColorOptionLabel = ({ value, label, color }) => (
-        <div className="flex items-center">
-            <span className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: color }}></span>
-            {label}
-        </div>
-    );
-
-    const handleColorChange = (selectedOption) => {
-        setFormData({
-            ...formData,
-            color: selectedOption ? selectedOption.value : "",
-        });
-        setErrors({
-            ...errors,
-            color: selectedOption ? "" : COLOR_REQUIRED,
-        });
-    };
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
+        console.log("Formulario enviado con datos iniciales:", formData);
+    
         const nameError = validateNames(name);
         const descriptionError = validateDescripcion(description);
+    
         if (nameError || descriptionError) {
+            console.log("Errores encontrados:", { nameError, descriptionError });
             setErrors({
                 ...errors,
                 name: nameError,
@@ -259,25 +224,41 @@ const LeaveTypeForm = ({
             });
             return;
         }
-
-        // Asignar un valor predeterminado para requires_document si está vacío
-        const requiresDocument = requires_document || "No";
-
-        if (!name || !description || !advance_notice_days || !time_unit || !max_duration || !icon || !color) {
+    
+        if (!name || !description || !advance_notice_days || !time_unit || !max_duration || !icon) {
+            console.log("Validaciones fallaron. Campos requeridos faltantes:", {
+                name,
+                description,
+                advance_notice_days,
+                time_unit,
+                max_duration,
+                icon,
+            });
             setErrors({
                 name: !name ? NAME_REQUIRED : "",
                 description: !description ? DESCRIPTION_REQUIRED : "",
-                advance_notice_days: !advance_notice_days ? ADVANCE_NOTICE_DAYS_REQUIRED : "",
+                advance_notice_days: !advance_notice_days
+                    ? ADVANCE_NOTICE_DAYS_REQUIRED
+                    : "",
                 time_unit: !time_unit ? TIME_UNIT_REQUIRED : "",
                 max_duration: !max_duration ? MAX_DURATION_REQUIRED : "",
                 icon: !icon ? ICON_REQUIRED : "",
-                color: !color ? COLOR_REQUIRED : "",
             });
             return;
         }
-
-        onSubmit({ ...formData, requires_document: requiresDocument });
+    
+        console.log("Formulario válido, enviando al componente padre:", formData);
+    
+        if (typeof onSubmit === "function") {
+            onSubmit({
+                ...formData,
+                requires_document: requires_document || "No",
+            });
+        } else {
+            console.error("Error: onSubmit no es una función válida.");
+        }
     };
+    
 
     return (
         <form onSubmit={handleSubmit}>
@@ -396,12 +377,36 @@ const LeaveTypeForm = ({
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div className="flex flex-col">
+                        <div className="flex gap-2">
+                            <input
+                                type="checkbox"
+                                id="deducts_from_vacation"
+                                name="deducts_from_vacation"
+                                checked={formData.deducts_from_vacation === 1}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        deducts_from_vacation: e.target.checked ? 1 : 0, // 1 = Sí, 0 = No
+                                    })
+                                }
+                                className="w-4 h-4 mt-1"
+                            />
+                            <label htmlFor="deducts_from_vacation" className="font-semibold">
+                                Deducible de vacaciones
+                            </label>
+                        </div>
+                        <span className="text-xs ps-6">Indica si el permiso deduce días de vacaciones.</span>
+                        {errors.deducts_from_vacation && (
+                            <span className="text-xs text-red-500 ps-6">{errors.deducts_from_vacation}</span>
+                        )}
+                    </div>
+                    <div className="flex flex-col">
                         <label className="mb-1 text-gray-800 font-semibold">Icono</label>
                         <Select
                             options={options}
                             value={options.find(option => option.value === icon)}
                             onChange={handleIconChange}
-                            className="border border-gray-300 rounded-lg p-2 w-full"
+                            className="border border-gray-300 rounded-lg p-2 w-full text-sm"
                             placeholder="Seleccione un icono"
                             menuPortalTarget={document.body}
                             styles={{
@@ -433,45 +438,7 @@ const LeaveTypeForm = ({
                             <span className="text-red-500 text-xs">{errors.icon}</span>
                         )}
                     </div>
-                    <div className="flex flex-col">
-                        <label className="mb-1 text-gray-800 font-semibold">Color reporte</label>
-                        <Select
-                            options={colorOptions}
-                            value={colorOptions.find(option => option.value === color)}
-                            onChange={handleColorChange}
-                            formatOptionLabel={formatColorOptionLabel}
-                            className="border border-gray-300 rounded-lg p-2 w-full"
-                            placeholder="Seleccione un color"
-                            menuPortalTarget={document.body}
-                            styles={{
-                                menuPortal: base => ({ ...base, zIndex: 9999 }),
-                                menu: base => ({ ...base, zIndex: 9999 }),
-                                menuList: base => ({
-                                    ...base,
-                                    maxHeight: 160,
-                                    overflowY: 'auto',
-                                }),
-                                control: base => ({
-                                    ...base,
-                                    overflow: 'visible'
-                                }),
-                                container: base => ({
-                                    ...base,
-                                    position: 'relative',
-                                    zIndex: 9999,
-                                }),
-                                dropdownIndicator: base => ({
-                                    ...base,
-                                    zIndex: 9999,
-                                }),
-                            }}
-                            menuPlacement="auto"
-                            menuPosition="fixed"
-                        />
-                        {errors.color && (
-                            <span className="text-red-500 text-xs">{errors.color}</span>
-                        )}
-                    </div>
+
                 </div>
             </div>
             <div className="flex items-center gap-x-2 mt-4">

@@ -104,6 +104,7 @@ const LeaveType = () => {
   const handleCloseModalForm = () => setIsOpenModalForm(false);
 
   const handleSubmit = async (formData) => {
+    console.log('formData', formData);
     try {
       if (isEditing && currentLeaveType) {
         const updatedLeaveTypeData = {

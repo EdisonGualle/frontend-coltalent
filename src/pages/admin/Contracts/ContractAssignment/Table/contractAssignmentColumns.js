@@ -31,19 +31,25 @@ export const contractAssignmentVisibleColumns = [
     {
         id: "status",
         label: "Estado",
-        order: 5,
+        order: 6,
     },
     {
         id: "employee.organization.position",
         label: "Cargo",
         autoWidth: true,
-        order: 6,
+        order: 7,
     },
     
 ];
 
 // Todas las columnas disponibles
 export const contractAssignmentGeneralColumns = [
+    {
+        id: "vacation_balance",
+        label: "Saldo de vacaciones",
+        autoWidth: true,
+        order: 4,
+    },
     {
         id: "termination_reason",
         label: "Motivo de terminación",
@@ -55,19 +61,19 @@ export const contractAssignmentGeneralColumns = [
                 label: "Detalles",
             },
         ],
-        order: 4,
+        order: 5,
     },
     {
         id: "employee.organization.unit",
         label: "Unidad",
         autoWidth: true,
-        order: 7,
+        order: 8,
     },
     {
         id: "employee.organization.direction",
         label: "Dirección",
         autoWidth: true,
-        order: 8,
+        order: 9,
     },
     ...contractAssignmentVisibleColumns,
 ];
