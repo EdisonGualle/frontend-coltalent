@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Input from "../../../../components/ui/Input";
 import Textarea from "../../../../components/ui/Textarea";
 import { validateDescripcion, validateNames } from "../../../../Utils/validationsV2";
+import { AiOutlineCheckCircle, AiOutlineInfoCircle } from "react-icons/ai";
 
 import { FaHouseDamage, FaUmbrellaBeach, FaBriefcaseMedical, FaHome, FaUserMd, FaUniversity, FaPlus, FaPlane, FaHospital, FaChild, FaGraduationCap, FaSuitcase, FaRegClock } from 'react-icons/fa';
 import { FaHandshakeAngle } from "react-icons/fa6";
@@ -46,6 +47,7 @@ const ADVANCE_NOTICE_DAYS_REQUIRED = "Por favor, ingrese los días de anticipaci
 const TIME_UNIT_REQUIRED = "Por favor, seleccione la unidad de tiempo.";
 const MAX_DURATION_REQUIRED = "Por favor, ingrese la duración máxima.";
 const ICON_REQUIRED = "Por favor, seleccione un icono.";
+const FLOW_TYPE_REQUIRED = "Por favor, seleccione un flujo de aprobación.";
 
 const LeaveTypeForm = ({
     leaveType,
@@ -69,6 +71,7 @@ const LeaveTypeForm = ({
         advance_notice_days: "",
         icon: "",
         deducts_from_vacation: 0,
+        flow_type: "",
     });
     const [errors, setErrors] = useState({
         name: "",
@@ -78,11 +81,13 @@ const LeaveTypeForm = ({
         advance_notice_days: "",
         icon: "",
         deducts_from_vacation: "",
+        flow_type: "",
     });
 
     const [configurations, setConfigurations] = useState({});
 
-    const { name, description, max_duration, time_unit, requires_document, advance_notice_days, icon, color } = formData;
+    const { name, description, max_duration, time_unit, requires_document, advance_notice_days, icon, flow_type } = formData;
+
 
     useEffect(() => {
         setErrors(formErrors);
@@ -103,6 +108,7 @@ const LeaveTypeForm = ({
                 advance_notice_days: leaveType.advance_notice_days,
                 icon: leaveType.icon,
                 deducts_from_vacation: leaveType.deducts_from_vacation ? 1 : 0,
+                flow_type: leaveType.flow_type || "completo",
             });
 
             setErrors({
@@ -114,6 +120,7 @@ const LeaveTypeForm = ({
                 advance_notice_days: "",
                 icon: "",
                 deducts_from_vacation: "",
+                flow_type: "",
             });
         }
     }, [isEditing, leaveType]);
@@ -171,6 +178,8 @@ const LeaveTypeForm = ({
                 case "icon":
                     error = ICON_REQUIRED;
                     break;
+                case "flow_type":
+                    error = FLOW_TYPE_REQUIRED;
                 default:
                     break;
             }
@@ -209,20 +218,20 @@ const LeaveTypeForm = ({
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         const nameError = validateNames(name);
         const descriptionError = validateDescripcion(description);
-    
+
         if (nameError || descriptionError) {
-            console.log("Errores encontrados:", { nameError, descriptionError });
             setErrors({
                 ...errors,
                 name: nameError,
                 description: descriptionError,
+                flow_type: !formData.flow_type ? FLOW_TYPE_REQUIRED : "",
             });
             return;
         }
-    
+
         if (!name || !description || !advance_notice_days || !time_unit || !max_duration || !icon) {
             setErrors({
                 name: !name ? NAME_REQUIRED : "",
@@ -233,19 +242,19 @@ const LeaveTypeForm = ({
                 time_unit: !time_unit ? TIME_UNIT_REQUIRED : "",
                 max_duration: !max_duration ? MAX_DURATION_REQUIRED : "",
                 icon: !icon ? ICON_REQUIRED : "",
+                flow_type: !formData.flow_type ? FLOW_TYPE_REQUIRED : "",
             });
             return;
         }
-    
-    
+
         if (typeof onSubmit === "function") {
             onSubmit({
                 ...formData,
                 requires_document: requires_document || "No",
             });
-        } 
+        }
     };
-    
+
 
     return (
         <form onSubmit={handleSubmit}>
@@ -425,6 +434,72 @@ const LeaveTypeForm = ({
                             <span className="text-red-500 text-xs">{errors.icon}</span>
                         )}
                     </div>
+                </div>
+
+
+                {/* Flujo de aprobación */}
+                <div>
+                    <h3 className="font-bold text-gray-900 mb-2">
+                        Flujo de aprobación
+                    </h3>
+
+                    {/* Jefe Inmediato Option */}
+                    <div className="mb-2">
+                        <label className="flex items-center space-x-3">
+                            <input
+                                type="checkbox"
+                                name="flow_type"
+                                value="inmediato"
+                                checked={formData.flow_type === 'inmediato'}
+                                onChange={handleChange}
+                                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="text-sm font-medium text-gray-700">
+                                Usar flujo de Jefe Inmediato
+                            </span>
+                        </label>
+                        {formData.flow_type === 'inmediato' && (
+                            <div className="mt-2 p-4 bg-blue-50  border border-blue-200 rounded-md">
+                                <div className="flex items-center">
+                                    <AiOutlineInfoCircle className="h-5 w-5 text-blue-400" />
+                                    <p className="ml-2 text-sm text-blue-700">
+                                        El flujo de aprobación seguirá la jerarquía organizacional automáticamente.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Flujo Completo Option */}
+                    <div className="mb-2">
+                        <label className="flex items-center space-x-3">
+                            <input
+                                type="checkbox"
+                                name="flow_type"
+                                value="completo"
+                                checked={formData.flow_type === 'completo'}
+                                onChange={handleChange}
+                                className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                            />
+                            <span className="text-sm font-medium text-gray-700">
+                                Usar flujo completo
+                            </span>
+                        </label>
+                        {formData.flow_type === 'completo' && (
+                            <div className="mt-2 p-4 bg-green-50 border border-green-200 rounded-md">
+                                <div className="flex items-center">
+                                    <AiOutlineCheckCircle className="h-5 w-5 text-green-400" />
+                                    <p className="ml-2 text-sm text-green-700">
+                                        El flujo de aprobación implicará la revisión de todos los niveles jerárquicos antes de la aprobación final.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {errors.flow_type && (
+                        <span className="text-red-500 text-xs">{errors.flow_type}</span>
+                    )}
 
                 </div>
             </div>

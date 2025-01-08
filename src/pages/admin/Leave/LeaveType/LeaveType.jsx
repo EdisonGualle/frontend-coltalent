@@ -117,6 +117,7 @@ const LeaveType = () => {
         showAlert('Registro actualizado correctamente', 'success');
         dispatch(fetchLeaveTypes());
       } else {
+        console.log('formData padre', formData);
         const resultAction = await dispatch(createNewLeaveType(formData));
         unwrapResult(resultAction);
         showAlert('Registro creado correctamente', 'success');
@@ -134,6 +135,7 @@ const LeaveType = () => {
         time_unit: errors.time_unit ? errors.time_unit[0] : '',
         requires_document: errors.requires_document ? errors.requires_document[0] : '',
         advance_notice_days: errors.advance_notice_days ? errors.advance_notice_days[0] : '',
+        flow_type: errors.flow_type ? errors.flow_type[0] : '',
       };
 
       if (Object.values(formErrors).some(Boolean)) {
