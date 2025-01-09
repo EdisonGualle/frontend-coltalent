@@ -62,7 +62,6 @@ const History = () => {
     }
   };
 
-  console.log(leaves)
   return (
     <div className='m-3'>
       <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0 bg-gray-100">
