@@ -13,16 +13,16 @@ export const getAuthorizationCellStyle = (columnId, value) => {
 
   if (columnId === 'state.name') {
     if (value === 'Pendiente') {
-      return 'text-xs font-semibold  bg-yellow-100 text-yellow-600 shadow-sm';
+      return 'text-xs px-2 font-semibold  bg-yellow-100 text-yellow-600 shadow-sm';
     }
     if (value === 'Aprobado') {
-      return 'text-xs font-semibold  bg-green-100 text-green-600 shadow-sm';
+      return 'text-xs px-2 font-semibold  bg-green-100 text-green-600 shadow-sm';
     }
     if (value === 'Rechazado') {
-      return 'text-xs font-semibold  bg-red-100 text-red-600 shadow-sm';
+      return 'text-xs px-2 font-semibold  bg-red-100 text-red-600 shadow-sm';
     }
     if (value === 'Corregir') {
-      return 'text-xs font-semibold  bg-orange-100 text-orange-600 shadow-sm';
+      return 'text-xs px-2 font-semibold  bg-orange-100 text-orange-600 shadow-sm';
     }
   }
 

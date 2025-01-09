@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { CardHeader, Typography } from "@material-tailwind/react";
-import LeaveTable from '../components/Table/LeaveTable';
 import historyColumns from './historyColumns';
 import { fetchLeaveHistory, setLeaveHistoryFilter, updateCache, clearCache } from '../../../../redux/Leave/leaveHistorySlince';
 import { getHistoryCellStyle } from './historyComumnStyles';
-import { RiEyeLine } from 'react-icons/ri';
 import PermissionDetailModal from '../Authorization/PermissionDetails/PermissionDetailModal';
 import LoadingIndicator from '../../../../components/ui/LoadingIndicator';
+import renderHistoryActions from './renderHistoryActions';
+import MotionWrapper from '../../../../components/ui/MotionWrapper';
+import LeaveTable from '../Table/LeaveTable';
 
 const History = () => {
   const { id: employeeId } = useParams(); // Obtener employeeId desde la ruta
@@ -41,16 +42,6 @@ const History = () => {
     setDetailModalData(leave); // Pasa el permiso seleccionado
     setIsDetailModalOpen(true); // Abre el modal
   };
-
-  // Definición de acciones para cada fila
-  const actions = [
-    {
-      label: 'Ver más',
-      icon: <RiEyeLine className="text-gray-600 h-4 w-4" />,
-      onClick: handleViewDetails, // Llama a la función con el permiso seleccionado
-      className: 'bg-gray-100 hover:bg-gray-200 cursor-pointer',
-    }
-  ];
 
   // Manejo de cierre del modal
   const closeDetailModal = () => {
@@ -113,27 +104,34 @@ const History = () => {
           ))}
         </div>
       </CardHeader>
-      {loading ? (
-        <LoadingIndicator />
-      ) : error ? (
-        <div>Error: {error}</div>
-      ) : (
-        <LeaveTable
-          key={currentFilter}
-          columns={columns}
-          getCellStyle={getHistoryCellStyle}
-          data={leaves} // Enviar datos de la tabla
-          actions={actions} // Enviar acciones con el permiso seleccionado
-          showActions={true}
-          showFilters={false}
-          showExport={false}
-          showAddNew={false}
-          showColumnOptions={false}
-        />
-      )}
+      <MotionWrapper keyProp={currentFilter}>
+        {loading ? (
+          <LoadingIndicator />
+        ) : error ? (
+          <div>Error: {error}</div>
+        ) : (
+          <LeaveTable
+            key={currentFilter}
+            columns={columns}
+            getCellStyle={getHistoryCellStyle}
+            data={leaves}
+            showActions={true}
+            showFilters={false}
+            showExport={false}
+            showAddNew={false}
+            showColumnOptions={false}
+            actions={(row) =>
+              renderHistoryActions({
+                row,
+                handleViewDetails
+              })
+            }
+          />
+        )}
+      </MotionWrapper>
       {isDetailModalOpen && (
         <PermissionDetailModal
-          data={detailModalData} // Pasa los datos seleccionados al modal
+          data={detailModalData}
           onClose={closeDetailModal}
         />
       )}

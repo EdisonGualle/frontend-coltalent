@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CardHeader, Typography } from "@material-tailwind/react";
-import { RiCheckLine, RiCloseLine, RiEyeLine } from 'react-icons/ri';
-import LeaveTable from '../components/Table/LeaveTable';
 import { getColumns } from './Table/getColumns';
 import { useAuth } from '../../../../hooks/useAuth';
 import { fetchAssignedLeaves, setAssignedLeaveFilter, updateCache, clearCache } from '../../../../redux/Leave/assignedLeavesSlice';
@@ -10,6 +8,9 @@ import { getAuthorizationCellStyle } from './Table/authorizationColumnsStyles';
 import ActionModal from './Table/ActionModal';
 import PermissionDetailModal from './PermissionDetails/PermissionDetailModal';
 import LoadingIndicator from '../../../../components/ui/LoadingIndicator';
+import renderAssignedLeavesActions from './Table/renderAssignedLeavesActions';
+import MotionWrapper from '../../../../components/ui/MotionWrapper';
+import LeaveTable from '../Table/LeaveTable';
 
 const AssignedLeaves = () => {
   const dispatch = useDispatch();
@@ -61,32 +62,6 @@ const AssignedLeaves = () => {
     });
   };
 
-  const actions = [
-    {
-      label: 'Ver más',
-      icon: <RiEyeLine className="text-gray-700 h-4 w-4" />,
-      onClick: handleViewDetails,
-      className: 'bg-gray-100 hover:bg-gray-200 cursor-pointer',
-    },
-    ...(currentFilter === 'pendientes'
-      ? [
-        {
-          label: 'Aprobar',
-          icon: <RiCheckLine className="text-green-600 h-4 w-4" />,
-          onClick: (leave) => handleActionClick(leave, 'Aprobar'),
-          className: 'bg-green-100 hover:bg-green-200 cursor-pointer',
-        },
-        {
-          label: 'Rechazar',
-          icon: <RiCloseLine className="text-red-600 h-4 w-4" />,
-          onClick: (leave) => handleActionClick(leave, 'Rechazar'),
-          className: 'bg-red-100 hover:bg-red-200 cursor-pointer',
-        },
-      ]
-      : []),
-  ];
-
-
   const handleFilterChange = (filter) => {
     setCurrentFilter(filter);
     setColumns(getColumns(user.role, filter)); // Actualiza las columnas cada vez que se cambia el filtro
@@ -127,8 +102,8 @@ const AssignedLeaves = () => {
               key={filter}
               onClick={() => handleFilterChange(filter)}
               className={`px-4 py-2 rounded-lg font-semibold text-sm sm:text-base transition-all duration-300 ease-in-out ${currentFilter === filter
-                  ? 'bg-secondary-600 text-white shadow-lg transform scale-105'
-                  : 'bg-gray-200 text-gray-800 hover:bg-gray-200 hover:shadow-md'
+                ? 'bg-secondary-600 text-white shadow-lg transform scale-105'
+                : 'bg-gray-200 text-gray-800 hover:bg-gray-200 hover:shadow-md'
                 } focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50`}
             >
               {(() => {
@@ -149,25 +124,33 @@ const AssignedLeaves = () => {
           ))}
         </div>
       </CardHeader>
-      {loading ? (
-        <LoadingIndicator />
-      ) : error ? (
-        <div>Error: {error}</div>
-      ) : (
-        <LeaveTable
-          key={currentFilter}
-          columns={columns}
-          getCellStyle={getAuthorizationCellStyle}
-          data={leaves}
-          actions={actions}
-          showActions={true}
-          showFilters={false}
-          showExport={false}
-          showAddNew={false}
-          showColumnOptions={false}
-          onDelete={null}
-        />
-      )}
+      <MotionWrapper keyProp={currentFilter}>
+        {loading ? (
+          <LoadingIndicator />
+        ) : error ? (
+          <div>Error: {error}</div>
+        ) : (
+          <LeaveTable
+            key={currentFilter}
+            columns={columns}
+            getCellStyle={getAuthorizationCellStyle}
+            data={leaves}
+            showActions={true}
+            showFilters={false}
+            showExport={false}
+            showAddNew={false}
+            showColumnOptions={false}
+            actions={(row) =>
+              renderAssignedLeavesActions({
+                row,
+                handleViewDetails,
+                handleActionClick,
+                currentFilter,
+              })
+            }
+          />
+        )}
+      </MotionWrapper>
       {isActionModalOpen && (
         <ActionModal
           action={actionModalAction}

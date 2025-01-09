@@ -16,7 +16,6 @@ const LeaveHeader = () => {
     }
   }, [dispatch, employeeId]);
 
-  console.log("statistics", statistics);
   return (
     <div className="flex bg-white items-center shadow-sm rounded-lg p-4">
       <FaRegClipboard className="text-2xl text-gray-500 mr-2" />
