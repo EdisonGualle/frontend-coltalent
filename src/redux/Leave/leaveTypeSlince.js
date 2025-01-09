@@ -82,9 +82,11 @@ export const leaveTypeSlice = createSlice({
     allLeaveTypes: [],
     leaveType: {},
     status: "idle",
+    fetchAllStatus: "idle", // Estado para obtener tipos de permisos incluyendo eliminados
     error: null,
     hasFetchedOnce: false,
     hasFetchedAll: false, // Control para evitar múltiples peticiones
+    hasFetchedAllIncludingDeleted: false, // Control para evitar múltiples peticione
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -181,18 +183,18 @@ export const leaveTypeSlice = createSlice({
         state.error = action.error.message;
       })
       .addCase(fetchAllLeaveTypesIncludingDeleted.pending, (state) => {
-        state.status = "loading";
+        state.fetchAllStatus = "loading";
       })
       .addCase(
-        fetchAllLeaveTypesIncludingDeleted.fulfilled,
-        (state, action) => {
-          state.status = "succeeded";
+        fetchAllLeaveTypesIncludingDeleted.fulfilled, (state, action) => {
+          state.fetchAllStatus = "succeeded";
           state.allLeaveTypes = action.payload;
-        }
-      )
+          state.hasFetchedAllIncludingDeleted = true;
+        })
       .addCase(fetchAllLeaveTypesIncludingDeleted.rejected, (state, action) => {
-        state.status = "failed";
+        state.fetchAllStatus = "failed";
         state.error = action.error.message;
+        state.hasFetchedAllIncludingDeleted = false;
       })
       .addCase(toggleOneLeaveTypeStatus.pending, (state) => {
         state.status = "loading";

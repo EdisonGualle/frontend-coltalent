@@ -2,8 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { CardHeader, Typography } from "@material-tailwind/react";
-import { RiEdit2Line, RiCheckboxCircleLine, RiCloseCircleLine } from 'react-icons/ri';
-import SchedulesTable from "../../Schedule/Table/SheduleTable";
+import { RiCheckboxCircleLine, RiCloseCircleLine } from 'react-icons/ri';
 import rejectionReasonColumns from './Table/rejectionReasonColumns';
 import Dialog2 from '../../../../components/ui/Dialog2';
 import { AlertContext } from '../../../../contexts/AlertContext';
@@ -18,20 +17,15 @@ import RejectionReasonForm from './RejectionReasonForm';
 import { getCellStyle } from './Table/getCellStyle';
 import LoadingIndicator from '../../../../components/ui/LoadingIndicator';
 import renderRejectionReasonActions from './Table/renderRejectionReasonActions';
+import LeaveTable from '../Table/LeaveTable';
+import MotionWrapper from '../../../../components/ui/MotionWrapper';
 
 const RejectionReason = () => {
   const dispatch = useDispatch();
   const { showAlert } = useContext(AlertContext);
-  const { status, hasFetchedOnce, allRejectionReasons } = useSelector((state) => state.rejectionReason);
-
-  const [data, setData] = useState([]);
-  const [isLoadingInitial, setIsLoadingInitial] = useState(true);
-  const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
+  const { fetchAllStatus, allRejectionReasons, hasFetchedAllIncludingDeleted } = useSelector((state) => state.rejectionReason);
   const [selectedReason, setSelectedReason] = useState(null);
   const [isOpenToggleDialog, setIsOpenToggleDialog] = useState(false);
-
-  // Estado para almacenar los IDs de los registros seleccionados para eliminar
-  const [selectedIds, setSelectedIds] = useState([]);
 
   // Estados para manejar el formulario modal de creación y edición
   const [isOpenModalForm, setIsOpenModalForm] = useState(false);
@@ -42,27 +36,10 @@ const RejectionReason = () => {
   const [currentRejectionReason, setCurrentRejectionReason] = useState(null);
 
   useEffect(() => {
-    if (!hasFetchedOnce) {
-      setIsLoadingInitial(true);
-      dispatch(fetchAllRejectionReasonsIncludingDeleted())
-        .then(unwrapResult)
-        .then(() => {
-          setIsLoadingInitial(false);
-        })
-        .catch(() => {
-          setIsLoadingInitial(false);
-        });
-    } else {
-      setIsLoadingInitial(false);
+    if (!hasFetchedAllIncludingDeleted) {
+      dispatch(fetchAllRejectionReasonsIncludingDeleted());
     }
-  }, [dispatch, hasFetchedOnce]);
-
-  // Actualizar los datos cuando se carguen
-  useEffect(() => {
-    if (status === 'succeeded') {
-      setData(allRejectionReasons);
-    }
-  }, [allRejectionReasons, status]);
+  }, [dispatch, hasFetchedAllIncludingDeleted]);
 
   // Funciones para manejar el formulario modal de creación y edición
   const handleOpenModalForm = () => {
@@ -88,13 +65,12 @@ const RejectionReason = () => {
         const { reason, leave_type_ids } = formData;
 
         const updatedRejectionReasonData = {
-            rejectionReasonId: currentRejectionReason.id,
-            updateRejectionReason: {
-                reason,
-                leave_type_ids, // Asegúrate de incluir los IDs aquí
-            },
+          rejectionReasonId: currentRejectionReason.id,
+          updateRejectionReason: {
+            reason,
+            leave_type_ids, // Asegúrate de incluir los IDs aquí
+          },
         };
-        console.log(updatedRejectionReasonData);
         const resultAction = await dispatch(updateOneRejectionReason(updatedRejectionReasonData));
         unwrapResult(resultAction);
         showAlert('Registro actualizado correctamente', 'success');
@@ -122,28 +98,6 @@ const RejectionReason = () => {
       }
     }
   };
-
-  // const handleCancelDelete = () => setIsOpenDialogDelete(false);
-  // const handleClickDelete = (ids) => {
-  //   setSelectedIds(ids);
-  //   setIsOpenDialogDelete(true);
-  // };
-
-  // const handleConfirmDelete = async () => {
-  //   try {
-  //     for (const rejectionReasonId of selectedIds) {
-  //       const resultAction = await dispatch(deleteOneRejectionReason(rejectionReasonId));
-  //       unwrapResult(resultAction);
-  //     }
-  //     setSelectedIds([]); // Limpiar los IDs seleccionados después de eliminar
-  //     dispatch(fetchAllRejectionReasonsIncludingDeleted());
-  //     showAlert(`Registro${selectedIds.length > 1 ? 's' : ''} eliminado${selectedIds.length > 1 ? 's' : ''} correctamente`, 'success');
-  //   } catch (error) {
-  //     showAlert('Ocurrió un error al intentar eliminar el registro', 'error');
-  //   } finally {
-  //     setIsOpenDialogDelete(false);
-  //   }
-  // };
 
   const handleEdit = (row) => {
     const rejectionReason = allRejectionReasons.find(reason => reason.id === row.id);
@@ -194,22 +148,6 @@ const RejectionReason = () => {
     }
   };
 
-  const renderActions = (row) => [
-    {
-      label: 'Editar',
-      icon: <RiEdit2Line className="text-green-700 h-4 w-4 " />,
-      onClick: () => handleEdit(row),
-      className: 'bg-green-100 hover:bg-green-200 cursor-pointer',
-    },
-    {
-      label: row.status === 'Activo' ? 'Desactivar' : 'Activar',
-      icon: row.status === 'Activo' ? <RiCloseCircleLine className="text-yellow-700 h-4 w-4 " /> : <RiCheckboxCircleLine className="text-green-700 h-4 w-4" />,
-      onClick: () => handleToggleClick(row),
-      className: row.status === 'Activo' ? 'bg-yellow-100 hover:bg-yellow-200 cursor-pointer' : 'bg-green-100 hover:bg-green-200 cursor-pointer',
-    }
-  ];
-
-
   return (
     <div>
       <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0 bg-gray-100 " >
@@ -225,15 +163,15 @@ const RejectionReason = () => {
         </div>
       </CardHeader>
 
-      <div className=''>
-        {isLoadingInitial && !allRejectionReasons.length ? (
+      <MotionWrapper keyProp="rejection-reasons-management">
+        {fetchAllStatus === 'loading' && allRejectionReasons.length === 0 ? (
           <LoadingIndicator />
         ) : (
           <div>
-            <SchedulesTable
+            <LeaveTable
               columns={rejectionReasonColumns}
               getCellStyle={getCellStyle}
-              data={data}
+              data={allRejectionReasons}
               showAddNew={true}
               showFilters={false}
               showColumnOptions={false}
@@ -247,52 +185,39 @@ const RejectionReason = () => {
                 })
               }
             />
-
           </div>
         )}
-        {/* <Dialog2
-          isOpen={isOpenDialogDelete}
-          setIsOpen={setIsOpenDialogDelete}
-          title={`¿Eliminar ${selectedIds.length > 1 ? 'los registros seleccionados' : 'el registro seleccionado'}?`}
-          description={`¿Estás seguro de que deseas eliminar ${selectedIds.length > 1 ? 'estos registros' : 'este registro'}? Esta acción es permanente y no se podrá deshacer.`}
-          confirmButtonText="Sí, eliminar"
-          cancelButtonText="Cancelar"
-          onCancel={handleCancelDelete}
-          onConfirm={handleConfirmDelete}
-          confirmButtonColor="bg-red-500"
-          cancelButtonColor="border-gray-400"
-        /> */}
+      </MotionWrapper>
 
-        <Dialog2
-          isOpen={isOpenToggleDialog}
-          setIsOpen={setIsOpenToggleDialog}
-          title={getToggleMessage(selectedReason?.status).title}
-          description={getToggleMessage(selectedReason?.status).description}
-          confirmButtonText={getToggleMessage(selectedReason?.status).confirmButtonText}
-          cancelButtonText="Cancelar"
-          onConfirm={handleConfirmToggle}
-          onCancel={handleCancelToggle}
-          confirmButtonColor={getToggleMessage(selectedReason?.status).confirmButtonColor}
-          cancelButtonColor="border-gray-400"
-          icon={getToggleMessage(selectedReason?.status).icon}
+      <Dialog2
+        isOpen={isOpenToggleDialog}
+        setIsOpen={setIsOpenToggleDialog}
+        title={getToggleMessage(selectedReason?.status).title}
+        description={getToggleMessage(selectedReason?.status).description}
+        confirmButtonText={getToggleMessage(selectedReason?.status).confirmButtonText}
+        cancelButtonText="Cancelar"
+        onConfirm={handleConfirmToggle}
+        onCancel={handleCancelToggle}
+        confirmButtonColor={getToggleMessage(selectedReason?.status).confirmButtonColor}
+        cancelButtonColor="border-gray-400"
+        icon={getToggleMessage(selectedReason?.status).icon}
+      />
+      
+      <ModalForm
+        isOpen={isOpenModalForm}
+        setIsOpen={setIsOpenModalForm}
+        title={isEditing ? 'Editar motivo de rechazo' : 'Agregar nuevo motivo de rechazo'}
+        icon={<TbMessageX className="w-6 h-6 flex items-center justify-center rounded-full text-blue-500" />}
+        maxWidth='max-w-2xl'
+      >
+        <RejectionReasonForm
+          rejectionReason={currentRejectionReason}
+          isEditing={isEditing}
+          onSubmit={handleSubmit}
+          onCancel={handleCloseModalForm}
+          formErrors={formErrors}
         />
-
-        <ModalForm
-          isOpen={isOpenModalForm}
-          setIsOpen={setIsOpenModalForm}
-          title={isEditing ? 'Editar motivo de rechazo' : 'Agregar nuevo motivo de rechazo'}
-          icon={<TbMessageX className="w-6 h-6 flex items-center justify-center rounded-full text-blue-500" />}
-          maxWidth='max-w-2xl'
-        >
-          <RejectionReasonForm
-            rejectionReason={currentRejectionReason}
-            isEditing={isEditing}
-            onSubmit={handleSubmit}
-            onCancel={handleCloseModalForm}
-            formErrors={formErrors}
-          />
-        </ModalForm>
-      </div>
+      </ModalForm>
     </div>
   );
 };

@@ -2,14 +2,12 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { CardHeader, Typography } from "@material-tailwind/react";
-import { RiEdit2Line, RiCheckboxCircleLine, RiCloseCircleLine } from 'react-icons/ri';
-import LeaveTable from '../components/Table/LeaveTable';
+import { RiCheckboxCircleLine, RiCloseCircleLine } from 'react-icons/ri';
 import leaveTypeColumns from './Table/leaveTypeColumns';
 import Dialog2 from '../../../../components/ui/Dialog2';
 import { AlertContext } from '../../../../contexts/AlertContext';
-import SkeletonTable from '../components/Table/SkeletonTable';
 import {
-  fetchLeaveTypes, deleteOneLeaveType,
+  fetchLeaveTypes,
   updateOneLeaveType, createNewLeaveType,
   fetchAllLeaveTypesIncludingDeleted, toggleOneLeaveTypeStatus
 } from '../../../../redux/Leave/leaveTypeSlince';
@@ -17,21 +15,17 @@ import LeaveTypeForm from './LeaveTypeForm';
 import ModalForm from '../../../../components/ui/ModalForm';
 import { FaClipboardList } from "react-icons/fa";
 import { getLeaveTypeCellStyle } from './Table/leaveTypeColumnStyles';
-
 import LoadingIndicator from '../../../../components/ui/LoadingIndicator';
+import LeaveTable from '../Table/LeaveTable';
+import renderLeaveTypeActions from './Table/renderLeaveTypeActions';
+import MotionWrapper from '../../../../components/ui/MotionWrapper';
 
 const LeaveType = () => {
   const dispatch = useDispatch();
   const { showAlert } = useContext(AlertContext);
-  const { status, hasFetchedOnce, allLeaveTypes } = useSelector((state) => state.leaveType);
-  const [data, setData] = useState([]);
-  const [isLoadingInitial, setIsLoadingInitial] = useState(true);
-  const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
+  const { fetchAllStatus, allLeaveTypes, hasFetchedAllIncludingDeleted } = useSelector((state) => state.leaveType);
   const [selectedReason, setSelectedReason] = useState(null);
   const [isOpenToggleDialog, setIsOpenToggleDialog] = useState(false);
-
-  // Estado para almacenar los IDs de los registros seleccionados para eliminar
-  const [selectedIds, setSelectedIds] = useState([]);
 
   // Estados para manejar el formulario modal de creación y edición
   const [isOpenModalForm, setIsOpenModalForm] = useState(false);
@@ -41,51 +35,13 @@ const LeaveType = () => {
   // Estados para almacenar los datos del tipo de permiso actualmente en edición
   const [currentLeaveType, setCurrentLeaveType] = useState(null);
 
+
   useEffect(() => {
-    if (!hasFetchedOnce) {  // Solo cargar datos si no se han cargado previamente
-      setIsLoadingInitial(true); // Asegúrate de iniciar la carga
-      dispatch(fetchAllLeaveTypesIncludingDeleted())
-        .then(unwrapResult)
-        .then(() => {
-          setIsLoadingInitial(false); // Desactivar la carga inicial después de cargar datos
-        })
-        .catch(error => {
-          setIsLoadingInitial(false); // Asegurarse de desactivar la carga en caso de error
-        });
-    } else {
-      setIsLoadingInitial(false); // Asegúrate de desactivar la carga si los datos ya están disponibles
+    if (!hasFetchedAllIncludingDeleted) {
+      dispatch(fetchAllLeaveTypesIncludingDeleted());
     }
-  }, [dispatch, hasFetchedOnce]);
+  }, [dispatch, hasFetchedAllIncludingDeleted]);
 
-
-  // Actualizar los datos cuando se carguen
-  useEffect(() => {
-    if (status === 'succeeded') {
-      setData(allLeaveTypes);
-    }
-  }, [allLeaveTypes, status]);
-
-  // const handleCancelDelete = () => setIsOpenDialogDelete(false);
-  // const handleClickDelete = (ids) => {
-  //   setSelectedIds(ids);
-  //   setIsOpenDialogDelete(true);
-  // };
-
-  // const handleConfirmDelete = async () => {
-  //   try {
-  //     for (const leaveTypeId of selectedIds) {
-  //       const resultAction = await dispatch(deleteOneLeaveType(leaveTypeId));
-  //       unwrapResult(resultAction);
-  //     }
-  //     setSelectedIds([]);
-  //     dispatch(fetchLeaveTypes());
-  //     showAlert(`Registro${selectedIds.length > 1 ? 's' : ''} eliminado${selectedIds.length > 1 ? 's' : ''} correctamente`, 'success');
-  //   } catch (error) {
-  //     showAlert('Ocurrió un error al intentar eliminar el registro', 'error');
-  //   } finally {
-  //     setIsOpenDialogDelete(false);
-  //   }
-  // };
 
   const handleOpenModalForm = () => {
     setIsEditing(false);
@@ -104,7 +60,6 @@ const LeaveType = () => {
   const handleCloseModalForm = () => setIsOpenModalForm(false);
 
   const handleSubmit = async (formData) => {
-    console.log('formData', formData);
     try {
       if (isEditing && currentLeaveType) {
         const updatedLeaveTypeData = {
@@ -117,7 +72,6 @@ const LeaveType = () => {
         showAlert('Registro actualizado correctamente', 'success');
         dispatch(fetchLeaveTypes());
       } else {
-        console.log('formData padre', formData);
         const resultAction = await dispatch(createNewLeaveType(formData));
         unwrapResult(resultAction);
         showAlert('Registro creado correctamente', 'success');
@@ -194,23 +148,6 @@ const LeaveType = () => {
     }
   };
 
-  const renderActions = (row) => [
-    {
-      label: 'Editar',
-      icon: <RiEdit2Line className="text-green-700 h-4 w-4" />,
-      onClick: () => handleEdit(row),
-      className: 'bg-green-100 hover:bg-green-200 cursor-pointer',
-    },
-    {
-      label: row.status === 'Activo' ? 'Desactivar' : 'Activar',
-      icon: row.status === 'Activo' ? <RiCloseCircleLine className="text-yellow-700 h-4 w-4" /> : <RiCheckboxCircleLine className="text-green-700 h-4 w-4" />,
-      onClick: () => handleToggleClick(row),
-      className: row.status === 'Activo' ? 'bg-yellow-100 hover:bg-yellow-200 cursor-pointer' : 'bg-green-100 hover:bg-green-200 cursor-pointer',
-    }
-  ];
-
-
-
   return (
     <div>
       <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0 bg-gray-100">
@@ -226,67 +163,59 @@ const LeaveType = () => {
         </div>
       </CardHeader>
 
-      <div className=''>
-        {isLoadingInitial && !allLeaveTypes.length ? (
-          <LoadingIndicator/>
+      <MotionWrapper keyProp="leave-type-management">
+        {fetchAllStatus === "loading" && allLeaveTypes.length === 0 ? (
+          <LoadingIndicator />
         ) : (
           <LeaveTable
             columns={leaveTypeColumns}
-            data={data}
             getCellStyle={getLeaveTypeCellStyle}
-            actions={renderActions}
-            onAddNew={handleOpenModalForm}
-            showFilters={false}
-            showExport={false}
+            data={allLeaveTypes}
             showAddNew={true}
+            showFilters={false}
             showColumnOptions={false}
+            onAddNew={handleOpenModalForm}
             showActions={true}
-            onDelete={null}
+            actions={(row) =>
+              renderLeaveTypeActions({
+                row,
+                onEdit: handleEdit, // Pasar la función de editar
+                onToggleStatus: () => handleToggleClick(row), // Pasar la función de toggle
+              })
+            }
           />
         )}
-        {/* <Dialog2
-            isOpen={isOpenDialogDelete}
-            setIsOpen={setIsOpenDialogDelete}
-            title={`¿Eliminar ${selectedIds.length > 1 ? 'los registros seleccionados' : 'el registro seleccionado'}?`}
-            description={`¿Estás seguro de que deseas eliminar ${selectedIds.length > 1 ? 'estos registros' : 'este registro'}? Esta acción es permanente y no se podrá deshacer.`}
-            confirmButtonText="Sí, eliminar"
-            cancelButtonText="Cancelar"
-            onCancel={handleCancelDelete}
-            onConfirm={handleConfirmDelete}
-            confirmButtonColor="bg-red-500"
-            cancelButtonColor="border-gray-400"
-          /> */}
+      </MotionWrapper>
 
-        <Dialog2
-          isOpen={isOpenToggleDialog}
-          setIsOpen={setIsOpenToggleDialog}
-          title={getToggleMessage(selectedReason?.status).title}
-          description={getToggleMessage(selectedReason?.status).description}
-          confirmButtonText={getToggleMessage(selectedReason?.status).confirmButtonText}
-          cancelButtonText="Cancelar"
-          onConfirm={handleConfirmToggle}
-          onCancel={handleCancelToggle}
-          confirmButtonColor={getToggleMessage(selectedReason?.status).confirmButtonColor}
-          cancelButtonColor="border-gray-400"
-          icon={getToggleMessage(selectedReason?.status).icon}
+      <Dialog2
+        isOpen={isOpenToggleDialog}
+        setIsOpen={setIsOpenToggleDialog}
+        title={getToggleMessage(selectedReason?.status).title}
+        description={getToggleMessage(selectedReason?.status).description}
+        confirmButtonText={getToggleMessage(selectedReason?.status).confirmButtonText}
+        cancelButtonText="Cancelar"
+        onConfirm={handleConfirmToggle}
+        onCancel={handleCancelToggle}
+        confirmButtonColor={getToggleMessage(selectedReason?.status).confirmButtonColor}
+        cancelButtonColor="border-gray-400"
+        icon={getToggleMessage(selectedReason?.status).icon}
+      />
+
+      <ModalForm
+        isOpen={isOpenModalForm}
+        setIsOpen={setIsOpenModalForm}
+        title={isEditing ? 'Editar tipo de permiso' : 'Agregar nuevo tipo de permiso'}
+        icon={<FaClipboardList className="w-6 h-6 flex items-center justify-center rounded-full text-blue-500" />}
+        maxWidth='max-w-lg'
+      >
+        <LeaveTypeForm
+          leaveType={currentLeaveType}
+          isEditing={isEditing}
+          onSubmit={handleSubmit}
+          onCancel={handleCloseModalForm}
+          formErrors={formErrors}
         />
-
-        <ModalForm
-          isOpen={isOpenModalForm}
-          setIsOpen={setIsOpenModalForm}
-          title={isEditing ? 'Editar tipo de permiso' : 'Agregar nuevo tipo de permiso'}
-          icon={<FaClipboardList className="w-6 h-6 flex items-center justify-center rounded-full text-blue-500" />}
-          maxWidth='max-w-lg'
-        >
-          <LeaveTypeForm
-            leaveType={currentLeaveType}
-            isEditing={isEditing}
-            onSubmit={handleSubmit}
-            onCancel={handleCloseModalForm}
-            formErrors={formErrors}
-          />
-        </ModalForm>
-      </div>
+      </ModalForm>
     </div>
   );
 };

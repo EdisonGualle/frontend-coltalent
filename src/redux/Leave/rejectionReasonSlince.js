@@ -85,8 +85,10 @@ export const rejectionReasonSlice = createSlice({
     allRejectionReasons: [],
     rejectionReason: {},
     status: "idle",
+    fetchAllStatus: "idle", // Estado para obtener razones de rechazo incluyendo eliminadas
     error: null,
     hasFetchedOnce: false,
+    hasFetchedAllIncludingDeleted: false, // Control para evitar múltiples peticione
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -183,22 +185,20 @@ export const rejectionReasonSlice = createSlice({
         state.error = action.error.message;
       })
       .addCase(fetchAllRejectionReasonsIncludingDeleted.pending, (state) => {
-        state.status = "loading";
+        state.fetchAllStatus = "loading";
       })
       .addCase(
-        fetchAllRejectionReasonsIncludingDeleted.fulfilled,
-        (state, action) => {
-          state.status = "succeeded";
+        fetchAllRejectionReasonsIncludingDeleted.fulfilled, (state, action) => {
+          state.fetchAllStatus = "succeeded";
           state.allRejectionReasons = action.payload;
-        }
-      )
+          state.hasFetchedAllIncludingDeleted = true;
+      })
       .addCase(
-        fetchAllRejectionReasonsIncludingDeleted.rejected,
-        (state, action) => {
-          state.status = "failed";
+        fetchAllRejectionReasonsIncludingDeleted.rejected,(state, action) => {
+          state.fetchAllStatus = "failed";
           state.error = action.error.message;
-        }
-      )
+          state.hasFetchedAllIncludingDeleted = false;
+      })
       .addCase(toggleOneRejectionReasonStatus.pending, (state) => {
         state.status = "loading";
       })
