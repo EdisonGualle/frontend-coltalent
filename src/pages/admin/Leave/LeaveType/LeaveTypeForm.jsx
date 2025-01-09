@@ -443,33 +443,6 @@ const LeaveTypeForm = ({
                         Flujo de aprobación
                     </h3>
 
-                    {/* Jefe Inmediato Option */}
-                    <div className="mb-2">
-                        <label className="flex items-center space-x-3">
-                            <input
-                                type="checkbox"
-                                name="flow_type"
-                                value="inmediato"
-                                checked={formData.flow_type === 'inmediato'}
-                                onChange={handleChange}
-                                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                            />
-                            <span className="text-sm font-medium text-gray-700">
-                                Usar flujo de Jefe Inmediato
-                            </span>
-                        </label>
-                        {formData.flow_type === 'inmediato' && (
-                            <div className="mt-2 p-4 bg-blue-50  border border-blue-200 rounded-md">
-                                <div className="flex items-center">
-                                    <AiOutlineInfoCircle className="h-5 w-5 text-blue-400" />
-                                    <p className="ml-2 text-sm text-blue-700">
-                                        El flujo de aprobación seguirá la jerarquía organizacional automáticamente.
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
                     {/* Flujo Completo Option */}
                     <div className="mb-2">
                         <label className="flex items-center space-x-3">
@@ -497,6 +470,32 @@ const LeaveTypeForm = ({
                         )}
                     </div>
 
+                    {/* Jefe Inmediato Option */}
+                    <div className="mb-2">
+                        <label className="flex items-center space-x-3">
+                            <input
+                                type="checkbox"
+                                name="flow_type"
+                                value="inmediato"
+                                checked={formData.flow_type === 'inmediato'}
+                                onChange={handleChange}
+                                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="text-sm font-medium text-gray-700">
+                                Usar flujo de Jefe Inmediato
+                            </span>
+                        </label>
+                        {formData.flow_type === 'inmediato' && (
+                            <div className="mt-2 p-4 bg-blue-50  border border-blue-200 rounded-md">
+                                <div className="flex items-center">
+                                    <AiOutlineInfoCircle className="h-5 w-5 text-blue-400" />
+                                    <p className="ml-2 text-sm text-blue-700">
+                                        El flujo de aprobación seguirá la jerarquía organizacional automáticamente.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                     {errors.flow_type && (
                         <span className="text-red-500 text-xs">{errors.flow_type}</span>
                     )}
