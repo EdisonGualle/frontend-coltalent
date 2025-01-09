@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CardHeader, Typography } from "@material-tailwind/react";
-import { getColumns } from './Table/getColumns';
+import { getColumns, getFilters } from './Table/getColumns';
 import { useAuth } from '../../../../hooks/useAuth';
 import { fetchAssignedLeaves, setAssignedLeaveFilter, updateCache, clearCache } from '../../../../redux/Leave/assignedLeavesSlice';
 import { getAuthorizationCellStyle } from './Table/authorizationColumnsStyles';
@@ -11,6 +11,7 @@ import LoadingIndicator from '../../../../components/ui/LoadingIndicator';
 import renderAssignedLeavesActions from './Table/renderAssignedLeavesActions';
 import MotionWrapper from '../../../../components/ui/MotionWrapper';
 import LeaveTable from '../Table/LeaveTable';
+import { generalColumns } from './Table/authorizationColumns';
 
 const AssignedLeaves = () => {
   const dispatch = useDispatch();
@@ -19,6 +20,9 @@ const AssignedLeaves = () => {
 
   const [currentFilter, setCurrentFilter] = useState('pendientes');
   const [columns, setColumns] = useState(getColumns(user.role, 'pendientes'));
+
+  const [filters, setFilters] = useState([]);
+
 
   // Estado para acciones del modal
   const [actionModalData, setActionModalData] = useState(null); // Datos del modal de acciones
@@ -40,6 +44,12 @@ const AssignedLeaves = () => {
   useEffect(() => {
     setColumns(getColumns(user.role, currentFilter));
   }, [currentFilter, user.role]);
+
+  useEffect(() => {
+    const newFilters = getFilters(user.role, currentFilter);
+    setFilters(newFilters);
+  }, [currentFilter, user.role]);
+
 
   const handleActionClick = (leave, action) => {
     setActionModalData(leave);
@@ -132,14 +142,15 @@ const AssignedLeaves = () => {
         ) : (
           <LeaveTable
             key={currentFilter}
+            allColumns={generalColumns}
             columns={columns}
             getCellStyle={getAuthorizationCellStyle}
             data={leaves}
             showActions={true}
-            showFilters={false}
+            showFilters={true}
             showExport={false}
             showAddNew={false}
-            showColumnOptions={false}
+            dynamicFilterColumns={filters}
             actions={(row) =>
               renderAssignedLeavesActions({
                 row,

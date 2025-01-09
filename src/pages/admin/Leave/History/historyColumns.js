@@ -1,6 +1,6 @@
 import { renderRequestedPeriod } from "../Authorization/Table/requestedPeriod";
 
-const historyColumns = {
+export const historyColumns = {
   pendientes: [
     { id: "created_at", label: "Fecha de solicitud", },
     { id: "leave_type.name", label: "Tipo de permiso" },
@@ -47,4 +47,13 @@ const historyColumns = {
   ],
 };
 
-export default historyColumns;
+export const commonFilters = [
+  { column: "leave_type.name", label: "Tipo de Permiso" },
+];
+
+export const historyFilters = {
+  pendientes: [...commonFilters],
+  aprobados: [...commonFilters],
+  rechazados: [...commonFilters],
+  historial: [...commonFilters],
+};

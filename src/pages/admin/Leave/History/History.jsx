@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { CardHeader, Typography } from "@material-tailwind/react";
-import historyColumns from './historyColumns';
+import {historyColumns, historyFilters} from './historyColumns';
 import { fetchLeaveHistory, setLeaveHistoryFilter, updateCache, clearCache } from '../../../../redux/Leave/leaveHistorySlince';
 import { getHistoryCellStyle } from './historyComumnStyles';
 import PermissionDetailModal from '../Authorization/PermissionDetails/PermissionDetailModal';
@@ -62,6 +62,7 @@ const History = () => {
     }
   };
 
+  console.log(leaves)
   return (
     <div className='m-3'>
       <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0 bg-gray-100">
@@ -116,7 +117,8 @@ const History = () => {
             getCellStyle={getHistoryCellStyle}
             data={leaves}
             showActions={true}
-            showFilters={false}
+            showFilters={true}
+            dynamicFilterColumns={historyFilters[currentFilter]}
             showExport={false}
             showAddNew={false}
             showColumnOptions={false}

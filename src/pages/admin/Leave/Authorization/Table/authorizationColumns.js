@@ -52,9 +52,46 @@ export const adminColumns = {
       autoWidth: true,
       render: renderRequestedPeriod, // Render personalizado
     },
-    { id: "state.name", label: "Estado" }, 
+    { id: "state.name", label: "Estado" },
   ],
 };
+
+export const generalColumns = [
+  {
+    id: "employee.position_name",
+    label: "Cargo",
+    autoWidth: true,
+  },
+  {
+    id: "employee.unit_name",
+    label: "Unidad",
+    autoWidth: true,
+  },
+  {
+    id: "employee.direction_name",
+    label: "Dirección",
+    autoWidth: true,
+  },
+];
+
+
+export const adminFilters = {
+  pendientes: [
+    { column: "leave_type.name", label: "Tipo de Permiso" }, // Solo el tipo de permiso
+  ],
+  aprobados: [
+    { column: "leave_type.name", label: "Tipo de Permiso" }, // Solo el tipo de permiso
+  ],
+  rechazados: [
+    { column: "leave_type.name", label: "Tipo de Permiso" }, // Solo el tipo de permiso
+  ],
+  historial: [
+    { column: "leave_type.name", label: "Tipo de Permiso" }, // Tipo de permiso
+    { column: "state.name", label: "Estado" },               // Estado
+  ],
+};
+
+
 
 export const jefeDireccionColumns = {
   pendientes: [
