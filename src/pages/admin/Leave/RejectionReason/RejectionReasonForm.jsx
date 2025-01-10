@@ -133,8 +133,6 @@ const RejectionReasonForm = ({
             leave_type_ids: selectedLeaveTypes,
         };
     
-        console.log(formattedData);
-    
         onSubmit(formattedData);
     };
     

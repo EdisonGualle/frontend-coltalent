@@ -226,7 +226,6 @@ const LeaveTable = ({
         const label = typeof col === "object" && col.label ? col.label : column;
 
         if (!column) {
-          console.error("Se detectó una columna inválida:", col);
           return null; // Ignorar columnas inválidas
         }
 

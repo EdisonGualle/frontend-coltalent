@@ -23,7 +23,7 @@ function UnitTable({ }) {
       try {
         await dispatch(fetchAllUnitsIncludingDeleted());
       } catch (error) {
-        console.error('Error fetching positions:', error);
+        throw error;
       } finally {
         setIsLoading(false);
       }

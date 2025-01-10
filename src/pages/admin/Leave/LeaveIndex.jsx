@@ -37,7 +37,6 @@ const LeaveIndex = () => {
           setIsValidId(false);
         }
       } catch (error) {
-        console.error("Error fetching employee data:", error);
         setIsValidId(false);
       } finally {
         setLoading(false); // Finaliza la carga

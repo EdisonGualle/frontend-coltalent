@@ -23,7 +23,7 @@ function DepartamentTable() {
       try {
         await dispatch(fetchAllDepartmentsIncludingDeleted()).unwrap();
       } catch (error) {
-        console.error('Error fetching positions:', error);
+        throw error;
       } finally {
         setIsLoading(false);
       }

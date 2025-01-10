@@ -140,7 +140,7 @@ const LeaveTypeForm = ({
 
                 setConfigurations(configData);
             } catch (error) {
-                console.error("Error al cargar las configuraciones:", error);
+                throw new Error("No se pudieron cargar las configuraciones.");
             }
         };
 

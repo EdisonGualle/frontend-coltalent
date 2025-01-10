@@ -54,7 +54,6 @@ const FileViewer = ({ filename }) => {
         fileUrl={fileUrl}
         plugins={[defaultLayoutPluginInstance]}
         onDocumentLoadError={(error) => {
-          console.error('Error loading PDF:', error);
           setPdfError(error.message);
         }}
       />

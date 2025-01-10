@@ -291,22 +291,22 @@ const Request = () => {
 
     // Validar si `startTime` está dentro del horario laboral (incluyendo límites)
     if (startTime < workStartTime || startTime > workEndTime) {
-      newErrors.start_time = "La hora de inicio debe estar dentro del horario laboral.";
+      newErrors.start_time = `La hora de inicio debe estar dentro del horario laboral (${schedule.start_time} - ${schedule.end_time}).`;
     }
 
     // Validar si `endTime` está dentro del horario laboral (incluyendo límites)
     if (endTime < workStartTime || endTime > workEndTime) {
-      newErrors.end_time = "La hora de fin debe estar dentro del horario laboral.";
+      newErrors.end_time =  `La hora de fin debe estar dentro del horario laboral (${schedule.start_time} - ${schedule.end_time}).`;
     }
 
     // Validar si `startTime` cae en el horario de descanso
     if (startTime >= breakStartTime && startTime < breakEndTime) {
-      newErrors.start_time = "La hora de inicio no puede estar dentro del horario de descanso.";
+      newErrors.start_time = `La hora de inicio no puede estar dentro del horario de descanso (${schedule.break_start_time} - ${schedule.break_end_time}).`;
     }
 
     // Validar si `endTime` cae en el horario de descanso
     if (endTime > breakStartTime && endTime <= breakEndTime) {
-      newErrors.end_time = "La hora de fin no puede estar dentro del horario de descanso.";
+      newErrors.end_time = `La hora de fin no puede estar dentro del horario de descanso (${schedule.break_start_time} - ${schedule.break_end_time}).`;
     }
 
     // Validar que `endTime` sea mayor que `startTime`
@@ -546,8 +546,6 @@ const Request = () => {
         setTimeUnit('Horas');
         showAlert('Solicitud creada correctamente', 'success', 3000);
       } catch (error) {
-        console.error('Error al enviar la solicitud:', error);
-
         const errorMsg = JSON.parse(error.message);
         if (errorMsg.msg) showAlert(errorMsg.msg, 'error', 3000);
 

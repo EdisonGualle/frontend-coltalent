@@ -27,7 +27,6 @@ const PositionIndex = () => {
   const handleClose = () => setIsOpen(false);
 
   const handleSubmit = async (positionData) => {
-    console.log("Datos recibidos en handleSubmit de PositionIndex:", positionData);
     try {
       const actionResult = await dispatch(createNewPosition(positionData));
       unwrapResult(actionResult);
