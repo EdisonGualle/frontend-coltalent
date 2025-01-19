@@ -26,9 +26,9 @@ const PermissionDetailModal = ({ data, onClose }) => {
   } = data;
 
   const fileUrl = attachment
-    ? `${import.meta.env.VITE_WEB_BASE_URL}/show/${attachment}`
-    : null;
-
+  ? `${import.meta.env.VITE_SHOW_FILE_URL}/show/${attachment}`
+  : null;
+  
   const fileName = attachment ? attachment.split('/').pop() : null;
 
   const permissionTypeColor =

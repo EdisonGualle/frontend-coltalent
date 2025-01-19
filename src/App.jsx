@@ -147,9 +147,6 @@ function App() {
                   {/* Otro componente  */}
                   <Route path="/prueba-calendario" element={<AnotherComponent />} />
 
-                  {/* Asistencia */}
-
-
                 </Route>
               </Route>
               {/* Ruta para manejar acceso no autorizado */}
