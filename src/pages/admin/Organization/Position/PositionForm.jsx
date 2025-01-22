@@ -14,6 +14,8 @@ const FUNCTION_DESCRIPTION_REQUIRED = "Proporciona una descripción de la funci�
 const UNIT_REQUIRED = "Selecciona una unidad.";
 const DIRECTION_REQUIRED = "Selecciona una dirección.";
 const UNIT_OR_DIRECTION_REQUIRED = "Debe seleccionar una unidad o una dirección.";
+const RESPONSIBILITY_REQUIRED = "Debe asignar al menos una responsabilidad al cargo.";
+
 
 const PositionForm = ({
     position,
@@ -194,6 +196,7 @@ const PositionForm = ({
             unit_id: selectedOption === "unit" && !selectedUnit ? UNIT_REQUIRED : "",
             direction_id: selectedOption === "direction" && !selectedDirection ? DIRECTION_REQUIRED : "",
             belongsTo: !selectedOption ? UNIT_OR_DIRECTION_REQUIRED : "",
+            responsibilities: responsibilities.length === 0 ? RESPONSIBILITY_REQUIRED : "",
         };
 
         setErrors(newErrors);
@@ -308,12 +311,12 @@ const PositionForm = ({
                     </>
                 )}
                 {errors.belongsTo && (
-                    <div className="text-red-500 text-sm mt-2">
+                    <div className="text-red-500 text-xs mt-0">
                         {errors.belongsTo}
                     </div>
                 )}
                 {errors.is_manager && (
-                    <div className="text-red-500 text-sm mt-2">
+                    <div className="text-red-500 text-xs mt-0">
                         {errors.is_manager}
                     </div>
                 )}
@@ -326,16 +329,26 @@ const PositionForm = ({
             >
                 Gestionar responsabilidades
             </button>
+            {errors.responsibilities && (
+                <div className="text-red-500 text-xs mt-2">
+                    {errors.responsibilities}
+                </div>
+            )}
+
 
 
             {isResponsibilitiesModalOpen && (
                 <ResponsibilitiesModal
                     responsibilities={responsibilities}
                     onSave={(updatedResponsibilities) => {
-                        setResponsibilities(updatedResponsibilities); 
+                        setResponsibilities(updatedResponsibilities);
+                        setErrors((prevErrors) => ({
+                            ...prevErrors,
+                            responsibilities: updatedResponsibilities.length === 0 ? RESPONSIBILITY_REQUIRED : "",
+                        }));
                         setIsResponsibilitiesModalOpen(false);
                     }}
-                    onClose={() => setIsResponsibilitiesModalOpen(false)} 
+                    onClose={() => setIsResponsibilitiesModalOpen(false)}
                 />
             )}
 

@@ -50,6 +50,22 @@ const Request = () => {
   const [employeeCalendar, setEmployeeCalendar] = useState([]);
 
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!startDate) newErrors.start_date = 'La fecha de inicio es requerida.';
+    if (!endDate && timeUnit === 'Días') newErrors.end_date = 'La fecha de fin es requerida.';
+    if (!startTime && timeUnit === 'Horas') newErrors.start_time = 'La hora de inicio es requerida.';
+    if (!endTime && timeUnit === 'Horas') newErrors.end_time = 'La hora de fin es requerida.';
+    if (!reason) newErrors.reason = 'La razón es requerida.';
+    if (selectedLeave?.requires_document === "Si" && !attachment) {
+      newErrors.attachment = 'El documento es requerido.';
+    }
+
+    return newErrors;
+  };
+
+
   useEffect(() => {
     const fetchConfigurations = async () => {
       try {
@@ -103,6 +119,7 @@ const Request = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [panelRef]);
+
 
 
   const resetForm = () => {
@@ -296,7 +313,7 @@ const Request = () => {
 
     // Validar si `endTime` está dentro del horario laboral (incluyendo límites)
     if (endTime < workStartTime || endTime > workEndTime) {
-      newErrors.end_time =  `La hora de fin debe estar dentro del horario laboral (${schedule.start_time} - ${schedule.end_time}).`;
+      newErrors.end_time = `La hora de fin debe estar dentro del horario laboral (${schedule.start_time} - ${schedule.end_time}).`;
     }
 
     // Validar si `startTime` cae en el horario de descanso
@@ -501,16 +518,13 @@ const Request = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    let newErrors = {};
+    // Validaciones básicas centralizadas
+    const newErrors = validateForm();
 
-    // Validaciones básicas de campos requeridos
-    if (!startDate) newErrors.start_date = 'La fecha de inicio es requerida.';
-    if (!endDate && timeUnit === 'Días') newErrors.end_date = 'La fecha de fin es requerida.';
-    if (!startTime && timeUnit === 'Horas') newErrors.start_time = 'La hora de inicio es requerida.';
-    if (!endTime && timeUnit === 'Horas') newErrors.end_time = 'La hora de fin es requerida.';
-    if (!reason) newErrors.reason = 'La razón es requerida.';
-    if (selectedLeave?.requires_document === "Si" && !attachment) {
-      newErrors.attachment = 'El documento es requerido.';
+    // Si hay errores básicos, los asigna al estado y detiene el envío
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
     }
 
     // Convertir fechas al formato esperado (YYYY-MM-DD)

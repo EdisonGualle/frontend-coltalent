@@ -78,28 +78,68 @@ const workReferenceForm = ({
     // Función para manejar los cambios en los campos del formulario
     const handleChange = (e) => {
         const { name, value } = e.target;
-
-        if (name === 'name') {
-            const nameError = !value ? NAME_REQUIRED : "";
+    
+        if (name === "name") {
+            // Validar que el nombre tenga mínimo 2 palabras y máximo 4, sin caracteres especiales
+            const words = value.trim().split(/\s+/);
+            const hasSpecialCharacters = /[^a-zA-Z\s]/.test(value);
+    
+            let nameError = "";
+            if (!value) {
+                nameError = NAME_REQUIRED;
+            } else if (words.length < 2) {
+                nameError = "El nombre debe contener al menos 2 palabras.";
+            } else if (words.length > 4) {
+                nameError = "El nombre no puede contener más de 4 palabras.";
+            } else if (hasSpecialCharacters) {
+                nameError = "El nombre no puede contener caracteres especiales.";
+            }
+    
             setErrors((prevErrors) => ({ ...prevErrors, name: nameError }));
-        } else if (name === 'position') {
+        } else if (name === "position") {
             const positionError = !value ? POSITION_REQUIRED : "";
             setErrors((prevErrors) => ({ ...prevErrors, position: positionError }));
-        } else if (name === 'company_name') {
+        } else if (name === "company_name") {
             const companyNameError = !value ? COMPANY_NAME_REQUIRED : "";
             setErrors((prevErrors) => ({ ...prevErrors, company_name: companyNameError }));
-        } else if (name === 'contact_number') {
-            const contactNumberError = !value ? CONTACT_NUMBER_REQUIRED : "";
-            setErrors((prevErrors) => ({ ...prevErrors, contact_number: contactNumberError }));
-        } else if (name === 'relationship_type') {
-            const relationshipTypeError = !value ? RELATIONSHIP_TYPE_REQUIRED : "";
-            setErrors((prevErrors) => ({ ...prevErrors, relationship_type: relationshipTypeError }));
+        } else if (name === "contact_number") {
+            // Validar que el número tenga exactamente 10 dígitos y comience con 09 o 08
+            const isValidNumber = /^0[89]\d{8}$/.test(value);
+            let contactNumberError = "";
+    
+            if (!value) {
+                contactNumberError = CONTACT_NUMBER_REQUIRED;
+            } else if (!isValidNumber) {
+                contactNumberError =
+                    "El número debe tener 10 dígitos y comenzar con 09 o 08.";
+            }
+    
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                contact_number: contactNumberError,
+            }));
+        } else if (name === "relationship_type") {
+            // Validar que solo contenga letras y espacios
+            const isValidRelationshipType = /^[a-zA-Z\s]+$/.test(value);
+            let relationshipTypeError = "";
+    
+            if (!value) {
+                relationshipTypeError = RELATIONSHIP_TYPE_REQUIRED;
+            } else if (!isValidRelationshipType) {
+                relationshipTypeError = "El tipo de relación solo puede contener letras.";
+            }
+    
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                relationship_type: relationshipTypeError,
+            }));
         }
-
+    
         setFormData({ ...fromData, [name]: value });
-
     };
-
+    
+    
+    
     // Función para manejar el envío del formulario
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -212,7 +252,6 @@ const workReferenceForm = ({
 };
 
 export default workReferenceForm;
-
 
 
 

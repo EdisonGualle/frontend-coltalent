@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Input from "../../../../../components/ui/Input";
 import Textarea from "../../../../../components/ui/Textarea";
-
+import { FaRegClock } from "react-icons/fa";
+import { BsCalendarRange, BsCalendarPlus, BsSuitcaseLg, BsHourglassSplit } from "react-icons/bs";
 
 // Función para validar un campo individual
 const validateField = (name, value, formData) => {
@@ -159,6 +160,7 @@ const ContractTypeForm = ({
                     value={formData.max_duration_months}
                     onChange={handleChange}
                     error={errors.max_duration_months}
+                    icon={BsCalendarRange}
                 />
                 <Input
                     label="Horas de trabajo (semanales)"
@@ -169,6 +171,7 @@ const ContractTypeForm = ({
                     value={formData.weekly_hours}
                     onChange={handleChange}
                     error={errors.weekly_hours}
+                    icon={FaRegClock}
                 />
             </div>
 
@@ -183,6 +186,7 @@ const ContractTypeForm = ({
                     value={formData.vacation_days_per_year}
                     onChange={handleChange}
                     error={errors.vacation_days_per_year}
+                    icon={BsSuitcaseLg}
                 />
                 <Input
                     label="Antigüedad para vacaciones (meses)"
@@ -193,6 +197,7 @@ const ContractTypeForm = ({
                     value={formData.min_tenure_months_for_vacation}
                     onChange={handleChange}
                     error={errors.min_tenure_months_for_vacation}
+                    icon={BsHourglassSplit}
                 />
             </div>
 
@@ -207,6 +212,7 @@ const ContractTypeForm = ({
                     value={formData.max_vacation_days}
                     onChange={handleChange}
                     error={errors.max_vacation_days}
+                    icon={BsCalendarPlus}
                 />
                 <div className="flex flex-col">
                     <div className="flex gap-2">

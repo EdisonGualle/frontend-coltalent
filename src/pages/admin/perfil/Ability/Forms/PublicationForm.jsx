@@ -166,7 +166,7 @@ const PublicationForm = ({
                         options={publicationTypes}
                         value={selectPublicationType}
                         onChange={handlePublicationTypeChange}
-                        placeholder="Selecciona un tipo de publicación"
+                        placeholder="Seleccionar"
                         error={errors.publication_type_id}
                         isSearchable={true}
                         labelKey="name"
@@ -233,4 +233,3 @@ const PublicationForm = ({
 };
 
 export default PublicationForm;
-
