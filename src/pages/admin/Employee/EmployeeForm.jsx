@@ -278,7 +278,13 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
     const validationMethods = {
       'identification': isValidCI,
       'firstName': (val) => isValidName(val, 'nombre'),
-      'lastName': (val) => isValidName(val, 'apellido'),
+      'lastName': (val) => {
+        const words = val.trim().split(/\s+/);
+        if (words.length < 2) {
+            return 'Debe ingresar sus dos apellidos.';
+        }
+        return isValidName(val, 'apellido');
+    },
       'date_of_birth': isValidDateOfBirth,
       'ethnicity': isValidEthnicity,
       'nationality': isValidNationality,
@@ -316,6 +322,13 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
 
       newErrors['employee.position'] = isValidPosition(formData.position);
       newErrors['employee.position_id'] = isValidPosition(formData.position);
+
+       // Validación adicional para lastName
+       const lastNameWords = formData.lastName.trim().split(/\s+/);
+       if (lastNameWords.length < 2) {
+           newErrors['employee.lastName'] = 'Debe ingresar al menos dos apellidos.';
+       }
+       
 
       if (!selectedRole) {
         newErrors['user.role_id'] = 'Por favor, selecciona un rol.';

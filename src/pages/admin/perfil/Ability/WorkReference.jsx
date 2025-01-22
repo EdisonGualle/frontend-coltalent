@@ -182,7 +182,7 @@ const WorkReference = () => {
        <ModalForm
         isOpen={isOpenModalForm}
         setIsOpen={setIsOpenModalForm}
-        title={isEditing ? 'Editar experiencia laboral' : 'Agregar nueva experiencia laboral'}
+        title={isEditing ? 'Editar referencia laboral' : 'Agregar nueva referencia laboral'}
         icon={< LuFileBadge className="w-6 h-6 flex items-center justify-center rounded-full text-blue-500" />}
         maxWidth='max-w-2xl'
       >
