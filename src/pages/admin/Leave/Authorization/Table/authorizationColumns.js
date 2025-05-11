@@ -2,57 +2,61 @@ import { renderRequestedPeriod } from "./requestedPeriod";
 
 export const adminColumns = {
   pendientes: [
-    { id: "created_at", label: "Fecha de solicitud" },
-    { id: "employee.identification", label: "Cédula" },
-    { id: "employee.full_name", label: "Solicitante" },
-    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "created_at", label: "Fecha de solicitud",  exportable: true, },
+    { id: "employee.identification", label: "Cédula",  exportable: true, },
+    { id: "employee.full_name", label: "Solicitante",  exportable: true, },
+    { id: "leave_type.name", label: "Tipo de permiso",  exportable: true, },
     {
       id: "requested_period",
       label: "Fecha Solicitada",
       autoWidth: true,
-      render: renderRequestedPeriod, // Render personalizado
+      render: renderRequestedPeriod, // Render personalizado,
+      exportable: true,
     },
-    { id: "state.name", label: "Estado" },
+    { id: "state.name", label: "Estado",  exportable: true, },
   ],
   aprobados: [
-    { id: "created_at", label: "Fecha de solicitud" },
-    { id: "employee.identification", label: "Cédula" },
-    { id: "employee.full_name", label: "Solicitante" },
-    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "created_at", label: "Fecha de solicitud",  exportable: true, },
+    { id: "employee.identification", label: "Cédula",  exportable: true, },
+    { id: "employee.full_name", label: "Solicitante",  exportable: true, },
+    { id: "leave_type.name", label: "Tipo de permiso",  exportable: true, },
     {
       id: "requested_period",
       label: "Fecha Solicitada",
       autoWidth: true,
       render: renderRequestedPeriod, // Render personalizado
+      exportable: true,
     },
-    { id: "state.name", label: "Estado" },
+    { id: "state.name", label: "Estado",  exportable: true, },
   ],
   rechazados: [
-    { id: "created_at", label: "Fecha de solicitud", autoWidth: true },
-    { id: "employee.identification", label: "Cédula" },
-    { id: "employee.full_name", label: "Solicitante" },
-    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "created_at", label: "Fecha de solicitud", autoWidth: true,  exportable: true, },
+    { id: "employee.identification", label: "Cédula",  exportable: true, },
+    { id: "employee.full_name", label: "Solicitante",  exportable: true, },
+    { id: "leave_type.name", label: "Tipo de permiso",  exportable: true, },
     {
       id: "requested_period",
       label: "Fecha Solicitada",
       autoWidth: true,
       render: renderRequestedPeriod, // Render personalizado
+      exportable: true,
     },
-    { id: "state.name", label: "Estado" },
+    { id: "state.name", label: "Estado",  exportable: true, },
   ],
   historial: [
     // { id: "created_at", label: "Fecha de solicitud", autoWidth: true },
-    { id: "created_at", label: "Fecha de solicitud"},
-    { id: "employee.identification", label: "Cédula" },
-    { id: "employee.full_name", label: "Solicitante" },
-    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "created_at", label: "Fecha de solicitud",  exportable: true,},
+    { id: "employee.identification", label: "Cédula",  exportable: true, },
+    { id: "employee.full_name", label: "Solicitante",  exportable: true, },
+    { id: "leave_type.name", label: "Tipo de permiso",  exportable: true, },
     {
       id: "requested_period",
       label: "Fecha Solicitada",
       autoWidth: true,
       render: renderRequestedPeriod, // Render personalizado
+      exportable: true,
     },
-    { id: "state.name", label: "Estado" },
+    { id: "state.name", label: "Estado",  exportable: true, },
   ],
 };
 
@@ -61,16 +65,19 @@ export const generalColumns = [
     id: "employee.position_name",
     label: "Cargo",
     autoWidth: true,
+    exportable: true,
   },
   {
     id: "employee.unit_name",
     label: "Unidad",
     autoWidth: true,
+    exportable: true,
   },
   {
     id: "employee.direction_name",
     label: "Dirección",
     autoWidth: true,
+    exportable: true,
   },
 ];
 

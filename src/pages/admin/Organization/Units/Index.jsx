@@ -1,28 +1,33 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { RiAddLine } from "react-icons/ri";
 import { CardHeader, Typography, Button } from "@material-tailwind/react";
-import UnitTable from './Table/UnitTable';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalForm from '../../../../components/ui/ModalForm';
 import { AlertContext } from '../../../../contexts/AlertContext';
 import UnitForm from './UnitForm';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { createNewUnit, fetchAllUnitsIncludingDeleted } from '../../../../redux/Organization/UnitSlince';
+import { createNewUnit, fetchUnits} from '../../../../redux/Organization/UnitSlince';
 import { PiOfficeChairLight } from "react-icons/pi";
 import MotionWrapper from '../../../../components/ui/MotionWrapper';
+import Skeleton from '../../../../components/Table/Skeleton';
+import OptionsColumn from './Table/OptionsColumn';
+import OrganizationTable from '../components/OrganizationTable';
+import { unitColumnsFixed, unitColumnsVisible, unitColumnsGeneral, unitColumnsFilters } from './Table/UnitColumns';
+import getUnitColumnsStyles from './Table/unitColumnsStyles';
 
 const UnitIndex = () => {
   const dispatch = useDispatch();
-  const { status } = useSelector(state => state.unit);
+  const { fetchAllStatus, units, hasFetchedAll } = useSelector(state => state.unit);
   const [isOpen, setIsOpen] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const { showAlert } = useContext(AlertContext);
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchAllUnitsIncludingDeleted());
+    if (!hasFetchedAll) {
+      dispatch(fetchUnits());
     }
-  }, [status, dispatch]);
+  }, [dispatch, hasFetchedAll]);
+
 
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
@@ -76,7 +81,24 @@ const UnitIndex = () => {
 
       {/* Tabla */}
       <MotionWrapper keyProp="unit-table">
-        <UnitTable />
+        {fetchAllStatus === 'loading' && units.length === 0 ? (
+          <Skeleton />
+        ) : (
+          <OrganizationTable
+            allColumns={unitColumnsGeneral}
+            columns={[...unitColumnsFixed, ...unitColumnsVisible]}
+            fixedColumns={unitColumnsFixed}
+            getCellStyle={getUnitColumnsStyles}
+            data={units}
+            dynamicFilterColumns={unitColumnsFilters}
+            showFilters={false}
+            showAddNew={false}
+            showActions={true}
+            showColumnOptions={true}
+            actions={(row) => <OptionsColumn unit={row} />}
+          />
+        )}
+
       </MotionWrapper>
 
       {/* Modal para crear una nueva unidad */}

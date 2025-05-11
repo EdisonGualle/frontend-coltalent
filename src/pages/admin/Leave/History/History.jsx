@@ -10,6 +10,8 @@ import LoadingIndicator from '../../../../components/ui/LoadingIndicator';
 import renderHistoryActions from './renderHistoryActions';
 import MotionWrapper from '../../../../components/ui/MotionWrapper';
 import LeaveTable from '../Table/LeaveTable';
+import { exportToExcel } from "../../Subrogations/Table/exportToExcel";
+import { exportToPdf } from "../../Subrogations/Table/exportToPdf";
 
 const History = () => {
   const { id: employeeId } = useParams(); // Obtener employeeId desde la ruta
@@ -62,6 +64,30 @@ const History = () => {
     }
   };
 
+  const handleExport = (data, columns, options = {}) => {
+    const { filename = "historial_permisos", sheetName = "Historial de Permisos", format = "excel" } = options;
+  
+    // Generar un identificador único basado en la fecha y hora actual
+    const uniqueId = new Date().toISOString().replace(/[-T:.Z]/g, "");
+    const baseFilename = filename.replace(/\.(xlsx|pdf)$/, ""); // Eliminar extensión si existe
+    const uniqueFilename = `${baseFilename}_${uniqueId}`;
+  
+    // Manejar exportación según el formato
+    if (format === "excel") {
+      exportToExcel(data, columns, {
+        filename: `${uniqueFilename}.xlsx`,
+        sheetName,
+      });
+    } else if (format === "pdf") {
+      exportToPdf(data, columns, {
+        filename: `${uniqueFilename}.pdf`,
+        title: sheetName,
+        subtitle: "Historial de permisos de los empleados",
+      });
+    }
+  };
+
+  
   return (
     <div className='m-3'>
       <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0 bg-gray-100">
@@ -118,7 +144,7 @@ const History = () => {
             showActions={true}
             showFilters={true}
             dynamicFilterColumns={historyFilters[currentFilter]}
-            showExport={false}
+            showExport={true}
             showAddNew={false}
             showColumnOptions={false}
             actions={(row) =>
@@ -127,6 +153,14 @@ const History = () => {
                 handleViewDetails
               })
             }
+            exportFunction={(data, columns, format) =>
+              handleExport(data, columns, {
+                filename: "historial_permisos",
+                sheetName: "Historial de Permisos",
+                format,
+              })
+            }
+            exportAllColumns={false}
           />
         )}
       </MotionWrapper>

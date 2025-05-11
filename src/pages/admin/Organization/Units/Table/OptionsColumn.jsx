@@ -1,7 +1,11 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { RiEdit2Line, RiDeleteBin6Line, RiCheckboxCircleLine, RiCloseCircleLine } from 'react-icons/ri';
-import { deleteOneUnit, updateOneUnit, toggleOneUnitStatus } from '../../../../../redux/Organization/UnitSlince';
+import { Menu, MenuButton, MenuItem } from "@szhsin/react-menu";
+import { RiMore2Fill } from "react-icons/ri";
+import { AiOutlineDelete, AiOutlineCheck, AiOutlineEdit } from "react-icons/ai";
+
+import { RiEdit2Line, RiCheckboxCircleLine, RiCloseCircleLine } from 'react-icons/ri';
+import { updateOneUnit, toggleOneUnitStatus } from '../../../../../redux/Organization/UnitSlince';
 import Dialog2 from '../../../../../components/ui/Dialog2';
 import { AlertContext } from '../../../../../contexts/AlertContext';
 import { unwrapResult } from '@reduxjs/toolkit';
@@ -9,16 +13,16 @@ import ModalForm from '../../../../../components/ui/ModalForm';
 import UnitForm from '../UnitForm';
 import { fetchPositions } from '../../../../../redux/Organization/PositionSlice';
 
-const OptionsColumn = ({ unit, fetchUnits }) => {
+const OptionsColumn = ({ unit }) => {
   const dispatch = useDispatch();
   const { showAlert } = useContext(AlertContext);
-  const [isOpenDialog2, setIsOpenDialog2] = useState(false);
   const [isOpenEditModal, setIsOpenEditModal] = useState(false);
+
   const [formErrors, setFormErrors] = useState({});
 
   const [isOpenToggleDialog, setIsOpenToggleDialog] = useState(false);
-  const [toggleAction, setToggleAction] = useState(null);
-
+  const [isToggleStatus, setIsToggleStatus] = useState(false);
+  const [visibleStatus, setVisibleStatus] = useState(unit.status);
 
   // Efecto para limpiar los errores del formulario al cerrar el modal
   useEffect(() => {
@@ -58,7 +62,6 @@ const OptionsColumn = ({ unit, fetchUnits }) => {
       const actionResult = await dispatch(updateOneUnit(updatedData));
       // Desempaquetar el resultado de la acción
       unwrapResult(actionResult);
-      fetchUnits();
       dispatch(fetchPositions());
       showAlert('Unidad actualizada correctamente', 'success');
       setFormErrors({});
@@ -83,20 +86,6 @@ const OptionsColumn = ({ unit, fetchUnits }) => {
     }
   };
 
-  // Funcion para eliminar una unidad
-  // const handleDelete = async () => {
-  //   try {
-  //     // Despachar la acción para eliminar la unidad
-  //     const actionResult = await dispatch(deleteOneUnit(unit.id));
-  //     // Desempaquetar el resultado de la acción
-  //     unwrapResult(actionResult);
-  //     fetchUnits();
-  //     dispatch(fetchPositions());
-  //     showAlert('Unidad eliminada correctamente', 'success');
-  //   } catch (error) {
-  //     showAlert('Error al eliminar la unidad', 'error');
-  //   }
-  // };
 
   // Funciones para manejar la apertura y cierre del modal y actualizar la unidad
   const handleEditClick = () => setIsOpenEditModal(true);
@@ -106,83 +95,104 @@ const OptionsColumn = ({ unit, fetchUnits }) => {
     setIsOpenEditModal(false);
   };
 
-  // Funciones para manejar la apertura y cierre del dialogo y eliminar la unidad
-  // const handleCancel = () => setIsOpenDialog2(false);
+  // Función para alternar el estado de una unidad
+  const handleToggleStatus = async () => {
+    setIsToggleStatus(true);
+    try {
+      // Despachar la acción para alternar el estado de la unidad
+      await dispatch(toggleOneUnitStatus(unit.id)).then(unwrapResult);
+      // Desempaquetar el resultado de la acción
+      showAlert('Estado de la unidad actualizado correctamente', 'success');
+    } catch (error) {
+      showAlert('Error al actualizar el estado de la unidad.', 'error');
+    } finally {
+      setIsToggleStatus(false);
+    }
+  };
 
-  // const handleClick = async () => setIsOpenDialog2(true);
+  // Funciones para manejar la apertura y cierre del diálogo de activación/desactivación
+  const handleOpenToggleDialog = () => {
+    setVisibleStatus(unit.status);
+    setIsOpenToggleDialog(true);
+  };
+
   
-  // const handleConfirm = async () => {
-  //   await handleDelete();
-  //   setIsOpenDialog2(false);
-  // };
-
-    // Función para alternar el estado de una unidad
-    const handleToggleStatus = async () => {
-      try {
-        // Despachar la acción para alternar el estado de la unidad
-        const actionResult = await dispatch(toggleOneUnitStatus(unit.id));
-        // Desempaquetar el resultado de la acción
-        unwrapResult(actionResult);
-        fetchUnits();
-        showAlert('Estado de la unidad actualizado correctamente', 'success');
-      } catch (error) {
-        showAlert('Error al actualizar el estado de la unidad.', 'error');
-      }
-    };
-
-      // Funciones para manejar la apertura y cierre del diálogo de activación/desactivación
-  const handleOpenToggleDialog = () => setIsOpenToggleDialog(true);
   const handleConfirmToggle = async () => {
     await handleToggleStatus();
     setIsOpenToggleDialog(false);
   };
   const handleCancelToggle = () => setIsOpenToggleDialog(false);
 
-    // Función para personalizar el mensaje de confirmación
-    const getToggleMessage = (status) => {
-      if (status === 'Activo') {
-        return {
-          title: '¿Desactivar unidad?',
-          description: 'Desactivar esta unidad puede afectar a los empleados y procesos asociados. ¿Está seguro que desea continuar?',
-          confirmButtonText: 'Sí, desactivar unidad',
-          confirmButtonColor: 'bg-yellow-500',
-          icon: <RiCloseCircleLine className="w-10 h-10 flex items-center justify-center rounded-full text-yellow-500" />
-        };
-      } else {
-        return {
-          title: '¿Activar unidad?',
-          description: 'Activar esta unidad permitirá que los empleados y procesos asociados puedan utilizarla nuevamente. ¿Está seguro que desea continuar?',
-          confirmButtonText: 'Sí, activar unidad',
-          confirmButtonColor: 'bg-green-500',
-          icon: <RiCheckboxCircleLine className="w-10 h-10 flex items-center justify-center rounded-full text-green-500" />
-        };
-      }
-    };
+  // Función para personalizar el mensaje de confirmación
+  const getToggleMessage = (status) => {
+    if (status === 'Activo') {
+      return {
+        title: '¿Desactivar unidad?',
+        description: 'Desactivar esta unidad puede afectar a los empleados y procesos asociados. ¿Está seguro que desea continuar?',
+        confirmButtonText: 'Sí, desactivar unidad',
+        confirmButtonColor: 'bg-yellow-500',
+        icon: <RiCloseCircleLine className="w-10 h-10 flex items-center justify-center rounded-full text-yellow-500" />
+      };
+    } else {
+      return {
+        title: '¿Activar unidad?',
+        description: 'Activar esta unidad permitirá que los empleados y procesos asociados puedan utilizarla nuevamente. ¿Está seguro que desea continuar?',
+        confirmButtonText: 'Sí, activar unidad',
+        confirmButtonColor: 'bg-green-500',
+        icon: <RiCheckboxCircleLine className="w-10 h-10 flex items-center justify-center rounded-full text-green-500" />
+      };
+    }
+  };
 
-    const toggleMessage = getToggleMessage(unit.status);
+  const toggleMessage = getToggleMessage(visibleStatus);
 
-  
+
   return (
     <>
-      <div className="flex gap-2">
-        <button
-          onClick={handleEditClick}
-          className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-700 rounded-lg transition-colors hover:bg-gray-200">
-          <RiEdit2Line />
-        </button>
-        <button
-          onClick={handleOpenToggleDialog}
-          className={`flex items-center justify-center w-8 h-8 ${unit.status === 'Activo' ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' : 'bg-green-100 text-green-700 hover:bg-green-200'} rounded-lg transition-colors`}
-          title={unit.status === 'Activo' ? 'Desactivar' : 'Activar'}
-        >
-          {unit.status === 'Activo' ? <RiCloseCircleLine /> : <RiCheckboxCircleLine />}
-        </button>
-        {/* <button
-          onClick={handleClick}
-          className="flex items-center justify-center w-8 h-8 bg-red-100 text-red-600 rounded-lg transition-colors hover:bg-red-200">
-          <RiDeleteBin6Line />
-        </button> */}
-      </div>
+      <Menu
+        menuButton={
+          <MenuButton
+            className="flex items-center justify-center w-8 h-8 hover:bg-gray-200 rounded-lg transition-colors"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            <RiMore2Fill className="text-gray-600" />
+          </MenuButton>
+        }
+        align="end"
+        arrow
+        arrowClassName="bg-gray-200"
+        transition
+        menuClassName="bg-gray-200 p-1 rounded-lg shadow-sm"
+      >
+        <MenuItem className="p-0 hover:bg-transparent">
+          <button
+            onClick={() => handleEditClick()}
+            className="w-full rounded-lg transition-colors text-xs hover:bg-gray-50 flex items-center gap-2 p-2"
+          >
+            <AiOutlineEdit className="text-blue-500 text-sm" />
+            <span className="text-gray-800">Editar</span>
+          </button>
+        </MenuItem>
+        <MenuItem className="p-0 hover:bg-transparent">
+          <button
+            onClick={() => handleOpenToggleDialog()}
+            className="w-full rounded-lg transition-colors text-xs hover:bg-gray-50 flex items-center gap-2 p-2"
+          >
+            {unit.status === "Inactivo" ? (
+              <>
+                <AiOutlineCheck className="text-green-500 text-sm" />
+                <span className="text-gray-800">Activar</span>
+              </>
+            ) : (
+              <>
+                <AiOutlineDelete className="text-yellow-500 text-sm" />
+                <span className="text-gray-800">Desactivar</span>
+              </>
+            )}
+          </button>
+        </MenuItem>
+      </Menu>
 
       <Dialog2
         isOpen={isOpenToggleDialog}
@@ -196,24 +206,8 @@ const OptionsColumn = ({ unit, fetchUnits }) => {
         confirmButtonColor={toggleMessage.confirmButtonColor}
         cancelButtonColor="border-gray-400"
         icon={toggleMessage.icon}
+        isLoading={isToggleStatus}
       />
-
-      {/* Modal de eliminacion */}
-      {/* <Dialog2
-        isOpen={isOpenDialog2}
-        setIsOpen={setIsOpenDialog2}
-        title="¿Eliminar unidad?"
-        description="¿Estás seguro de que deseas eliminar esta unidad? Esta acción es permanente y no se podrá deshacer."
-        confirmButtonText="Sí, eliminar unidad"
-        cancelButtonText="Cancelar"
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
-        confirmButtonColor="bg-red-500"
-        cancelButtonColor="border-gray-400"
-        icon={
-          <RiDeleteBin6Line className="w-10 h-10 flex items-center justify-center rounded-full text-red-500" />
-        }
-      /> */}
 
       {/* Modal de edición */}
       <ModalForm

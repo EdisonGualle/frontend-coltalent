@@ -16,7 +16,7 @@ const selectUsersRef = selectUsers;
 
 // Componente para la columna de opciones de la tabla de usuarios
 const OptionsColumn = ({ user, updateUsers }) => {
- // Hook para despachar acciones
+  // Hook para despachar acciones
   const dispatch = useDispatch();
   // Inicializamos los estados locales
   const [users, setUsers] = useState([]);
@@ -59,7 +59,7 @@ const OptionsColumn = ({ user, updateUsers }) => {
     desactivar: async () => {
       try {
         await dispatch(disableUserAction(user.id)).unwrap();
-        updateUsers(); 
+        updateUsers();
         showAlert('Usuario desactivado correctamente', 'success');
       } catch (error) {
         showAlert(error.msg || 'Error al desactivar el usuario', 'error');
@@ -68,7 +68,7 @@ const OptionsColumn = ({ user, updateUsers }) => {
     activar: async () => {
       try {
         dispatch(enableUserAction(user.id));
-        updateUsers(); 
+        updateUsers();
         showAlert('Usuario activado correctamente', 'success');
       } catch (error) {
         showAlert('Error al activar el usuario', 'error');
@@ -77,7 +77,7 @@ const OptionsColumn = ({ user, updateUsers }) => {
     eliminar: async () => {
       try {
         dispatch(deleteUserAction(user.id));
-        updateUsers(); 
+        updateUsers();
         showAlert('Usuario eliminado correctamente', 'success');
       } catch (error) {
         showAlert('Error al eliminar el usuario', 'error');
@@ -91,7 +91,7 @@ const OptionsColumn = ({ user, updateUsers }) => {
         const updatedUser = { id: user.id, name, email, role_id, user_state_id, employee_id };
         await updateUser(updatedUser, user.id);
         showAlert('Usuario actualizado correctamente', 'success');
-        updateUsers(); 
+        updateUsers();
         setFormErrors({});
         setIsOpenEditModal(false);
       } catch (error) {
@@ -159,40 +159,35 @@ const OptionsColumn = ({ user, updateUsers }) => {
         transition
         menuClassName="bg-gray-300 p-1 rounded-lg shadow-lg"
       >
-        <div className=" scroll-editado overflow-y-auto h-[13vh]">
+        <div className=" scroll-editado overflow-y-auto h-auto">
           <MenuItem className="p-0 hover:bg-transparent" onClick={handleEditClick}>
             <button className="w-full rounded-lg transition-colors text-xs hover:bg-teal-50 flex items-center gap-x-2 p-2">
               <RiEdit2Line className="text-blue-500" />
               <span className="truncate">Editar</span>
             </button>
           </MenuItem>
-          <MenuItem
-            className="p-0 hover:bg-transparent"
-            onClick={() => handleActionClick('desactivar')}
-          >
-            <button className="w-full rounded-lg transition-colors text-xs hover:bg-teal-50 flex items-center gap-x-2 p-2">
-              <RiUserUnfollowLine className="text-yellow-500" />
-              <span className="truncate">Desactivar</span>
-            </button>
-          </MenuItem>
-          <MenuItem
-            className="p-0 hover:bg-transparent"
-            onClick={() => handleActionClick('activar')}
-          >
-            <button className="w-full rounded-lg transition-colors text-xs hover:bg-teal-50 flex items-center gap-x-2 p-2">
-              <VscActivateBreakpoints className="text-green-500" />
-              <span className="truncate">Activar</span>
-            </button>
-          </MenuItem>
-          {/* <MenuItem
-            className="p-0 hover:bg-transparent"
-            onClick={() => handleActionClick('eliminar')}
-          >
-            <button className="w-full rounded-lg transition-colors text-xs hover:bg-teal-50 flex items-center gap-x-2 p-2">
-              <RiDeleteBin6Line className="text-red-500" />
-              <span className="truncate">Eliminar</span>
-            </button>
-          </MenuItem> */}
+          {user.user_state.name === 'Activo' ? (
+            <MenuItem
+              className="p-0 hover:bg-transparent"
+              onClick={() => handleActionClick('desactivar')}
+            >
+              <button className="w-full rounded-lg transition-colors text-xs hover:bg-teal-50 flex items-center gap-x-2 p-2">
+                <RiUserUnfollowLine className="text-yellow-500" />
+                <span className="truncate">Desactivar</span>
+              </button>
+            </MenuItem>
+          ) : (
+            <MenuItem
+              className="p-0 hover:bg-transparent"
+              onClick={() => handleActionClick('activar')}
+            >
+              <button className="w-full rounded-lg transition-colors text-xs hover:bg-teal-50 flex items-center gap-x-2 p-2">
+                <VscActivateBreakpoints className="text-green-500" />
+                <span className="truncate">Activar</span>
+              </button>
+            </MenuItem>
+          )}
+
         </div>
       </Menu>
       <Dialog2

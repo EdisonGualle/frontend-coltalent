@@ -12,6 +12,9 @@ import renderAssignedLeavesActions from './Table/renderAssignedLeavesActions';
 import MotionWrapper from '../../../../components/ui/MotionWrapper';
 import LeaveTable from '../Table/LeaveTable';
 import { generalColumns } from './Table/authorizationColumns';
+import { exportToExcel } from "../../Subrogations/Table/exportToExcel";
+import { exportToPdf } from "../../Subrogations/Table/exportToPdf";
+
 
 const AssignedLeaves = () => {
   const dispatch = useDispatch();
@@ -34,12 +37,22 @@ const AssignedLeaves = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   useEffect(() => {
-    if (!cache[currentFilter]) {
-      dispatch(fetchAssignedLeaves({ employeeId: user.employee_id, filter: currentFilter }));
-    } else {
-      dispatch(setAssignedLeaveFilter(currentFilter));
-    }
-  }, [dispatch, user.employee_id, currentFilter, cache]);
+    // Siempre solicitar datos actualizados al cargar el componente
+    dispatch(fetchAssignedLeaves({ employeeId: user.employee_id, filter: currentFilter }))
+      .then((response) => {
+        // Opcional: actualizar el caché con los datos más recientes
+        dispatch(updateCache({ filter: currentFilter, data: response.payload.data }));
+      })
+      .catch((error) => {
+        console.error("Error al obtener permisos asignados:", error);
+
+        // Si falla, usar el caché como respaldo
+        if (cache[currentFilter]) {
+          dispatch(setAssignedLeaveFilter(currentFilter));
+        }
+      });
+  }, [dispatch, user.employee_id, currentFilter]);
+
 
   useEffect(() => {
     setColumns(getColumns(user.role, currentFilter));
@@ -68,6 +81,9 @@ const AssignedLeaves = () => {
     ['pendientes', 'aprobados', 'rechazados', 'historial'].forEach((filter) => {
       dispatch(fetchAssignedLeaves({ employeeId: user.employee_id, filter })).then((response) => {
         dispatch(updateCache({ filter, data: response.payload.data }));
+
+        // asegurarse de mostrar el filtro correcto después de la actualización
+        dispatch(setAssignedLeaveFilter(currentFilter));
       });
     });
   };
@@ -93,6 +109,30 @@ const AssignedLeaves = () => {
     setDetailModalData(null);
   };
 
+  const handleExport = (data, columns, options = {}) => {
+    const { filename = "permisos_asignados", sheetName = "Permisos", format = "excel" } = options;
+
+    // Generar un identificador único basado en la fecha y hora actual
+    const uniqueId = new Date().toISOString().replace(/[-T:.Z]/g, "");
+    const baseFilename = filename.replace(/\.(xlsx|pdf)$/, ""); // Eliminar extensión si existe
+    const uniqueFilename = `${baseFilename}_${uniqueId}`;
+
+    // Manejar exportación según el formato
+    if (format === "excel") {
+      exportToExcel(data, columns, {
+        filename: `${uniqueFilename}.xlsx`,
+        sheetName,
+      });
+    } else if (format === "pdf") {
+      exportToPdf(data, columns, {
+        filename: `${uniqueFilename}.pdf`,
+        title: sheetName,
+        subtitle: "Detalle de permisos asignados",
+      });
+    }
+  };
+
+
   return (
     <div>
       <CardHeader floated={false} shadow={false} className="rounded-none mt-0 mx-0 bg-gray-100 mb-2">
@@ -107,31 +147,36 @@ const AssignedLeaves = () => {
           </div>
         </div>
         <div className="flex flex-wrap justify-center gap-6 mb-2">
-          {['pendientes', 'aprobados', 'rechazados', 'historial'].map((filter) => (
-            <button
-              key={filter}
-              onClick={() => handleFilterChange(filter)}
-              className={`px-4 py-2 rounded-lg font-semibold text-sm sm:text-base transition-all duration-300 ease-in-out ${currentFilter === filter
-                ? 'bg-secondary-600 text-white shadow-lg transform scale-105'
-                : 'bg-gray-200 text-gray-800 hover:bg-gray-200 hover:shadow-md'
-                } focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50`}
-            >
-              {(() => {
-                switch (filter) {
-                  case 'pendientes':
-                    return 'Solicitudes Pendientes';
-                  case 'aprobados':
-                    return 'Solicitudes Aprobadas';
-                  case 'rechazados':
-                    return 'Solicitudes Rechazadas';
-                  case 'historial':
-                    return 'Historial de Solicitudes';
-                  default:
-                    return `Solicitudes ${filter.charAt(0).toUpperCase() + filter.slice(1)}`;
-                }
-              })()}
-            </button>
-          ))}
+{['pendientes', 'aprobados', 'rechazados', 'historial'].map((filter) => (
+  <button
+    key={filter}
+    disabled={loading}
+    onClick={() => !loading && handleFilterChange(filter)}
+    className={`
+      px-4 py-2 rounded-lg font-semibold text-sm sm:text-base 
+      transition-all duration-300 ease-in-out
+      ${currentFilter === filter
+        ? 'bg-secondary-600 text-white shadow-lg transform scale-105'
+        : `bg-gray-200 text-gray-800 hover:bg-gray-200 hover:shadow-md ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+    `}
+  >
+    {(() => {
+      switch (filter) {
+        case 'pendientes':
+          return 'Solicitudes Pendientes';
+        case 'aprobados':
+          return 'Solicitudes Aprobadas';
+        case 'rechazados':
+          return 'Solicitudes Rechazadas';
+        case 'historial':
+          return 'Historial de Solicitudes';
+        default:
+          return `Solicitudes ${filter.charAt(0).toUpperCase() + filter.slice(1)}`;
+      }
+    })()}
+  </button>
+))}
+
         </div>
       </CardHeader>
       <MotionWrapper keyProp={currentFilter}>
@@ -148,7 +193,7 @@ const AssignedLeaves = () => {
             data={leaves}
             showActions={true}
             showFilters={true}
-            showExport={false}
+            showExport={true}
             showAddNew={false}
             dynamicFilterColumns={filters}
             actions={(row) =>
@@ -157,6 +202,14 @@ const AssignedLeaves = () => {
                 handleViewDetails,
                 handleActionClick,
                 currentFilter,
+              })
+            }
+            exportAllColumns={false}
+            exportFunction={(data, columns, format) =>
+              handleExport(data, columns, {
+                filename: "permisos_asignados",
+                sheetName: "Permisos",
+                format,
               })
             }
           />

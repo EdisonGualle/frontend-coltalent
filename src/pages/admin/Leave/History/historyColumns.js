@@ -2,48 +2,52 @@ import { renderRequestedPeriod } from "../Authorization/Table/requestedPeriod";
 
 export const historyColumns = {
   pendientes: [
-    { id: "created_at", label: "Fecha de solicitud", },
-    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "created_at", label: "Fecha de solicitud", exportable: true,},
+    { id: "leave_type.name", label: "Tipo de permiso", exportable: true,},
     {
       id: "requested_period",
       label: "Fecha Solicitada",
       render: renderRequestedPeriod, 
+      exportable: true,
     },
     // { id: "duration", label: "Duración"},
-    { id: "state.name", label: "Estado" },
+    { id: "state.name", label: "Estado", exportable: true, },
   ],
   aprobados: [
-    { id: "created_at", label: "Fecha de solicitud",  },
-    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "created_at", label: "Fecha de solicitud", exportable: true, },
+    { id: "leave_type.name", label: "Tipo de permiso", exportable: true, },
     {
       id: "requested_period",
       label: "Fecha Solicitada",
-      render: renderRequestedPeriod, 
+      render: renderRequestedPeriod,
+      exportable: true,
     },
     // { id: "duration", label: "Duración"},
-    { id: "state.name", label: "Estado" },
+    { id: "state.name", label: "Estado", exportable: true, },
   ],
   rechazados: [
-    { id: "created_at", label: "Fecha de solicitud",  },
-    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "created_at", label: "Fecha de solicitud",exportable: true,  },
+    { id: "leave_type.name", label: "Tipo de permiso", exportable: true, },
     {
       id: "requested_period",
       label: "Fecha Solicitada",
       render: renderRequestedPeriod, 
+      exportable: true,
     },
     // { id: "duration", label: "Duración"},
-    { id: "state.name", label: "Estado" },
+    { id: "state.name", label: "Estado", exportable: true, },
   ],
   historial: [
-    { id: "created_at", label: "Fecha de solicitud",  },
-    { id: "leave_type.name", label: "Tipo de permiso" },
+    { id: "created_at", label: "Fecha de solicitud", exportable: true, },
+    { id: "leave_type.name", label: "Tipo de permiso", exportable: true, },
     {
       id: "requested_period",
       label: "Fecha Solicitada",
       render: renderRequestedPeriod, 
+      exportable: true,
     },
     // { id: "duration", label: "Duración"},
-    { id: "state.name", label: "Estado" },
+    { id: "state.name", label: "Estado", exportable: true, },
   ],
 };
 

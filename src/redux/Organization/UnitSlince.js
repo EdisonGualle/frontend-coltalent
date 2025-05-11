@@ -75,21 +75,25 @@ export const unitSlice = createSlice({
     allUnits: [],
     unit: {},
     status: "idle",
+    fetchAllStatus: "idle",
     error: null,
+    hasFetchedAll: false,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchUnits.pending, (state) => {
-        state.status = "loading";
+        state.fetchAllStatus = "loading";
       })
       .addCase(fetchUnits.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.fetchAllStatus = "succeeded";
         state.units = action.payload;
+        state.hasFetchedAll = true;
       })
       .addCase(fetchUnits.rejected, (state, action) => {
-        state.status = "failed";
+        state.fetchAllStatus = "failed";
         state.error = action.error.message;
+        state.hasFetchedAll = false;
       })
       .addCase(fetchUnit.pending, (state) => {
         state.status = "loading";
@@ -121,32 +125,12 @@ export const unitSlice = createSlice({
         state.status = "loading";
       })
       .addCase(updateOneUnit.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        const updatedUnit = action.payload;
-
-        // Actualizar en `units`
-        if (updatedUnit.status === "Activo") {
-          const index = state.units.findIndex(
-            (unit) => unit.id === updatedUnit.id
-          );
-          if (index !== -1) {
-            state.units[index] = updatedUnit;
-          } else {
-            state.units.push(updatedUnit);
-          }
-        } else {
-          state.units = state.units.filter(
-            (unit) => unit.id !== updatedUnit.id
-          );
+        const updatedUnit = action.payload.data; 
+        const index = state.units.findIndex((unit) => unit.id === updatedUnit.id);
+        if (index !== -1) {
+          state.units[index] = updatedUnit;
         }
-
-        // Actualizar en `allUnits`
-        const allIndex = state.allUnits.findIndex(
-          (unit) => unit.id === updatedUnit.id
-        );
-        if (allIndex !== -1) {
-          state.allUnits[allIndex] = updatedUnit;
-        }
+        state.status = "succeeded"; 
       })
       .addCase(updateOneUnit.rejected, (state, action) => {
         state.status = "failed";
@@ -182,30 +166,11 @@ export const unitSlice = createSlice({
         state.status = "loading";
       })
       .addCase(toggleOneUnitStatus.fulfilled, (state, action) => {
-        const updatedUnit = action.payload;
-
-        // Actualizar en `units` (solo si está activo)
-        const index = state.units.findIndex(
-          (unit) => unit.id === updatedUnit.id
-        );
-        if (index !== -1) {
-          if (updatedUnit.status === "Activo") {
-            state.units[index] = updatedUnit;
-          } else {
-            state.units.splice(index, 1); // Eliminar si se desactiva
-          }
-        } else if (updatedUnit.status === "Activo") {
-          state.units.push(updatedUnit); // Añadir si se activa
+        const updatedUnit = action.payload.data;
+        const index = state.units.findIndex((unit) => unit.id === updatedUnit.id);
+        if( index !== -1) {
+          state.units[index] = updatedUnit;
         }
-
-        // Actualizar en `allUnits`
-        const allIndex = state.allUnits.findIndex(
-          (unit) => unit.id === updatedUnit.id
-        );
-        if (allIndex !== -1) {
-          state.allUnits[allIndex] = updatedUnit;
-        }
-
         state.status = "succeeded";
       })
       .addCase(toggleOneUnitStatus.rejected, (state, action) => {

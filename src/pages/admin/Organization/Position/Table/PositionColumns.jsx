@@ -1,29 +1,63 @@
-import { SelectColumnFilter } from '../../../../../components/Table/SelectColumnFilter';
-import { StatusPill } from '../../../../../components/Table/StatusPill';
+export const positionColumnsFixed = [
+  {
+    id: 'name',
+    label: 'Nombre',
+    order: 1,
+  },
+  {
+    id: "function",
+    label: 'Función',
+    order: 2,
+  },
+  {
+    id: 'status',
+    label: 'Estado',
+    order: 6,
+  },
+];
 
-export const PositionColumns = [
+export const positionColumnsVisible = [
   {
-    Header: "Nombre",
-    accessor: 'name',
+    id: 'unit.name',
+    label: 'Unidad',
+    order: 3,
   },
   {
-    Header: "Función",
-    accessor: 'function',
+    id: 'direction.name',
+    label: 'Dirección',
+    order: 4,
+  },
+];
+
+export const positionColumnsGeneral = [
+  ...positionColumnsVisible,
+  {
+    id: "responsibilities",
+    label: "Responsabilidades",
+    showIcon: true,
+    modalTitle: "Responsabilidades",
+    modalConfig: [
+      {
+        key: "responsibilities",
+        label: "Lista",
+      },
+    ],
+    order: 5,
+    exportable: false,
+  },
+];
+
+export const positionColumnsFilters = [
+  {
+    id: 'unit.name',
+    label: 'Unidad',
   },
   {
-    Header: "Unidad",
-    accessor: 'unit.name',
-    Filter: SelectColumnFilter,  
+    id: 'direction.name',
+    label: 'Dirección',
   },
   {
-    Header: "Dirección",
-    accessor: 'direction.name',
-    Filter: SelectColumnFilter,  
-  },
-  {
-    Header: "Estado",
-    accessor: 'status',
-    Cell: StatusPill,
-    Filter: SelectColumnFilter,
+    id: 'status',
+    label: 'Estado',
   },
 ];

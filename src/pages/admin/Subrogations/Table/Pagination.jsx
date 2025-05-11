@@ -16,7 +16,7 @@ const Pagination = ({ currentPage, rowsPerPage, totalRows, onPageChange, onRowsP
         <select
           value={rowsPerPage}
           onChange={(e) => onRowsPerPageChange(Number(e.target.value))}
-          className="px-2 py-1 border rounded-md focus:outline-none focus:ring"
+          className="px-2 py-1 border rounded-md focus:outline-none focus:ring-1"
         >
           <option value={10}>10</option>
           <option value={25}>25</option>

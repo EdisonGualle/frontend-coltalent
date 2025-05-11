@@ -129,8 +129,8 @@ const Settings = () => {
 
     return (
         <div className="">
-            <CardHeader floated={false} shadow={false} className="rounded-none mt-0">
-                <div className="mb-2 flex items-center justify-between gap-8">
+            <CardHeader floated={false} shadow={false} className="rounded-none mt-0 bg-gray-100">
+                <div className=" mb-2 flex items-center justify-between gap-8">
                     <Typography variant="h5" color="blue-gray" className="font-semibold">
                         Configuración
                     </Typography>

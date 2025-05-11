@@ -1,22 +1,26 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { RiEdit2Line, RiDeleteBin6Line, RiCheckboxCircleLine, RiCloseCircleLine } from 'react-icons/ri';
-import { deleteOnePosition, updateOnePosition, toggleOnePositionStatus } from '../../../../../redux/Organization/PositionSlice';
+import { Menu, MenuButton, MenuItem } from "@szhsin/react-menu";
+import { RiMore2Fill } from "react-icons/ri";
+import { AiOutlineDelete, AiOutlineCheck, AiOutlineEdit } from "react-icons/ai";
+
+import { RiEdit2Line, RiCheckboxCircleLine, RiCloseCircleLine } from 'react-icons/ri';
+import { updateOnePosition, toggleOnePositionStatus } from '../../../../../redux/Organization/PositionSlice';
 import Dialog2 from '../../../../../components/ui/Dialog2';
 import { AlertContext } from '../../../../../contexts/AlertContext';
 import { unwrapResult } from '@reduxjs/toolkit';
 import ModalForm from '../../../../../components/ui/ModalForm';
 import PositionForm from '../PositionForm';
 
-const OptionsColumn = ({ position, fetchPositions }) => {
+const OptionsColumn = ({ position}) => {
   const dispatch = useDispatch();
   const { showAlert } = useContext(AlertContext);
-  const [isOpenDialog2, setIsOpenDialog2] = useState(false);
   const [isOpenEditModal, setIsOpenEditModal] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
   const [isOpenToggleDialog, setIsOpenToggleDialog] = useState(false);
-  const [toggleAction, setToggleAction] = useState(null);
+    const [isToggleStatus, setIsToggleStatus] = useState(false);
+    const [visibleStatus, setVisibleStatus] = useState(position.status);
 
   // Efecto para limpiar los errores del formulario al cerrar el modal
   useEffect(() => {
@@ -36,7 +40,7 @@ const OptionsColumn = ({ position, fetchPositions }) => {
   const handleUpdate = async (formData) => {
     try {
       // Obtener los datos del formulario
-      const { name, function: functionDescription, unit_id: unitId, direction_id: directionId, is_manager: isManager, responsibilities  } = formData;
+      const { name, function: functionDescription, unit_id: unitId, direction_id: directionId, is_manager: isManager, responsibilities } = formData;
 
       // Crear el objeto con los datos actualizados
       const data = {
@@ -58,7 +62,6 @@ const OptionsColumn = ({ position, fetchPositions }) => {
       const actionResult = await dispatch(updateOnePosition(updatedData));
       // Desempaquetar el resultado de la acción
       unwrapResult(actionResult);
-      fetchPositions();
       showAlert('Cargo actualizado correctamente', 'success');
       setFormErrors({});
       setIsOpenEditModal(false);
@@ -85,21 +88,6 @@ const OptionsColumn = ({ position, fetchPositions }) => {
     }
   };
 
-  // Función para eliminar una posición
-  // const handleDelete = async () => {
-  //   try {
-  //     // Despachar la acción para eliminar la posición
-  //     const actionResult = await dispatch(deleteOnePosition(position.id));
-  //     // Desempaquetar el resultado de la acción
-  //     unwrapResult(actionResult);
-  //     fetchPositions();
-  //     showAlert('Cargo eliminado correctamente', 'success');
-  //   } catch (error) {
-  //     console.log('Error deleting position:', error);
-  //     showAlert('Error al eliminar el cargo', 'error');
-  //   }
-  // }
-
   // Funciones para manejar la apertura y cierre del modal y actualizar la posición
   const handleEditClick = () => setIsOpenEditModal(true);
   const handleConfirmEdit = async (formData) => await handleUpdate(formData);
@@ -108,34 +96,31 @@ const OptionsColumn = ({ position, fetchPositions }) => {
     setIsOpenEditModal(false);
   };
 
-  // Funciones para manejar la apertura y cierre del dialogo y eliminar la unidad
-  // const handleCancel = () => setIsOpenDialog2(false);
-  // const handleClick = async () => setIsOpenDialog2(true);
-  // const handleConfirm = async () => {
-  //   await handleDelete();
-  //   setIsOpenDialog2(false);
-  // };
-
 
   // Función para activar/desactivar una posición
   const handleToggleStatus = async () => {
+    setIsToggleStatus(true);
     try {
       // Despachar la acción para activar/desactivar la posición
-      const actionResult = await dispatch(toggleOnePositionStatus(position.id));
+      await dispatch(toggleOnePositionStatus(position.id)).then(unwrapResult);
       // Desempaquetar el resultado de la acción
-      unwrapResult(actionResult);
-      fetchPositions();
       showAlert('Estado del cargo actualizado correctamente', 'success');
     } catch (error) {
       showAlert('Error al actualizar el estado del cargo.', 'error');
+    } finally {
+      setIsToggleStatus(false);
     }
   };
 
   // Funciones para manejar la apertura y cierre del diálogo de activación/desactivación
-  const handleOpenToggleDialog = () => setIsOpenToggleDialog(true);
+  const handleOpenToggleDialog = () => {
+    setVisibleStatus(position.status);
+    setIsOpenToggleDialog(true)
+  };
+
   const handleConfirmToggle = async () => {
-    setIsOpenToggleDialog(false);
     await handleToggleStatus();
+    setIsOpenToggleDialog(false);
   };
   const handleCancelToggle = () => setIsOpenToggleDialog(false);
 
@@ -162,48 +147,55 @@ const OptionsColumn = ({ position, fetchPositions }) => {
   };
 
 
-  const toggleMessage = getToggleMessage(position.status);
+  const toggleMessage = getToggleMessage(visibleStatus);
 
   return (
     <>
-      <div className="flex gap-2">
-        <button
-          onClick={handleEditClick}
-          className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-700 rounded-lg transition-colors hover:bg-gray-200"
-        >
-          <RiEdit2Line />
-        </button>
-        <button
-          onClick={handleOpenToggleDialog}
-          className={`flex items-center justify-center w-8 h-8 ${position.status === 'Activo' ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' : 'bg-green-100 text-green-700 hover:bg-green-200'} rounded-lg transition-colors`}
-          title={position.status === 'Activo' ? 'Desactivar' : 'Activar'}
-        >
-          {position.status === 'Activo' ? <RiCloseCircleLine /> : <RiCheckboxCircleLine />}
-        </button>
-        {/* <button
-          onClick={handleClick}
-          className="flex items-center justify-center w-8 h-8 bg-red-100 text-red-600 rounded-lg transition-colors hover:bg-red-200"
-        >
-          <RiDeleteBin6Line />
-        </button> */}
-      </div>
-
-      {/* Modal de eliminacion */}
-      {/* <Dialog2
-        isOpen={isOpenDialog2}
-        setIsOpen={setIsOpenDialog2}
-        title="¿Eliminar cargo?"
-        description={`¿Estás seguro de eliminar el cargo ${position.name}? Esta acción no se puede deshacer.`}
-        confirmButtonText="Sí, eliminar cargo"
-        cancelButtonText="Cancelar"
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
-        confirmButtonColor="bg-red-500"
-        cancelButtonColor="border-gray-400"
-        icon={
-          <RiDeleteBin6Line className="w-10 h-10 flex items-center justify-center rounded-full text-red-500" />
+      <Menu
+        menuButton={
+          <MenuButton
+            className="flex items-center justify-center w-8 h-8 hover:bg-gray-200 rounded-lg transition-colors"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            <RiMore2Fill className="text-gray-600" />
+          </MenuButton>
         }
-      /> */}
+        align="end"
+        arrow
+        arrowClassName="bg-gray-200"
+        transition
+        menuClassName="bg-gray-200 p-1 rounded-lg shadow-sm"
+      >
+        <MenuItem className="p-0 hover:bg-transparent">
+          <button
+            onClick={() => handleEditClick()}
+            className="w-full rounded-lg transition-colors text-xs hover:bg-gray-50 flex items-center gap-2 p-2"
+          >
+            <AiOutlineEdit className="text-blue-500 text-sm" />
+            <span className="text-gray-800">Editar</span>
+          </button>
+        </MenuItem>
+        <MenuItem className="p-0 hover:bg-transparent">
+          <button
+            onClick={() => handleOpenToggleDialog()}
+            className="w-full rounded-lg transition-colors text-xs hover:bg-gray-50 flex items-center gap-2 p-2"
+          >
+            {position.status === "Inactivo" ? (
+              <>
+                <AiOutlineCheck className="text-green-500 text-sm" />
+                <span className="text-gray-800">Activar</span>
+              </>
+            ) : (
+              <>
+                <AiOutlineDelete className="text-yellow-500 text-sm" />
+                <span className="text-gray-800">Desactivar</span>
+              </>
+            )}
+          </button>
+        </MenuItem>
+      </Menu>
+
 
       <Dialog2
         isOpen={isOpenToggleDialog}
@@ -217,6 +209,7 @@ const OptionsColumn = ({ position, fetchPositions }) => {
         confirmButtonColor={toggleMessage.confirmButtonColor}
         cancelButtonColor="border-gray-400"
         icon={toggleMessage.icon}
+        isLoading={isToggleStatus}
       />
 
       {/* Modal de edición */}

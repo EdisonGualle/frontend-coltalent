@@ -19,6 +19,7 @@ import {
 
 import { fetchRoles } from '../../../redux/User/rolSlice.js';
 import CustomSelect from '../../../components/ui/Select.jsx';
+import { getConfigurations } from '../../../services/configurationService.js';
 
 
 const steps = [
@@ -80,8 +81,11 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
 
   const [selectedRole, setSelectedRole] = useState(null);
 
-  const [scheduleErrors, setScheduleErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false);
+
+  const [workingAgeLimits, setWorkingAgeLimits] = useState({ min: 16, max: 70 });
 
   // Cargar roles al montar el componente, solo si no están ya en el estado global
   const rolesState = useSelector((state) => state.role);
@@ -98,9 +102,37 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
     setSelectedRole(option);
     setErrors((prevErrors) => ({
       ...prevErrors,
-      user: { role_id: option ? '' : 'Por favor, selecciona un rol.' }
+      user: {
+        ...(prevErrors.user || {}),
+        role_id: option ? '' : 'Por favor, selecciona un rol.'
+      }
     }));
+
   };
+
+  // Cargar configuraciones de edad laboral al montar el componente
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const res = await getConfigurations();
+        const configArray = res?.data || [];
+        const configMap = configArray.reduce((acc, item) => {
+          acc[item.key] = item.value;
+          return acc;
+        }, {});
+
+        setWorkingAgeLimits({
+          min: parseInt(configMap.min_working_age) || 16,
+          max: parseInt(configMap.max_working_age) || 70,
+        });
+      } catch (error) {
+        console.error('Error al obtener configuraciones del sistema:', error);
+      }
+    };
+
+    fetchConfig();
+  }, []);
 
 
   // Agregar este efecto para cargar los datos del empleado si initialData.id está presente
@@ -178,16 +210,16 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
           });
         }
 
-
+        setHasLoadedInitialData(true);
       } catch (error) {
         console.error('Error loading employee data', error);
       }
     };
 
-    if (initialData && initialData.id) {
+    if (initialData && initialData.id && !hasLoadedInitialData) {
       fetchEmployee(initialData.id);
     }
-  }, [initialData]);
+  }, [initialData, hasLoadedInitialData]);
 
 
   useEffect(() => {
@@ -222,6 +254,7 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
       newErrors['employee.firstName'] = isValidName(formData.firstName, 'nombre');
       newErrors['employee.lastName'] = isValidName(formData.lastName, 'apellido');
       newErrors['employee.date_of_birth'] = isValidDateOfBirth(formData.date_of_birth);
+
       newErrors['employee.gender'] = isValidGender(formData.gender);
       newErrors['employee.ethnicity'] = isValidEthnicity(formData.ethnicity);
       newErrors['employee.nationality'] = isValidNationality(formData.nationality);
@@ -281,11 +314,11 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
       'lastName': (val) => {
         const words = val.trim().split(/\s+/);
         if (words.length < 2) {
-            return 'Debe ingresar sus dos apellidos.';
+          return 'Debe ingresar sus dos apellidos.';
         }
         return isValidName(val, 'apellido');
-    },
-      'date_of_birth': isValidDateOfBirth,
+      },
+      'date_of_birth': (val) => isValidDateOfBirth(val, workingAgeLimits.min, workingAgeLimits.max),
       'ethnicity': isValidEthnicity,
       'nationality': isValidNationality,
       'gender': isValidGender,
@@ -323,23 +356,30 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
       newErrors['employee.position'] = isValidPosition(formData.position);
       newErrors['employee.position_id'] = isValidPosition(formData.position);
 
-       // Validación adicional para lastName
-       const lastNameWords = formData.lastName.trim().split(/\s+/);
-       if (lastNameWords.length < 2) {
-           newErrors['employee.lastName'] = 'Debe ingresar al menos dos apellidos.';
-       }
-       
-
-      if (!selectedRole) {
-        newErrors['user.role_id'] = 'Por favor, selecciona un rol.';
+      // Validación adicional para lastName
+      const lastNameWords = formData.lastName.trim().split(/\s+/);
+      if (lastNameWords.length < 2) {
+        newErrors['employee.lastName'] = 'Debe ingresar al menos dos apellidos.';
       }
+
+
+      if (!selectedRole || !selectedRole.value?.id) {
+        newErrors.user = { ...(newErrors.user || {}), role_id: 'Por favor, selecciona un rol.' };
+      }
+
+      // Elimina errores con strings vacíos ('')
+      const cleanedErrors = JSON.parse(JSON.stringify(newErrors, (key, value) => {
+        if (value === '') return undefined;
+        return value;
+      }));
 
       setErrors((prevErrors) => ({
         ...prevErrors,
         ...newErrors,
       }));
 
-      if (Object.values(newErrors).every((error) => !error)) {
+      if (Object.keys(cleanedErrors).length === 0) {
+        setIsSubmitting(true);
         const [first_name, ...second_name] = formData.firstName.split(' ');
         const [last_name, ...second_last] = formData.lastName.split(' ');
 
@@ -371,18 +411,14 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
             },
           },
           user: {
-            role_id: selectedRole?.value?.id // Verifica que selectedRole y selectedRole.value estén definidos
+            role_id: selectedRole?.value?.id
           }
         };
 
+        Promise.resolve(onSubmit(submissionData)).finally(() => {
+          setIsSubmitting(false);
+        });
 
-        if (Object.values(scheduleErrors).every((error) => !error)) {
-          // Proceso de envío de datos
-        } else {
-          console.log('Errores en el horario:', scheduleErrors);
-        }
-
-        onSubmit(submissionData);
       }
     } else {
       handleNext();
@@ -656,13 +692,13 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
               icon={RiCalendarLine}
             />
             <div>
-              <label htmlFor="gender" className="block text-sm font-medium text-gray-700">Género</label>
+              <label htmlFor="gender" className="block text-base font-semibold text-gray-800">Género</label>
               <select
                 id="gender"
                 name="gender"
                 value={formData.gender}
                 onChange={handleInputChange}
-                className={`mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.gender ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
+                className={`mt-1 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.gender ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
               >
                 <option value="">Seleccione el género</option>
                 <option value="Hombre">Hombre</option>
@@ -672,14 +708,14 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
               {errors['employee.gender'] && <p className="mt-1 text-xs text-red-500">{errors['employee.gender']}</p>}
             </div>
             <div>
-              <label htmlFor="maritalStatus" className="block text-sm font-medium text-gray-700">Estado Civil</label>
+              <label htmlFor="maritalStatus" className="block text-base font-semibold text-gray-800">Estado Civil</label>
               <select
                 id="maritalStatus"
                 name="maritalStatus"
                 value={formData.maritalStatus}
                 onChange={handleInputChange}
                 disabled={!formData.gender}
-                className="mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                className="mt-1 block w-full pl-3 pr-10 py-3 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
               >
                 <option value="">Seleccione el estado civil</option>
                 {maritalOptions.map((option, index) => (
@@ -758,13 +794,13 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
         {currentStep === 3 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="province" className="block text-sm font-medium text-gray-700">Provincia</label>
+              <label htmlFor="province" className="block text-base font-semibold text-gray-800">Provincia</label>
               <select
                 id="province"
                 name="province"
                 value={selectedProvince}
                 onChange={handleProvinceChange}
-                className={`mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.province ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
+                className={`mt-1 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.province ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
               >
                 <option value="">Seleccione la provincia</option>
                 {provinces.map((province) => (
@@ -774,14 +810,14 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
               {errors['employee.address.province'] && <p className="mt-1 text-xs text-red-500">{errors['employee.address.province']}</p>}
             </div>
             <div>
-              <label htmlFor="canton" className="block text-sm font-medium text-gray-700">Cantón</label>
+              <label htmlFor="canton" className="block text-base font-semibold text-gray-800">Cantón</label>
               <select
                 id="canton"
                 name="canton"
                 value={selectedCanton}
                 onChange={handleCantonChange}
                 disabled={!selectedProvince}
-                className={`mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.canton ? 'border-red-500' : 'border-gray-300'}focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
+                className={`mt-1 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.canton ? 'border-red-500' : 'border-gray-300'}focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
               >
                 <option value="">Seleccione el cantón</option>
                 {cantons.map((canton) => (
@@ -791,14 +827,14 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
               {errors['employee.address.canton'] && <p className="mt-1 text-xs text-red-500">{errors['employee.address.canton']}</p>}
             </div>
             <div>
-              <label htmlFor="parish" className="block text-sm font-medium text-gray-700">Parroquia</label>
+              <label htmlFor="parish" className="block text-base font-semibold text-gray-800">Parroquia</label>
               <select
                 id="parish"
                 name="parish"
                 value={formData.parish}
                 onChange={handleParishChange}
                 disabled={!selectedCanton}
-                className={`mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.parish ? 'border-red-500' : 'border-gray-300'}focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
+                className={`mt-1 block w-full  pl-3 pr-10 py-3 text-base border-2 ${errors.parish ? 'border-red-500' : 'border-gray-300'}focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
               >
                 <option value="">Seleccione la parroquia</option>
                 {parishes.map((parish) => (
@@ -864,13 +900,13 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
         {currentStep === 4 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="direction" className="block text-sm font-medium text-gray-700">Dirección</label>
+              <label htmlFor="direction" className="block text-base font-semibold text-gray-800">Dirección</label>
               <select
                 id="direction"
                 name="direction"
                 value={selectedDirection}
                 onChange={handleDirectionChange}
-                className={`mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.direction ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
+                className={`mt-1 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.direction ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
               >
                 <option value="">Seleccione la dirección</option>
                 {directions.map((direction) => (
@@ -880,14 +916,14 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
               {errors['employee.direction'] && <p className="mt-1 text-xs text-red-500">{errors['employee.direction']}</p>}
             </div>
             <div>
-              <label htmlFor="unit" className="block text-sm font-medium text-gray-700">Unidad</label>
+              <label htmlFor="unit" className="block text-base font-semibold text-gray-800">Unidad</label>
               <select
                 id="unit"
                 name="unit"
                 value={selectedUnit}
                 onChange={handleUnitChange}
                 disabled={!selectedDirection}
-                className={`mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.unit ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
+                className={`mt-1 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.unit ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
               >
                 <option value="">Seleccione la unidad</option>
                 {units.map((unit) => (
@@ -897,14 +933,14 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
               {errors['employee.unit'] && <p className="mt-1 text-xs text-red-500">{errors['employee.unit']}</p>}
             </div>
             <div>
-              <label htmlFor="position" className="block text-sm font-medium text-gray-700">Cargo</label>
+              <label htmlFor="position" className="block text-base font-semibold text-gray-800">Cargo</label>
               <select
                 id="position"
                 name="position"
                 value={formData.position}
                 onChange={handlePositionChange}
                 disabled={!selectedDirection && !selectedUnit}
-                className={`mt-2 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.position ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
+                className={`mt-1 block w-full pl-3 pr-10 py-3 text-base border-2 ${errors.position ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-blue-300 focus:border-blue-300 sm:text-sm rounded-md`}
               >
                 <option value="">Seleccione el cargo</option>
                 {positions.map((position) => (
@@ -925,24 +961,25 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
                 value={selectedRole}
                 onChange={handleRoleChange}
                 placeholder="Selecciona un rol"
-                error={errors.user?.role_id}
+                error={errors?.user?.role_id ?? ''}
                 isSearchable={true}
               />
-              {errors.user?.role_id && (
-    <p className="mt-1 text-xs text-red-500">{errors.user.role_id}</p>
-)}
             </div>
           </div>
         )}
 
-    
+
         <div className="flex justify-between mt-4">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleBack}
             type="button"
-            className="px-6 py-2 bg-gray-50 text-gray-600 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200"
+            disabled={isSubmitting} // ✅ Desactivado durante envío
+            className={`px-6 py-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${isSubmitting
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              : 'bg-gray-50 text-gray-600 hover:bg-gray-100 focus:ring-gray-200'
+              }`}
           >
             Anterior
           </motion.button>
@@ -950,9 +987,19 @@ const EmployeeForm = ({ onSubmit, onCancel, formErrors, initialData, isEditMode 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             type="submit"
-            className="px-6 py-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300"
+            disabled={isSubmitting} // ✅ Desactivado durante envío
+            className={`px-6 py-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${isSubmitting
+              ? 'bg-blue-200 text-blue-400 cursor-not-allowed'
+              : 'bg-blue-100 text-blue-600 hover:bg-blue-200 focus:ring-blue-300'
+              }`}
           >
-            {currentStep < steps.length ? 'Siguiente' : isEditMode ? 'Editar Empleado' : 'Crear Empleado'}
+            {isSubmitting
+              ? 'Enviando...'
+              : currentStep < steps.length
+                ? 'Siguiente'
+                : isEditMode
+                  ? 'Editar Empleado'
+                  : 'Crear Empleado'}
           </motion.button>
         </div>
       </div>

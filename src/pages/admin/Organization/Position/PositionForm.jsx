@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef} from "react";
 import Input from "../../../../components/ui/Input";
 import { useDispatch, useSelector } from "react-redux";
 import Textarea from "../../../../components/ui/Textarea";
@@ -30,14 +30,21 @@ const PositionForm = ({
 }) => {
     const dispatch = useDispatch();
     const unitsState = useSelector((state) => state.unit);
-    const units = unitsState ? unitsState.units : [];
+    const units = unitsState
+        ? unitsState.units.filter((unit) => unit.status === "Activo")
+        : [];
     const departmentsState = useSelector((state) => state.departament);
-    const departments = departmentsState ? departmentsState.departments : [];
+    const departments = departmentsState
+        ? departmentsState.departments.filter((department) => department.status === "Activo")
+        : [];
+
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
     const [selectedOption, setSelectedOption] = useState(null);
 
     const [isResponsibilitiesModalOpen, setIsResponsibilitiesModalOpen] = useState(false);
     const [responsibilities, setResponsibilities] = useState([]);
+    
+    const isFormInitialized = useRef(false);
 
 
     const [formData, setFormData] = useState({
@@ -70,11 +77,15 @@ const PositionForm = ({
         dispatch(fetchDepartments());
     }, [dispatch]);
 
-    useEffect(() => {
-        const positionUnit = units.find((unit) => unit.id === position?.unit?.id);
-        const positionDirection = departments.find((department) => department.id === position?.direction?.id);
 
-        if (isEditing && position && (units.length > 0 || departments.length > 0)) {
+    useEffect(() => {
+        
+        if (isEditing && position && !isFormInitialized.current && (units.length > 0 || departments.length > 0)) {
+            const positionUnit = units.find((unit) => unit.id === position?.unit?.id);
+            const positionDirection = departments.find((department) => department.id === position?.direction?.id);
+            console.log(positionUnit);
+            console.log(positionDirection);
+            
             const nameError = validateName(position.name) || "";
             const functionError = !position.function ? FUNCTION_REQUIRED : "";
             const belongsToValue = position.unit ? 'unit' : (position.direction ? 'direction' : null);
@@ -96,6 +107,7 @@ const PositionForm = ({
                 belongsTo: "",
                 is_manager: "",
             });
+            isFormInitialized.current = true;
         }
     }, [position, units, departments, isEditing]);
 

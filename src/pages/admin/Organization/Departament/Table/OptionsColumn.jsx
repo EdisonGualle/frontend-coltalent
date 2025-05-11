@@ -1,23 +1,28 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { RiEdit2Line, RiDeleteBin6Line, RiCheckboxCircleLine, RiCloseCircleLine } from 'react-icons/ri';
-import { deleteOneDepartment, updateOneDepartment, toggleOneDepartmentStatus } from '../../../../../redux/Organization/DepartamentSlice';
+import { Menu, MenuButton, MenuItem } from "@szhsin/react-menu";
+import { RiMore2Fill } from "react-icons/ri";
+import { AiOutlineDelete, AiOutlineCheck, AiOutlineEdit } from "react-icons/ai";
+
+import { RiEdit2Line, RiCheckboxCircleLine, RiCloseCircleLine } from 'react-icons/ri';
+import { updateOneDepartment, toggleOneDepartmentStatus } from '../../../../../redux/Organization/DepartamentSlice';
 import Dialog2 from '../../../../../components/ui/Dialog2';
 import { AlertContext } from '../../../../../contexts/AlertContext';
 import { unwrapResult } from '@reduxjs/toolkit';
 import DepartmentForm from '../DepartmentForm';
 import ModalForm from '../../../../../components/ui/ModalForm';
 import { fetchUnits } from '../../../../../redux/Organization/UnitSlince';
-
-const OptionsColumn = ({ departament, fetchDepartments }) => {
+import {fetchPositions} from '../../../../../redux/Organization/PositionSlice';
+const OptionsColumn = ({ departament }) => {
   const dispatch = useDispatch();
-  const [isOpenDialog2, setIsOpenDialog2] = useState(false);
   const { showAlert } = useContext(AlertContext);
   const [isOpenEditModal, setIsOpenEditModal] = useState(false);
+
   const [formErrors, setFormErrors] = useState({});
 
   const [isOpenToggleDialog, setIsOpenToggleDialog] = useState(false);
-  const [toggleAction, setToggleAction] = useState(null);
+  const [isToggleStatus, setIsToggleStatus] = useState(false);
+  const [visibleStatus, setVisibleStatus] = useState(departament.status);
 
   //Efecto para limpiar los errores del formulario al cerrar el modal
   useEffect(() => {
@@ -25,6 +30,7 @@ const OptionsColumn = ({ departament, fetchDepartments }) => {
       setFormErrors({});
     }
   }, [isOpenEditModal]);
+
 
   //Efecto para mostrar los errores del formulario al abrir el modal
   useEffect(() => {
@@ -56,8 +62,8 @@ const OptionsColumn = ({ departament, fetchDepartments }) => {
       const actionResult = await dispatch(updateOneDepartment(updatedData));
       // Desempaquetar el resultado de la acción
       unwrapResult(actionResult);
-      fetchDepartments();
       dispatch(fetchUnits());
+      dispatch(fetchPositions());
       showAlert('Dirección actualizada correctamente', 'success');
       setFormErrors({});
       setIsOpenEditModal(false);
@@ -79,33 +85,18 @@ const OptionsColumn = ({ departament, fetchDepartments }) => {
     }
   };
 
-  // Función para eliminar un departamento
-  // const handleDelete = async () => {
-  //   try {
-  //     // Despachar la acción para eliminar el departamento
-  //     const actionResult = await dispatch(deleteOneDepartment(departament.id));
-  //     // Desempaquetar el resultado de la acción
-  //     unwrapResult(actionResult);
-  //     fetchDepartments();
-  //     dispatch(fetchUnits());
-  //     showAlert('Dirección eliminada correctamente', 'success');
-  //   } catch (error) {
-  //     showAlert('Error al eliminar la dirección.', 'error');
-  //   }
-  // };
-
   // Función para activar/desactivar un departamento
   const handleToggleStatus = async () => {
+    setIsToggleStatus(true);
     try {
       // Despachar la acción para activar/desactivar el departamento
-      const actionResult = await dispatch(toggleOneDepartmentStatus(departament.id));
+      await dispatch(toggleOneDepartmentStatus(departament.id)).then(unwrapResult);
       // Desempaquetar el resultado de la acción
-      unwrapResult(actionResult);
-      fetchDepartments();
-      dispatch(fetchUnits());
       showAlert('Estado de la dirección actualizado correctamente', 'success');
     } catch (error) {
       showAlert('Error al actualizar el estado de la dirección.', 'error');
+    } finally {
+      setIsToggleStatus(false);
     }
   };
 
@@ -117,16 +108,13 @@ const OptionsColumn = ({ departament, fetchDepartments }) => {
     setIsOpenEditModal(false);
   };
 
-  // Funciones para manejar la apertura y cierre del dialogo y eliminar el departamento
-  // const handleCancel = () => setIsOpenDialog2(false);
-  // const handleClick = async () => setIsOpenDialog2(true);
-  // const handleConfirm = async () => {
-  //   await handleDelete();
-  //   setIsOpenDialog2(false);
-  // };
 
   // Funciones para manejar la apertura y cierre del diálogo de activación/desactivación
-  const handleOpenToggleDialog = () => setIsOpenToggleDialog(true);
+  const handleOpenToggleDialog = () => {
+    setVisibleStatus(departament.status);
+    setIsOpenToggleDialog(true);
+  };
+
   const handleConfirmToggle = async () => {
     await handleToggleStatus();
     setIsOpenToggleDialog(false);
@@ -155,49 +143,54 @@ const OptionsColumn = ({ departament, fetchDepartments }) => {
     }
   };
 
-  const toggleMessage = getToggleMessage(departament.status);
+  const toggleMessage = getToggleMessage(visibleStatus);
 
   return (
     <>
-      <div className="flex gap-2">
-        <button
-          onClick={handleEditClick}
-          className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-600 rounded-lg transition-colors hover:bg-gray-200"
-          title="Editar"
-        >
-          <RiEdit2Line />
-        </button>
-        <button
-          onClick={handleOpenToggleDialog}
-          className={`flex items-center justify-center w-8 h-8 ${departament.status === 'Activo' ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200' : 'bg-green-100 text-green-600 hover:bg-green-200'} rounded-lg transition-colors`}
-          title={departament.status === 'Activo' ? 'Desactivar' : 'Activar'}
-        >
-          {departament.status === 'Activo' ? <RiCloseCircleLine /> : <RiCheckboxCircleLine />}
-        </button>
-        {/* <button
-          onClick={handleClick}
-          className="flex items-center justify-center w-8 h-8 bg-red-100 text-red-600 rounded-lg transition-colors hover:bg-red-200"
-        >
-          <RiDeleteBin6Line />
-        </button> */}
-      </div>
-
-      {/* Modal de eliminacion*/}
-      {/* <Dialog2
-        isOpen={isOpenDialog2}
-        setIsOpen={setIsOpenDialog2}
-        title="¿Eliminar dirección?"
-        description="¿Está seguro que desea eliminar la dirección? Esta acción es permanente y no se podrá deshacer."
-        confirmButtonText="Sí, eliminar dirección"
-        cancelButtonText="Cancelar"
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
-        confirmButtonColor="bg-red-500"
-        cancelButtonColor="border-gray-400"
-        icon={
-          <RiDeleteBin6Line className="w-10 h-10 flex items-center justify-center rounded-full text-red-500" />
+      <Menu
+        menuButton={
+          <MenuButton
+            className="flex items-center justify-center w-8 h-8 hover:bg-gray-200 rounded-lg transition-colors"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            <RiMore2Fill className="text-gray-600" />
+          </MenuButton>
         }
-      /> */}
+        align="end"
+        arrow
+        arrowClassName="bg-gray-200"
+        transition
+        menuClassName="bg-gray-200 p-1 rounded-lg shadow-sm"
+      >
+        <MenuItem className="p-0 hover:bg-transparent">
+          <button
+            onClick={() => handleEditClick()}
+            className="w-full rounded-lg transition-colors text-xs hover:bg-gray-50 flex items-center gap-2 p-2"
+          >
+            <AiOutlineEdit className="text-blue-500 text-sm" />
+            <span className="text-gray-800">Editar</span>
+          </button>
+        </MenuItem>
+        <MenuItem className="p-0 hover:bg-transparent">
+          <button
+            onClick={() => handleOpenToggleDialog()}
+            className="w-full rounded-lg transition-colors text-xs hover:bg-gray-50 flex items-center gap-2 p-2"
+          >
+            {departament.status === "Inactivo" ? (
+              <>
+                <AiOutlineCheck className="text-green-500 text-sm" />
+                <span className="text-gray-800">Activar</span>
+              </>
+            ) : (
+              <>
+                <AiOutlineDelete className="text-yellow-500 text-sm" />
+                <span className="text-gray-800">Desactivar</span>
+              </>
+            )}
+          </button>
+        </MenuItem>
+      </Menu>
 
       <Dialog2
         isOpen={isOpenToggleDialog}
@@ -211,6 +204,7 @@ const OptionsColumn = ({ departament, fetchDepartments }) => {
         confirmButtonColor={toggleMessage.confirmButtonColor}
         cancelButtonColor="border-gray-400"
         icon={toggleMessage.icon}
+        isLoading={isToggleStatus}
       />
 
       {/* Modal del formulario */}

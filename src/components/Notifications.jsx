@@ -5,11 +5,12 @@ import "@szhsin/react-menu/dist/index.css";
 import "@szhsin/react-menu/dist/transitions/slide.css";
 import { Link } from "react-router-dom";
 import { RiNotification3Line, RiUser3Fill } from "react-icons/ri";
-import echo from "../config/echo";
 import { useAuth } from "../hooks/useAuth";
 import { getUnreadNotifications, markNotificationsAsRead } from "../services/NotificationService";
 import { useDispatch } from 'react-redux'; // Import useDispatch
-import { fetchAssignedLeaves, updateCache, clearCache } from '../redux/Leave/assignedLeavesSlice'; // Import actions
+import { createPusherClient } from "../config/pusherClient";
+
+
 
 const notificationTypeColors = {
     'Primera aprobación': 'text-blue-600',
@@ -31,35 +32,32 @@ const Notifications = () => {
     const { user } = useAuth();
     const dispatch = useDispatch(); // Initialize useDispatch
     const [notifications, setNotifications] = useState([]);
+    const [channel, setChannel] = useState(null);
 
     useEffect(() => {
         if (user) {
-            // Obtener notificaciones no leídas
+            // Cargar notificaciones iniciales
             getUnreadNotifications()
                 .then(data => setNotifications(data))
                 .catch(error => console.error("Error al obtener notificaciones:", error));
 
-            // Configurar canal de Echo para recibir nuevas notificaciones en tiempo real
-            const channel = echo.private(`notifications.${user.id}`);
+            // Conectar a Pusher
+            const pusherChannel = createPusherClient(user.id);
 
-            channel.listen('NotificationEvent', (event) => {
+            if (!pusherChannel) return;
+
+            setChannel(pusherChannel);
+
+            pusherChannel.bind('NotificationEvent', (event) => {
                 setNotifications((prev) => [event.notification, ...prev]);
-
-                // Dispatch action to update the assigned leaves
-                dispatch(clearCache());
-                ['pendientes', 'aprobados', 'rechazados'].forEach(filter => {
-                    dispatch(fetchAssignedLeaves({ employeeId: user.employee_id, filter })).then(response => {
-                        dispatch(updateCache({ filter, data: response.payload.data }));
-                    });
-                });
             });
 
             return () => {
-                channel.stopListening('NotificationEvent');
-                echo.leave(`notifications.${user.id}`);
+                pusherChannel.unbind_all();
+                pusherChannel.unsubscribe();
             };
         }
-    }, [user, dispatch]);
+    }, [user]);
 
     // Marcar notificaciones como leídas cuando el usuario abre el menú de notificaciones
     const handleOpenMenu = () => {

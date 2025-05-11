@@ -3,29 +3,31 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RiAddLine } from "react-icons/ri";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { CardHeader, Typography, Button } from "@material-tailwind/react";
-import DepartamentTable from './Table/DepartamentTable';
 import ModalForm from '../../../../components/ui/ModalForm';
 import { AlertContext } from '../../../../contexts/AlertContext';
 import DepartmentForm from './DepartmentForm';
-import { createNewDepartment, fetchAllDepartmentsIncludingDeleted } from '../../../../redux/Organization/DepartamentSlice';
+import { createNewDepartment, fetchDepartments } from '../../../../redux/Organization/DepartamentSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
 import MotionWrapper from '../../../../components/ui/MotionWrapper';
+import OrganizationTable from '../components/OrganizationTable';
+import Skeleton from '../../../../components/Table/Skeleton';
+import { departamentColumnsFixed, departamentColumnsGeneral, departamentFilters } from './Table/DepartamentColumns';
+import getDepartamentColumnsStyles from './Table/DepartamentColumnsStyles';
+import OptionsColumn from './Table/OptionsColumn';
 
 const DepartamentIndex = () => {
   const dispatch = useDispatch();
   // Selector para obtener el estado de los departamentos
-  const { status } = useSelector(state => state.departament);
+  const { fetchAllStatus, departments, hasFetchedAll } = useSelector(state => state.departament);
   const [isOpen, setIsOpen] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const { showAlert } = useContext(AlertContext);
 
-  // Efecto para cargar los departamentos
   useEffect(() => {
-    // Si el estado es idle, se realiza la petición para obtener los departamentos
-    if (status === 'idle') {
-      dispatch(fetchAllDepartmentsIncludingDeleted());
+    if (!hasFetchedAll) {
+      dispatch(fetchDepartments());
     }
-  }, [status, dispatch]);
+  }, [dispatch, hasFetchedAll]);
 
   // Funciones para manejar la apertura y cierre del modal
   const handleOpen = () => setIsOpen(true);
@@ -82,11 +84,26 @@ const DepartamentIndex = () => {
       </CardHeader>
 
       {/* Tabla*/}
-      <div className='flex-1 overflow-y-auto'>
-        <MotionWrapper keyProp="department-table">
-          <DepartamentTable />
-        </MotionWrapper>
-      </div>
+      <MotionWrapper keyProp="department-table">
+        {fetchAllStatus === 'loading' && departments.length === 0 ? (
+          <Skeleton />
+        ) : (
+          <OrganizationTable
+            allColumns={departamentColumnsGeneral}
+            columns={departamentColumnsFixed}
+            fixedColumns={departamentColumnsFixed}
+            getCellStyle={getDepartamentColumnsStyles}
+            data={departments}
+            showAddNew={false}
+            showFilters={false}
+            showColumnOptions={true}
+            showActions={true}
+            actions={(row) => <OptionsColumn departament={row} />}
+            dynamicFilterColumns={departamentFilters}
+          />
+        )}
+
+      </MotionWrapper>
       {/* Formulario */}
       <ModalForm
         isOpen={isOpen}

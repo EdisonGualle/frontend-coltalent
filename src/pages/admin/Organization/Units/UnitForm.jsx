@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Input from "../../../../components/ui/Input";
 import { useDispatch, useSelector } from "react-redux";
 import Textarea from "../../../../components/ui/Textarea";
@@ -23,11 +23,16 @@ const UnitForm = ({
   cancelButtonColor = "border-gray-400",
   formErrors = {},
 }) => {
-    
+
   const dispatch = useDispatch();
   const departmentsState = useSelector((state) => state.departament);
-  const departments = departmentsState ? departmentsState.departments : [];
+  const departments = departmentsState
+    ? departmentsState.departments.filter((department) => department.status === "Activo")
+    : [];
+
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+
+  const isFormInitialized = useRef(false);
 
   // Estados locales para manejar los errores y los datos del formulario
   const [formData, setFormData] = useState({
@@ -57,30 +62,31 @@ const UnitForm = ({
   }, [dispatch]);
 
   // Efecto para cargar los datos de la unidad a editar
-  useEffect(() => {
-    // Encontrar la dirección a la que pertenece la unidad
-    const unitDirection = departments.find((department) => department.id === unit?.direction?.id);
+useEffect(() => {
+  if (isEditing && unit && departments.length > 0 && !isFormInitialized.current) {
+    const unitDirection = departments.find(
+      (department) => department.id === unit?.direction?.id
+    );
 
-    // Validar los datos de la unidad
-    if (isEditing && unit && departments.length > 0) {
-      const nameError = validateName(unit.name) || "";
-      const functionError = !unit.function ? FUNCTION_DESCRIPTION_REQUIRED : "";
-      const landlinePhoneError = validateLandlinePhone(unit.phone) || "";
-      // Actualizar los datos del formulario y los errores
-      setFormData({
-        name: unit.name,
-        functionDescription: unit.function,
-        landlinePhone: unit.phone,
-        selectedDirection: unitDirection ? { value: unitDirection.id, label: unitDirection.name } : null,
-      });
-      setErrors({
-        name: nameError,
-        function: functionError,
-        phone: landlinePhoneError,
-        direction_id: "",
-      });
-    }
-  }, [unit, departments, isEditing]);
+    setFormData({
+      name: unit.name,
+      functionDescription: unit.function,
+      landlinePhone: unit.phone,
+      selectedDirection: unitDirection
+        ? { value: unitDirection.id, label: unitDirection.name }
+        : null,
+    });
+
+    setErrors({
+      name: validateName(unit.name) || "",
+      function: !unit.function ? FUNCTION_DESCRIPTION_REQUIRED : "",
+      phone: validateLandlinePhone(unit.phone) || "",
+      direction_id: "",
+    });
+
+    isFormInitialized.current = true; // Marca como inicializado
+  }
+}, [unit, departments, isEditing]);
 
 
   // Efecto para limpiar los datos del formulario al cancelar la edición

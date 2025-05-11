@@ -23,6 +23,7 @@ const createUser = async (newUser) => {
 
 const updateUser = async (updatedUser, userId) => {
   try {
+
     const response = await AxiosInstance.put(`/users/${userId}`, updatedUser);
     return response.data;
   } catch (error) {

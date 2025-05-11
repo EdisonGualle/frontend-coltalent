@@ -10,171 +10,140 @@ import { fetchEmployees } from '../../../../redux/Employee/employeSlice.js';
 
 // Componente para el formulario de creación y edición de usuarios
 const UserForm = ({
-  user,               // Usuario a editar
-  isEditing,          // Indica si se está editando un usuario
-  onSubmit,           // Función para enviar el formulario
-  onCancel,           // Función para cancelar la edición
-  confirmButtonText = isEditing ? 'Guardar cambios' : 'Crear usuario',  // Texto del botón de confirmación
-  cancelButtonText = 'Cancelar',         // Texto del botón de cancelación
-  confirmButtonColor = 'bg-blue-500',    // Color del botón de confirmación
-  cancelButtonColor = 'border-gray-400', // Color del botón de cancelación
-  formErrors = {}      // Errores del formulario
+  user,
+  isEditing,
+  onSubmit,
+  onCancel,
+  confirmButtonColor = 'bg-blue-500',
+  cancelButtonColor = 'border-gray-400',
+  formErrors = {}
 }) => {
-  // Hooks de Redux para despachar acciones 
   const dispatch = useDispatch();
-  // Obtener los roles, estados de usuario y empleados del estado global
-  const rolesState = useSelector((state) => state.role);
-  const roles = rolesState ? rolesState.roles : [];
-  const userStatesState = useSelector((state) => state.userState);
-  const userStates = userStatesState ? userStatesState.userStates : [];
-  const employeesState = useSelector((state) => state.employee);
-  const employees = employeesState ? employeesState.employees : [];
+  const roles = useSelector(state => state.role?.roles ?? []);
+  const userStates = useSelector(state => state.userState?.userStates ?? []);
+  const employees = useSelector(state => state.employee?.employees ?? []);
 
-  // Estados locales para manejar los errores y los datos del formulario
-  const [errors, setErrors] = useState({ name: '', email: '', role: '', role_id: '', state: '', state_id: '', employee: '', employee_id: '' });
+  const [errors, setErrors] = useState({
+    name: '', email: '', role: '', state: '', employee_id: ''
+  });
   const [formData, setFormData] = useState({ name: '', email: '' });
   const [selectedRole, setSelectedRole] = useState(null);
   const [selectedUserState, setSelectedUserState] = useState(null);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
+  // etiquetas dinámicas
+  const submitLabel = isEditing ? 'Guardar cambios' : 'Crear usuario';
+  const cancelLabel = 'Cancelar';
 
-  // Efecto para actualizar los errores del formulario
   useEffect(() => {
     setErrors(formErrors);
   }, [formErrors]);
 
-  // Efecto para cargar los roles, estados de usuario y empleados
+  // cargar catálogos
   useEffect(() => {
-    // Despachar las acciones para cargar los roles, estados de usuario y empleados
     dispatch(fetchRoles());
     dispatch(fetchUserStates());
     dispatch(fetchEmployees());
   }, [dispatch]);
 
-  // Efecto para cargar los datos del usuario a editar
+  // precarga en edición
   useEffect(() => {
-    const userRole = roles.find(role => role.id === user?.role?.id);
-    const userState = userStates.find(state => state.id === user?.user_state?.id);
-    const userEmployee = employees.find(employee => employee.id === user?.employee_id);
+    if (
+      isEditing &&
+      user &&
+      roles.length &&
+      userStates.length &&
+      employees.length
+    ) {
+      setFormData({ name: user.name, email: user.email });
 
-    if (isEditing && user && roles.length > 0 && userStates.length > 0 && employees.length > 0) {
-      // Si formData ya tiene valores, no lo actualices
-      if (!formData.name && !formData.email) {
-        setFormData({ name: user.name, email: user.email });
-      }
+      const rol = roles.find(r => r.id === user.role.id);
+      if (rol) setSelectedRole({ value: rol, label: rol.name });
 
-      // Si los valores seleccionados no tienen valores, actualízalos
-      if (!selectedRole) {
-        setSelectedRole(userRole ? { value: userRole, label: userRole.name } : null);
-      }
-      if (!selectedUserState) {
-        setSelectedUserState(userState ? { value: userState, label: userState.name } : null);
-      }
-      if (!selectedEmployee) {
-        setSelectedEmployee(userEmployee ? { value: userEmployee, label: userEmployee.full_name } : null);
-      }
+      const st = userStates.find(s => s.id === user.user_state.id);
+      if (st) setSelectedUserState({ value: st, label: st.name });
+
+      const emp = employees.find(e => e.id === user.employee_id);
+      if (emp)
+        setSelectedEmployee({ value: emp, label: emp.full_name });
     }
-  }, [isEditing, user, roles, userStates, employees, formData]);
+  }, [isEditing, user, roles, userStates, employees]);
 
-  
-  // Función para manejar el cambio de los campos del formulario
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value } = e.target;
     let error = '';
 
-    // Validación para el campo name
     if (name === 'name') {
-      const usernameError = validateUsername(value);
-      if (usernameError) {
-        error = usernameError;
-      } else {
-        error = '';
-      }
+      error = validateUsername(value) || '';
     }
-
-    // Validación para el campo email
     if (name === 'email') {
-      const emailError = validateEmail(value);
-      if (emailError) {
-        error = emailError;
-      } else {
-        error = '';
-      }
+      error = validateEmail(value) || '';
     }
 
-    setErrors({ ...errors, [name]: error });
-    setFormData({ ...formData, [name]: value });
+    setErrors(prev => ({ ...prev, [name]: error }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Función para manejar el cambio del campo de rol
-  const handleRoleChange = (option) => {
+  const handleRoleChange = option => {
     setSelectedRole(option);
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      role: option ? '' : 'Por favor, selecciona un rol.',
+    setErrors(prev => ({
+      ...prev,
+      role: option ? '' : 'Por favor, selecciona un rol.'
     }));
   };
 
-  // Función para manejar el cambio del campo de estado de usuario
-  const handleUserStateChange = (option) => {
+  const handleUserStateChange = option => {
     setSelectedUserState(option);
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      state: option ? '' : 'Por favor, selecciona un estado.',
+    setErrors(prev => ({
+      ...prev,
+      state: option ? '' : 'Por favor, selecciona un estado.'
     }));
   };
 
-  // Función para manejar el cambio del campo de empleado
-  const handleEmployeeChange = (option) => {
+  const handleEmployeeChange = option => {
     setSelectedEmployee(option);
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      employee_id: option ? '' : 'Por favor, selecciona un empleado.',
+    setErrors(prev => ({
+      ...prev,
+      employee_id: option ? '' : 'Por favor, selecciona un empleado.'
     }));
   };
 
-  // Función para enviar el formulario
-  const handleSubmit = (e) => {
-    // Evitar que el formulario recargue la página
+  const handleSubmit = e => {
     e.preventDefault();
-    // Validar si hay errores en los campos
-    const hasErrors = Object.values(errors).some((error) => error !== '');
-    // Validar si hay errores en los campos de rol, estado de usuario y empleado
-    if (!hasErrors) {
-      const roleId = selectedRole ? selectedRole.value.id : null;
-      const userStateId = selectedUserState ? selectedUserState.value.id : null;
-      const employeeId = selectedEmployee ? selectedEmployee.value.id : null;
-      const updatedFormData = { ...formData, role_id: roleId, user_state_id: userStateId, employee_id: employeeId };
+    const hasErrors = Object.values(errors).some(err => err);
+    if (hasErrors) return;
 
-      // Validar campos requeridos
-      const { name, email, employee_id } = updatedFormData;
-      const isCreating = !isEditing; // Determinar si se está creando un nuevo usuario
+    const role_id = selectedRole?.value.id ?? null;
+    const user_state_id = selectedUserState?.value.id ?? null;
+    const employee_id = selectedEmployee?.value.id ?? null;
+    const payload = {
+      ...formData,
+      role_id,
+      user_state_id,
+      employee_id
+    };
 
-      if (isCreating) {
-        // Validaciones para crear un nuevo usuario
-        if (!name) {
-          setErrors((prevErrors) => ({ ...prevErrors, name: 'El nombre es requerido.' }));
-        }
-        if (!email) {
-          setErrors((prevErrors) => ({ ...prevErrors, email: 'El correo es requerido.' }));
-        }
-        if (!employee_id) {
-          setErrors((prevErrors) => ({ ...prevErrors, employee_id: 'El empleado es requerido' }));
-        }
-      }
-
-      // Enviar el formulario si no hay errores en los campos requeridos
-      if ((isCreating && name && email && employee_id) || (!isCreating)) {
-        onSubmit(updatedFormData);
-      }
+    if (!isEditing) {
+      if (!payload.name) setErrors(prev => ({ ...prev, name: 'El nombre es requerido.' }));
+      if (!payload.email) setErrors(prev => ({ ...prev, email: 'El correo es requerido.' }));
+      if (!payload.employee_id)
+        setErrors(prev => ({ ...prev, employee_id: 'El empleado es requerido.' }));
+      if (!payload.name || !payload.email || !payload.employee_id) return;
     }
+    console.log('Payload:', payload);
+    onSubmit(payload);
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      {formErrors.role_id && <span className="text-red-500">{formErrors.role_id}<br /></span>}
-      {formErrors.user_state_id && <span className="text-red-500">{formErrors.user_state_id}<br /></span>}
-      <div className='mt-2'>
+      {formErrors.role_id && (
+        <span className="text-red-500">{formErrors.role_id}<br /></span>
+      )}
+      {formErrors.user_state_id && (
+        <span className="text-red-500">{formErrors.user_state_id}<br /></span>
+      )}
+
+      <div className="mt-2">
         <Input
           label="Nombre de usuario"
           id="name"
@@ -185,7 +154,8 @@ const UserForm = ({
           error={errors.name}
         />
       </div>
-      <div className='mt-2'>
+
+      <div className="mt-2">
         <Input
           label="Correo electrónico"
           id="email"
@@ -196,7 +166,8 @@ const UserForm = ({
           error={errors.email}
         />
       </div>
-      <div className='mt-2'>
+
+      <div className="mt-2">
         <CustomSelect
           label="Empleado"
           options={employees}
@@ -204,11 +175,12 @@ const UserForm = ({
           onChange={handleEmployeeChange}
           placeholder="Selecciona un empleado"
           error={errors.employee_id}
-          isSearchable={true}
-          labelKey='full_name'
+          isSearchable
+          labelKey="full_name"
         />
       </div>
-      <div className='mt-2'>
+
+      <div className="mt-2">
         <CustomSelect
           label="Rol"
           options={roles}
@@ -216,10 +188,10 @@ const UserForm = ({
           onChange={handleRoleChange}
           placeholder="Selecciona un rol"
           error={errors.role}
-          isSearchable={false}
         />
       </div>
-      <div className='mt-2'>
+
+      <div className="mt-2">
         <CustomSelect
           label="Estado de usuario"
           options={userStates}
@@ -227,22 +199,28 @@ const UserForm = ({
           onChange={handleUserStateChange}
           placeholder="Selecciona un estado"
           error={errors.state}
-          isSearchable={false}
         />
       </div>
+
       <div className="mt-6 flex items-center gap-x-2">
         <button
           type="submit"
-          className={`p-2 px-1 ${confirmButtonColor} rounded-xl text-white w-full outline-none border border-transparent transform transition-all duration-300 hover:scale-105`}
+          className={`
+            p-2 px-1 ${confirmButtonColor} rounded-xl text-white w-full
+            outline-none transform transition-all duration-300 hover:scale-105
+          `}
         >
-          {confirmButtonText}
+          {submitLabel}
         </button>
         <button
           type="button"
-          className={`p-2 rounded-xl bg-transparent border border-dashed ${cancelButtonColor} w-full outline-none transform transition-all duration-300 hover:scale-105`}
+          className={`
+            p-2 rounded-xl bg-transparent border-dashed ${cancelButtonColor} w-full
+            outline-none transform transition-all duration-300 hover:scale-105
+          `}
           onClick={onCancel}
         >
-          {cancelButtonText}
+          {cancelLabel}
         </button>
       </div>
     </form>

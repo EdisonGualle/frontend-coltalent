@@ -17,17 +17,6 @@ AxiosInstance.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // if (config.method.toLowerCase() === 'post' || config.method.toLowerCase() === 'put' || config.method.toLowerCase() === 'delete') {
-    //   try {
-    //     await axios.get('https://coltalent.com/backend/public/sanctum/csrf-cookie', {
-    //       withCredentials: true
-    //     });
-    //     const csrfToken = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN=')).split('=')[1];
-    //     console.log('Token CSRF obtenido:', csrfToken);
-    //     config.headers['X-XSRF-TOKEN'] = csrfToken;
-    //   } catch (error) {
-    //   }
-    // }
 
     return config;
   },

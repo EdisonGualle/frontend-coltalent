@@ -17,7 +17,7 @@ const getNestedValue = (obj, path) => {
   return path.split('.').reduce((acc, part) => acc && acc[part], obj);
 };
 
-const LeaveTable = ({
+const OrganizationTable = ({
   allColumns,
   columns,
   data,
@@ -34,7 +34,6 @@ const LeaveTable = ({
   dynamicFilterColumns = [],
   getCellStyle = () => '',
   exportFunction = null,
-  exportAllColumns = true,
 }) => {
   const { visibleColumns, toggleColumnVisibility, isColumnVisible } = useColumnVisibility(columns, allColumns);
   const [selectedRows, setSelectedRows] = useState({});
@@ -51,6 +50,7 @@ const LeaveTable = ({
   const [modalContent, setModalContent] = useState('');
   const [modalTitle, setModalTitle] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filterValues, setFilterValues] = useState({});
 
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
@@ -58,10 +58,21 @@ const LeaveTable = ({
   const exportOptionsRef = useRef(null);
 
   useEffect(() => {
-    if (Array.isArray(data)) {
-      setFilteredData(data);
+    if (!data || !Array.isArray(data)) {
+      setFilteredData([]);
+      return;
     }
-  }, [data]);
+
+    const filteredData = data.filter((row) =>
+      dynamicFilterColumns.every((filter) =>
+        filterValues[filter.id]
+          ? getNestedValue(row, filter.id) === filterValues[filter.id]
+          : true
+      )
+    );
+    setFilteredData(filteredData);
+  }, [filterValues, data]);
+
 
   const parseDate = (dateString) => {
     // Si el valor ya es una instancia de Date, devolverlo directamente
@@ -219,32 +230,27 @@ const LeaveTable = ({
     setIsModalOpen(true);
   };
 
-  const activeFiltersConfig = [
-    ...(manualFiltersConfig || []),
-    ...(dynamicFilterColumns.length > 0
-      ? dynamicFilterColumns.map((col) => {
-        const column = typeof col === "string" ? col : col.column;
-        const label = typeof col === "object" && col.label ? col.label : column;
+  const activeFiltersConfig = dynamicFilterColumns.map((filter) => {
+    // Verifica que `data` es un array
+    if (!Array.isArray(data)) {
+      console.warn("La propiedad 'data' no es un array válido");
+      return { ...filter, options: [] };
+    }
 
-        if (!column) {
-          return null; // Ignorar columnas inválidas
-        }
+    // Obtiene los valores únicos de la columna correspondiente
+    const uniqueValues = [
+      ...new Set(data.map((row) => getNestedValue(row, filter.id)).filter(Boolean)), // Filtra valores vacíos
+    ];
 
-        const uniqueValues = [
-          ...new Set(data.map((row) => getNestedValue(row, column))),
-        ];
-
-        return {
-          column,
-          label,
-          options: uniqueValues.map((value) => ({
-            value,
-            label: value || "N/A",
-          })),
-        };
-      }).filter(Boolean) // Filtrar nulos para evitar problemas
-      : []),
-  ];
+    // Devuelve el filtro con sus opciones generadas
+    return {
+      ...filter,
+      options: uniqueValues.map((value) => ({
+        value,
+        label: value || "N/A", // Usa "N/A" si no hay valor
+      })),
+    };
+  });
 
 
 
@@ -292,6 +298,7 @@ const LeaveTable = ({
       <div className="mb-2 pt-1">
         <div className="flex justify-between items-center py-2 px-2">
           <div className="flex items-center space-x-2">
+            {/* Buscador */}
             <div className="relative flex items-center justify-center max-w-md mx-auto h-6 group">
               <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 opacity-50 blur-lg group-hover:opacity-75 transition-all duration-300"></div>
               <div className="relative w-full bg-white bg-opacity-30 backdrop-blur-sm rounded-lg shadow-md overflow-hidden border border-white border-opacity-50 group-hover:shadow-lg transition-all duration-300">
@@ -306,6 +313,30 @@ const LeaveTable = ({
                   <MdSearch className="w-5 h-5 transform transition-transform duration-300 group-hover:rotate-90 group-hover:scale-110" />
                 </button>
               </div>
+            </div>
+
+
+            {/* Filtros dinámicos */}
+            <div className="flex items-center space-x-4">
+              {activeFiltersConfig.map((filter) => (
+                <div key={filter.id} className="flex items-center space-x-2">
+                  <label className="text-sm font-medium text-gray-700">{filter.label}:</label>
+                  <select
+                    value={filterValues[filter.id] || ""}
+                    onChange={(e) =>
+                      setFilterValues({ ...filterValues, [filter.id]: e.target.value })
+                    }
+                    className="py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-1  text-sm"
+                  >
+                    <option value="">Todos</option>
+                    {filter.options.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))}
             </div>
 
             {showDateRangeFilter && (
@@ -340,33 +371,12 @@ const LeaveTable = ({
                       exportFunction(exportData, exportColumns, exportFormat);
                     }}
                     onClose={() => setShowExportOptions(false)}
-                    exportAllColumns={exportAllColumns}
                   />
                 )}
               </>
             )}
 
-            {/* Filtrar */}
-            {showFilters && (
-              <button
-                className="flex items-center justify-center w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg transition-colors hover:bg-gray-300 ml-2"
-                title='Filtrar'
-                onClick={() => setShowFiltersState(!showFiltersState)}
-              >
-                <MdFilterList />
-              </button>
-            )}
-            {showFiltersState && (
-              <div className="absolute top-full shadow-lg rounded-lg">
-                <Filters
-                  filtersConfig={activeFiltersConfig}
-                  filterColumns={dynamicFilterColumns}
-                  data={data}
-                  onFilter={setFilteredData}
-                  onClose={() => setShowFiltersState(false)}
-                />
-              </div>
-            )}
+
 
             {/* Columnas */}
             {showColumnOptions && (
@@ -584,4 +594,4 @@ const LeaveTable = ({
   );
 };
 
-export default LeaveTable;
+export default OrganizationTable;

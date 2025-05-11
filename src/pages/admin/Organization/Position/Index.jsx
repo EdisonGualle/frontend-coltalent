@@ -2,26 +2,31 @@ import React, { useState, useEffect, useContext } from 'react';
 import { RiAddLine, RiBriefcase2Line } from "react-icons/ri";
 import { CardHeader, Typography, Button } from "@material-tailwind/react";
 import { useDispatch, useSelector } from 'react-redux';
-import PositionTable from './Table/PositionTable';
 import ModalForm from '../../../../components/ui/ModalForm';
 import PositionForm from './PositionForm';
 import { AlertContext } from '../../../../contexts/AlertContext';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { createNewPosition, fetchAllPositionsIncludingDeleted } from '../../../../redux/Organization/PositionSlice';
+import { createNewPosition, fetchPositions } from '../../../../redux/Organization/PositionSlice';
 import MotionWrapper from '../../../../components/ui/MotionWrapper';
+import Skeleton from '../../../../components/Table/Skeleton';
+import OptionsColumn from './Table/OptionsColumn';
+import OrganizationTable from '../components/OrganizationTable';
+import { positionColumnsFixed, positionColumnsVisible, positionColumnsGeneral, positionColumnsFilters } from './Table/PositionColumns';
+import getPositionColumnsStyles from './Table/positionColumnsStyles';
 
 const PositionIndex = () => {
   const dispatch = useDispatch();
-  const { status } = useSelector(state => state.position);
+  const { fetchAllStatus, positions, hasFetchedAll } = useSelector(state => state.position);
   const [isOpen, setIsOpen] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const { showAlert } = useContext(AlertContext);
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchAllPositionsIncludingDeleted());
+    if (!hasFetchedAll) {
+      dispatch(fetchPositions());
     }
-  }, [status, dispatch]);
+  }, [dispatch, hasFetchedAll]);
+
 
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
@@ -77,9 +82,25 @@ const PositionIndex = () => {
 
       {/* Tabla */}
       <MotionWrapper keyProp="position-table">
-        <PositionTable />
+        {fetchAllStatus === 'loading' && positions.length === 0 ? (
+          <Skeleton />
+        ) : (
+          <OrganizationTable
+          allColumns={positionColumnsGeneral}
+          columns={[...positionColumnsFixed, ...positionColumnsVisible]}
+          fixedColumns={positionColumnsFixed}
+          getCellStyle={getPositionColumnsStyles}
+          data={positions}
+          dynamicFilterColumns={positionColumnsFilters}
+          showFilters={false}
+          showAddNew={false}
+          showActions={true}
+          showColumnOptions={true}
+          actions={(row) => <OptionsColumn position={row} />}
+          />
+        )}
       </MotionWrapper>
-        
+
       {/* Modal para crear un nuevo cargo */}
       <ModalForm
         isOpen={isOpen}

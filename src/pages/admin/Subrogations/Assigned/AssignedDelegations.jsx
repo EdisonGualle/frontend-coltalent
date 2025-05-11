@@ -23,6 +23,7 @@ const AssignedDelegations = () => {
   useEffect(() => {
     if (user?.employee_id && !hasFetchedAssigned) {
       dispatch(fetchAssignedDelegations(user.employee_id));
+      console.log("fetchAssignedDelegations", user.employee_id);
     }
   }, [dispatch, user?.employee_id, hasFetchedAssigned]);
 
@@ -51,6 +52,9 @@ const AssignedDelegations = () => {
       });
     }
   };
+
+  console.log("assignedDelegations", assignedDelegations);
+
 
   return (
     <div className="">

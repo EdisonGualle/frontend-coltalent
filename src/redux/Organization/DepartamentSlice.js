@@ -82,21 +82,25 @@ export const departamentSlice = createSlice({
     allDepartments: [],
     department: {},
     status: "idle",
+    fetchAllStatus: "idle",
     error: null,
+    hasFetchedAll: false,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchDepartments.pending, (state) => {
-        state.status = "loading";
+        state.fetchAllStatus = "loading";
       })
       .addCase(fetchDepartments.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.fetchAllStatus = "succeeded";
         state.departments = action.payload;
+        state.hasFetchedAll = true;
       })
       .addCase(fetchDepartments.rejected, (state, action) => {
-        state.status = "failed";
+        state.fetchAllStatus = "failed";
         state.error = action.error.message;
+        state.hasFetchedAll = false;
       })
       .addCase(fetchDepartment.pending, (state) => {
         state.status = "loading";
@@ -128,27 +132,13 @@ export const departamentSlice = createSlice({
         state.status = "loading";
       })
       .addCase(updateOneDepartment.fulfilled, (state, action) => {
+        const updatedDepartment = action.payload.data; 
+        const index = state.departments.findIndex(department => department.id === updatedDepartment.id);
+        if (index !== -1) {
+          state.departments[index] = updatedDepartment;
+        }
         state.status = "succeeded";
-        const updatedDepartment = action.payload;
-      
-        // Actualizar en `departments`
-        if (updatedDepartment.status === 'Activo') {
-          const index = state.departments.findIndex(department => department.id === updatedDepartment.id);
-          if (index !== -1) {
-            state.departments[index] = updatedDepartment;
-          } else {
-            state.departments.push(updatedDepartment);
-          }
-        } else {
-          state.departments = state.departments.filter(department => department.id !== updatedDepartment.id);
-        }
-      
-        // Actualizar en `allDepartments`
-        const allIndex = state.allDepartments.findIndex(department => department.id === updatedDepartment.id);
-        if (allIndex !== -1) {
-          state.allDepartments[allIndex] = updatedDepartment;
-        }
-      })
+      })      
       
       .addCase(updateOneDepartment.rejected, (state, action) => {
         state.status = "failed";
@@ -184,26 +174,11 @@ export const departamentSlice = createSlice({
         state.status = "loading";
       })
       .addCase(toggleOneDepartmentStatus.fulfilled, (state, action) => {
-        const updatedDepartment = action.payload;
-
-        // Actualizar en `departments` (solo si está activo)
+        const updatedDepartment = action.payload.data; 
         const index = state.departments.findIndex(department => department.id === updatedDepartment.id);
         if (index !== -1) {
-          if (updatedDepartment.status === 'Activo') {
-            state.departments[index] = updatedDepartment;
-          } else {
-            state.departments.splice(index, 1); // Eliminar si se desactiva
-          }
-        } else if (updatedDepartment.status === 'Activo') {
-          state.departments.push(updatedDepartment); // Añadir si se activa
+          state.departments[index] = updatedDepartment;
         }
-
-        // Actualizar en `allDepartments`
-        const allIndex = state.allDepartments.findIndex(department => department.id === updatedDepartment.id);
-        if (allIndex !== -1) {
-          state.allDepartments[allIndex] = updatedDepartment;
-        }
-
         state.status = "succeeded";
       })
       .addCase(toggleOneDepartmentStatus.rejected, (state, action) => {

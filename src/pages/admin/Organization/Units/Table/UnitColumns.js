@@ -1,35 +1,53 @@
-import { AvatarCell } from '../../../../../components/Table/AvatarCell';
-import { StatusPill } from '../../../../../components/Table/StatusPill';
-import { SelectColumnFilter } from '../../../../../components/Table/SelectColumnFilter';
+export const unitColumnsFixed = [
+  {
+    id: 'name',
+    label: 'Nombre',
+    order: 1,
+  },
+  {
+    id: 'status',
+    label: 'Estado',
+    order: 6,
+  },
+];
 
-export const UnitColumns = [
+export const unitColumnsVisible = [
   {
-    Header: "Nombre",
-    accessor: 'name',
+    id: 'function',
+    label: 'Función',
+    order: 2,
   },
   {
-    Header: "Función",
-    accessor: 'function',
+    id: 'direction.name',
+    label: 'Dirección',
+    order: 5,
+    autoWidth: true,
+  },
+];
+
+export const unitColumnsGeneral = [
+  ...unitColumnsVisible,
+  {
+    id: 'phone',
+    label: 'Teléfono',
+    order: 3,
   },
   {
-    Header: "Teléfono",
-    accessor: 'phone',
+    id: 'manager.name',
+    label: 'Jefe',
+    order: 4,
+    autoWidth: true,
+  },
+];
+
+export const unitColumnsFilters = [
+  {
+    id: 'direction.name',
+    label: 'Dirección',
+    autoWidth: true,
   },
   {
-    Header: "Dirección",
-    accessor: 'direction.name',
-    Filter: SelectColumnFilter,  
-  },
-  {
-    Header: "Jefe de Unidad",
-    accessor: 'manager.name',
-    Cell: AvatarCell,
-    imgAccessor: "manager.photo",
-  },
-  {
-    Header: "Estado",
-    accessor: 'status',
-    Cell: StatusPill,
-    Filter: SelectColumnFilter,
+    id: 'status',
+    label: 'Estado',
   },
 ];

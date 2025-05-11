@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RiCheckboxCircleLine, RiCloseCircleLine } from 'react-icons/ri';
 
-const CardConfigurable = ({ config, onSave, relatedConfigValue, translatedKey, showAlert, isEditing, setIsEditing }) => {
+const CardConfigurable = ({ config, onSave, relatedConfigValue, translatedKey, showAlert, isEditing, setIsEditing, relatedWorkingAgeValue, }) => {
   const [value, setValue] = useState(config.value);
   const [originalValue, setOriginalValue] = useState(config.value);
   const [minError, setMinError] = useState('');
@@ -25,6 +25,8 @@ const CardConfigurable = ({ config, onSave, relatedConfigValue, translatedKey, s
     'max_daily_work',
     'min_daily_break',
     'max_daily_break',
+    'min_working_age',
+    'max_working_age'
   ];
 
 
@@ -39,7 +41,32 @@ const CardConfigurable = ({ config, onSave, relatedConfigValue, translatedKey, s
         if (isNaN(numericValue) || numericValue <= 0) {
           validationMinError = validationMaxError = 'El valor debe ser un número mayor que 0.';
         }
-      } else if (timeFields.includes(config.key)) {      
+
+        if (config.key === 'min_working_age') {
+          if (numericValue < 16) {
+            validationMinError = 'La edad mínima no puede ser menor a 16 años.';
+          } else if (
+            relatedWorkingAgeValue &&
+            numericValue >= parseInt(relatedWorkingAgeValue, 10)
+          ) {
+            validationMinError = 'La edad mínima debe ser menor que la edad máxima.';
+          }
+        }
+
+        if (config.key === 'max_working_age') {
+          if (numericValue > 70) {
+            validationMaxError = 'La edad máxima no puede ser mayor a 70 años.';
+          } else if (
+            relatedWorkingAgeValue &&
+            numericValue <= parseInt(relatedWorkingAgeValue, 10)
+          ) {
+            validationMaxError = 'La edad máxima debe ser mayor que la edad mínima.';
+          }
+        }
+
+
+
+      } else if (timeFields.includes(config.key)) {
         if (!/^\d{2,}:[0-5]\d$/.test(value)) {
           validationMinError = 'El valor debe estar en el formato HH:MM.';
         } else if (relatedConfigValue) {
@@ -115,17 +142,17 @@ const CardConfigurable = ({ config, onSave, relatedConfigValue, translatedKey, s
 
   // Verifica si el campo actual debe manejarse como texto en formato HH:MM o como número
   const inputType = numberFields.includes(config.key)
-  ? 'number'
-  : timeFields.includes(config.key) || config.key.includes('hours')
-  ? 'text'
-  : 'number';
+    ? 'number'
+    : timeFields.includes(config.key) || config.key.includes('hours')
+      ? 'text'
+      : 'number';
 
 
   return (
     <li className="flex flex-col py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200 ease-in-out">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-        
+
           <div>
             <h3 className=" text-base  font-semibold text-gray-800">{translatedKey}</h3>
             <p className="text-gray-600 text-sm">{config.description}</p>
@@ -134,7 +161,7 @@ const CardConfigurable = ({ config, onSave, relatedConfigValue, translatedKey, s
         <div className="flex flex-col ms-1">
           <div className="flex items-center space-x-1">
             <input
-              type={inputType} 
+              type={inputType}
               min="1"
               className={` text-sm  text-center p-1 border ${(minError || maxError) ? 'border-red-400' : 'border-gray-300'} rounded w-14 focus:outline-none focus:ring-1 focus:ring-blue-400`}
               value={value}
@@ -153,7 +180,7 @@ const CardConfigurable = ({ config, onSave, relatedConfigValue, translatedKey, s
                 className="px-2 py-1 rounded-lg text-red-600 bg-red-100 hover:bg-red-200"
                 onClick={handleCancel}
               >
-              <RiCloseCircleLine size={20} />
+                <RiCloseCircleLine size={20} />
               </button>
             )}
           </div>

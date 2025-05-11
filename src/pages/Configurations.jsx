@@ -39,6 +39,9 @@ const keyTranslations = {
   'min_daily_break': 'descanso_diario_min',
   'max_daily_break': 'descanso_diario_max',
 
+  'min_working_age': 'edad_mínima_trabajo',
+  'max_working_age': 'edad_máxima_trabajo',
+
 
   // Puedes agregar más claves aquí si es necesario
 };
@@ -46,11 +49,12 @@ const keyTranslations = {
 
 const categoryOrder = [
   'Sistema',
+  'Empleados',
+  'Subrogaciones',
   'Contratos',
   'Trabajo',
   'Horarios',
   'Permisos',
-  'Subrogaciones',
   'Trabajo Extra',
 ];
 
@@ -142,6 +146,10 @@ const Configurations = () => {
                     relatedConfigValue={configurations.find(c =>
                       (config.key === 'max_duration_hours_min' && c.key === 'max_duration_hours_max') ||
                       (config.key === 'max_duration_hours_max' && c.key === 'max_duration_hours_min')
+                    )?.value}
+                    relatedWorkingAgeValue={configurations.find(c =>
+                      (config.key === 'min_working_age' && c.key === 'max_working_age') ||
+                      (config.key === 'max_working_age' && c.key === 'min_working_age')
                     )?.value}
                   />
                 ))}

@@ -1,4 +1,3 @@
-// validation.js
 export function isValidName(name, fieldName) {
   const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
   if (!name) {
@@ -14,38 +13,35 @@ export function isValidName(name, fieldName) {
   return "";
 }
 
-  
-
-  // validation.js
-export function isValidDateOfBirth(dateOfBirth) {
-    if (!dateOfBirth) {
-      return "La fecha de nacimiento es requerida.";
-    }
-  
-    const date = new Date(dateOfBirth);
-    const today = new Date();
-    const minAgeDate = new Date();
-    minAgeDate.setFullYear(today.getFullYear() - 16);
-    const maxAgeDate = new Date();
-    maxAgeDate.setFullYear(today.getFullYear() - 70);
-  
-    if (date > minAgeDate) {
-      return "El empleado debe ser mayor de 16 años.";
-    }
-  
-    if (date < maxAgeDate) {
-      return "La edad máxima permitida es de 70 años.";
-    }
-  
-    if (date > today) {
-      return "La fecha de nacimiento no puede ser en el futuro.";
-    }
-  
-    return "";
+export function isValidDateOfBirth(dateOfBirth, minAge = 16, maxAge = 70) {
+  if (!dateOfBirth) {
+    return "La fecha de nacimiento es requerida.";
   }
-  
 
-  // validation.js
+  const date = new Date(dateOfBirth);
+  const today = new Date();
+
+  const minAgeDate = new Date();
+  minAgeDate.setFullYear(today.getFullYear() - minAge);
+
+  const maxAgeDate = new Date();
+  maxAgeDate.setFullYear(today.getFullYear() - maxAge);
+
+  if (date > today) {
+    return "La fecha de nacimiento no puede ser en el futuro.";
+  }
+
+  if (date > minAgeDate) {
+    return `El empleado debe tener al menos ${minAge} años.`;
+  }
+
+  if (date < maxAgeDate) {
+    return `La edad máxima permitida es de ${maxAge} años.`;
+  }
+
+  return "";
+}
+
 export function isValidEthnicity(ethnicity) {
     const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/;
     if (ethnicity && !regex.test(ethnicity)) {
@@ -54,7 +50,6 @@ export function isValidEthnicity(ethnicity) {
     return "";
   }
   
-
   export function isValidNationality(nationality) {
     const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
     if (nationality && !regex.test(nationality)) {
@@ -64,7 +59,6 @@ export function isValidEthnicity(ethnicity) {
   }
 
 
-  // validation.js
 export function isValidGender(gender) {
     if (!gender) {
       return "El género es requerido.";
@@ -72,7 +66,6 @@ export function isValidGender(gender) {
     return "";
   }
   
-
 
 export function isValidNumber(number) {
   if (number && (isNaN(number) || number < 0)) {
@@ -101,9 +94,6 @@ export function isValidParish(parish) {
   }
   return "";
 }
-
-
-// validationEmployee.js
 
 export function isValidDirection(direction) {
   if (!direction) {

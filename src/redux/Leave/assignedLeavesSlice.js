@@ -6,6 +6,7 @@ export const fetchAssignedLeaves = createAsyncThunk(
     "assignedLeaves/fetchAssignedLeaves",
     async ({ employeeId, filter }) => {
         const response = await getLeavesByFilter(employeeId, filter);
+        console.log("fetchAssignedLeaves since", response.data);
         return { data: response.data, filter };
     }
 );
